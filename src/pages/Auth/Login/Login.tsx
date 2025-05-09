@@ -1,8 +1,10 @@
 
+import AuthForm from '../../../components/Auth/AuthForm';
+
 const Login = () => {
   return (
-    <div>Login</div>
-  )
-}
+    <AuthForm type="login" />
+  );
+};
 
 export default Login

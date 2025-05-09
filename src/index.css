@@ -1,13 +1,27 @@
 @import "tailwindcss";
+@import "@fontsource/poppins/700.css";
+@import "@fontsource/poppins/400.css";
+@import "@fontsource/poppins/500.css";
 
 * {
   box-sizing: border-box;
 }
 
+@layer base {
+  html {
+    @apply font-poppins;
+  }
+}
 @theme {
-  --color-primary-400: #2F83B2;
-  --color-primary-500: #07689F;
-  --color-primary-600: #043E5F;
-  --color-background: #F9F9F9;
-  --color-black-text: #0C0C0C;
+  --color-primary-400: #2f83b2;
+  --color-primary-500: #07689f;
+  --color-primary-600: #043e5f;
+  --color-background: #f9f9f9;
+  --color-black-text: #0c0c0c;
+  --color-gray-border: #d9d9d9;
+  --color-gray-button: #A6A6A6;
+  --font-poppins: "Poppins", "sans-serif";
+  --radius-4: 4px;
+  --radius-30: 30px;
+  --spacing-layout-padding: 108px;
 }
