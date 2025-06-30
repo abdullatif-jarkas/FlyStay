@@ -13,6 +13,7 @@ import { FaPhoneAlt } from "react-icons/fa";
 import { useUser } from "../../hooks/useUser";
 import { toast } from "sonner";
 import UserDropdown from "./UserDropdown";
+import { MdDashboard } from "react-icons/md";
 
 const NavBar = ({ isAuth }: { isAuth?: boolean }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -30,7 +31,10 @@ const NavBar = ({ isAuth }: { isAuth?: boolean }) => {
   useEffect(() => {
     // Close dropdown when clicking outside
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
         setShowUserDropdown(false);
       }
     };
@@ -96,18 +100,29 @@ const NavBar = ({ isAuth }: { isAuth?: boolean }) => {
               <FaPhoneAlt className="text-xl" />
             </Link>
 
+            {/* Dashboard */}
+            <Link
+              to="/admin"
+              className="text-primary-500 flex items-center gap-1"
+            >
+              <MdDashboard className="text-xl" />
+              <span className="hidden md:inline">Dashboard</span>
+            </Link>
+
             {/* User account with dropdown */}
             <div className="relative" ref={dropdownRef}>
-              <button 
+              <button
                 onClick={() => setShowUserDropdown(!showUserDropdown)}
                 className="cursor-pointer flex items-center gap-2"
               >
                 <div className="hidden md:block">
                   <div className="text-xs text-gray-600">Your Account</div>
-                  <div className="text-sm font-medium">{user?.name || "User"}</div>
+                  <div className="text-sm font-medium">
+                    {user?.name || "User"}
+                  </div>
                 </div>
               </button>
-              
+
               {showUserDropdown && (
                 <UserDropdown user={user} onLogout={handleLogout} />
               )}

@@ -1,8 +1,12 @@
 import { lazy, Suspense } from "react";
 import { createBrowserRouter } from "react-router-dom";
-import Layout from "./layouts/Layout";
-import AuthLayout from "./layouts/AuthLayout";
 import LoadingSpinner from "./components/LoadingSpinner/LoadingSpinner";
+import FlightAdmin from "./pages/Admin/FlightAdmin/FlightAdmin";
+
+// Layouts
+const Layout = lazy(() => import("./layouts/Layout"));
+const AuthLayout = lazy(() => import("./layouts/AuthLayout"));
+const AdminLayout = lazy(() => import("./layouts/AdminLayout"));
 
 // Home & Main Pages
 const Home = lazy(() => import("./pages/Home/Home"));
@@ -11,6 +15,14 @@ const AboutUs = lazy(() => import("./pages/AboutUs/AboutUs"));
 const CustomerService = lazy(
   () => import("./pages/CustomerService/CustomerService")
 );
+
+// Admin Pages
+const Dashboard = lazy(() => import("./pages/Admin/Dashboard"));
+const Hotels = lazy(() => import ("./pages/Admin/Hotels/Hotels"));
+const Permissions = lazy(() => import ("./pages/Admin/Permissions/Permissions"));
+const Roles = lazy(() => import ("./pages/Admin/Roles/Roles"));
+const Airports = lazy(() => import ("./pages/Admin/Airports/Airports"));
+const Cities = lazy(() => import ("./pages/Admin/Cities/Cities"));
 
 // Auth Pages
 const Login = lazy(() => import("./pages/Auth/Login/Login"));
@@ -43,6 +55,7 @@ const Settings = lazy(() => import("./pages/User/Settings"));
 const Payments = lazy(() => import("./pages/User/Payments"));
 
 export const routes = createBrowserRouter([
+  //* Public Rotues
   {
     path: "/",
     element: <Layout />,
@@ -198,7 +211,7 @@ export const routes = createBrowserRouter([
       },
     ],
   },
-  // Auth Routes
+  //? Auth Routes
   {
     path: "auth",
     element: <AuthLayout />,
@@ -232,6 +245,69 @@ export const routes = createBrowserRouter([
         element: (
           <Suspense fallback={<LoadingSpinner />}>
             <ResetPassword />
+          </Suspense>
+        ),
+      },
+    ],
+  },
+  //^ Admin Routes
+  {
+    path: "/admin",
+    element: <AdminLayout />,
+    children: [
+      {
+        index: true,
+        element: (
+          <Suspense fallback={<LoadingSpinner />}>
+            <Dashboard />
+          </Suspense>
+        ),
+      },
+      {
+        path: "permissions",
+        element: (
+          <Suspense fallback={<LoadingSpinner />}>
+            <Permissions />
+          </Suspense>
+        ),
+      },
+      {
+        path: "roles",
+        element: (
+          <Suspense fallback={<LoadingSpinner />}>
+            <Roles />
+          </Suspense>
+        ),
+      },
+      {
+        path: "airports",
+        element: (
+          <Suspense fallback={<LoadingSpinner />}>
+            <Airports />
+          </Suspense>
+        ),
+      },
+      {
+        path: "hotels",
+        element: (
+          <Suspense fallback={<LoadingSpinner />}>
+            <Hotels />
+          </Suspense>
+        ),
+      },
+      {
+        path: "cities",
+        element: (
+          <Suspense fallback={<LoadingSpinner />}>
+            <Cities />
+          </Suspense>
+        ),
+      },
+      {
+        path: "flights",
+        element: (
+          <Suspense fallback={<LoadingSpinner />}>
+            <FlightAdmin />
           </Suspense>
         ),
       },
