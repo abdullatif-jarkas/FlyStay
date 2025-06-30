@@ -1,14 +1,19 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { SortingState } from "@tanstack/react-table";
-import CreatePermission from "./CreatePermission";
-import { FiEdit, FiTrash2 } from "react-icons/fi";
+
+import { FaEye, FaPlus } from "react-icons/fa";
 import {
   TableContainer,
   ActionButtons,
+  createViewAction,
   createEditAction,
   createDeleteAction,
   Badge,
 } from "../../../components/ui/table";
+import CreatePermissionModal from "./CreatePermissionModal";
+import EditPermissionModal from "./EditPermissionModal";
+import ShowPermissionModal from "./ShowPermissionModal";
+import DeletePermissionModal from "./DeletePermissionModal";
 
 interface Role {
   id: number;
@@ -32,65 +37,86 @@ const Permissions = () => {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [sorting, setSorting] = useState<SortingState>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  const fetchPermissions = async (pageNumber: number) => {
-    const token = localStorage.getItem("token");
+  // Modal states
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isShowModalOpen, setIsShowModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [selectedPermission, setSelectedPermission] =
+    useState<Permission | null>(null);
+  const [selectedPermissionId, setSelectedPermissionId] = useState<
+    number | null
+  >(null);
 
-    try {
-      const res = await fetch(
-        `http://127.0.0.1:8000/api/permission?page=${pageNumber}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            Accept: "application/json",
-          },
+  const token = localStorage.getItem("token");
+
+  const fetchPermissions = useCallback(
+    async (pageNumber: number) => {
+      setLoading(true);
+      setError("");
+
+      try {
+        const res = await fetch(
+          `http://127.0.0.1:8000/api/permission?page=${pageNumber}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              Accept: "application/json",
+            },
+          }
+        );
+
+        const json = await res.json();
+        if (json.status === "success") {
+          setData(json.data || []);
+          setTotalPages(json.pagination?.total_pages || 1);
+        } else {
+          setError("Failed to load permissions");
         }
-      );
-
-      const json = await res.json();
-      setData(json.data || []);
-      setTotalPages(json.pagination?.total_pages || 1);
-    } catch (error) {
-      console.error("Failed to fetch permissions:", error);
-    }
-  };
-
-  const handleEdit = (permission: Permission) => {
-    // You can open a modal or navigate to edit page
-    alert(`Editing permission: ${permission.name}`);
-  };
-
-  const handleDelete = async (id: number) => {
-    const confirmed = window.confirm(
-      "Are you sure you want to delete this permission?"
-    );
-    if (!confirmed) return;
-
-    const token = localStorage.getItem("token");
-    try {
-      const res = await fetch(`http://127.0.0.1:8000/api/permission/${id}`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          Accept: "application/json",
-        },
-      });
-
-      if (res.ok) {
-        alert("Permission deleted successfully.");
-        fetchPermissions(page); // Refresh table
-      } else {
-        alert("Failed to delete permission.");
+      } catch (err) {
+        setError("Failed to load permissions");
+        console.error("Failed to fetch permissions:", err);
+      } finally {
+        setLoading(false);
       }
-    } catch (error) {
-      console.error("Delete error:", error);
-      alert("Something went wrong.");
-    }
-  };
+    },
+    [token]
+  );
+
+  // Handler functions
+  const handleView = useCallback((permission: Permission) => {
+    setSelectedPermissionId(permission.id);
+    setIsShowModalOpen(true);
+  }, []);
+
+  const handleEdit = useCallback((permission: Permission) => {
+    setSelectedPermission(permission);
+    setIsEditModalOpen(true);
+  }, []);
+
+  const handleDelete = useCallback((permission: Permission) => {
+    setSelectedPermission(permission);
+    setIsDeleteModalOpen(true);
+  }, []);
+
+  const handleCreateSuccess = useCallback(() => {
+    fetchPermissions(page); // Refresh the table
+  }, [fetchPermissions, page]);
+
+  const handleEditSuccess = useCallback(() => {
+    fetchPermissions(page); // Refresh the table
+  }, [fetchPermissions, page]);
+
+  const handleDeleteSuccess = useCallback(() => {
+    fetchPermissions(page); // Refresh the table
+  }, [fetchPermissions, page]);
 
   useEffect(() => {
     fetchPermissions(page);
-  }, [page]);
+  }, [page, fetchPermissions]);
 
   const columns = useMemo<ColumnDef<Permission>[]>(
     () => [
@@ -105,45 +131,21 @@ const Permissions = () => {
         enableSorting: true,
       },
       {
-        header: "Guard",
-        accessorKey: "guard",
-        enableSorting: true,
-      },
-      {
-        header: "Created At",
-        accessorKey: "created_at",
-        cell: (info) => new Date(info.getValue() as string).toLocaleString(),
-        enableSorting: true,
-      },
-      {
-        header: "Roles",
-        accessorKey: "related_roles",
-        cell: (info) => (
-          <div className="flex flex-wrap gap-1">
-            {(info.getValue() as Role[]).map((role) => (
-              <Badge key={role.id} variant="primary" size="sm">
-                {role.name}
-              </Badge>
-            ))}
-          </div>
-        ),
-        enableSorting: false,
-      },
-      {
         header: "Actions",
         id: "actions",
         cell: ({ row }) => (
           <ActionButtons
             actions={[
+              createViewAction(() => handleView(row.original)),
               createEditAction(() => handleEdit(row.original)),
-              createDeleteAction(() => handleDelete(row.original.id)),
+              createDeleteAction(() => handleDelete(row.original)),
             ]}
           />
         ),
         enableSorting: false,
       },
     ],
-    []
+    [handleView, handleEdit, handleDelete]
   );
 
   // Create pagination object for TableContainer
@@ -155,19 +157,60 @@ const Permissions = () => {
   };
 
   return (
-    <div className="p-4">
-      <h1 className="text-2xl font-semibold mb-4">Permissions</h1>
-      <CreatePermission onCreated={() => fetchPermissions(page)} />
+    <div className="p-6">
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold">Permissions Management</h1>
+        <button
+          onClick={() => setIsCreateModalOpen(true)}
+          className="flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 transition-colors"
+        >
+          <FaPlus />
+          Create New Permission
+        </button>
+      </div>
+
+      {error && (
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+          {error}
+        </div>
+      )}
 
       <TableContainer
         data={data}
         columns={columns}
-        // loading={loading}
+        loading={loading}
         sorting={sorting}
         onSortingChange={setSorting}
         pagination={paginationData}
         onPageChange={setPage}
         emptyMessage="No permissions found"
+      />
+
+      {/* Modals */}
+      <CreatePermissionModal
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+        onSuccess={handleCreateSuccess}
+      />
+
+      <EditPermissionModal
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        onSuccess={handleEditSuccess}
+        permission={selectedPermission}
+      />
+
+      <ShowPermissionModal
+        isOpen={isShowModalOpen}
+        onClose={() => setIsShowModalOpen(false)}
+        permissionId={selectedPermissionId}
+      />
+
+      <DeletePermissionModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onSuccess={handleDeleteSuccess}
+        permission={selectedPermission}
       />
     </div>
   );
