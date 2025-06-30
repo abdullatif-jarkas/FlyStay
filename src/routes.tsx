@@ -18,11 +18,11 @@ const CustomerService = lazy(
 
 // Admin Pages
 const Dashboard = lazy(() => import("./pages/Admin/Dashboard"));
-const Hotels = lazy(() => import ("./pages/Admin/Hotels/Hotels"));
-const Permissions = lazy(() => import ("./pages/Admin/Permissions/Permissions"));
-const Roles = lazy(() => import ("./pages/Admin/Roles/Roles"));
-const Airports = lazy(() => import ("./pages/Admin/Airports/Airports"));
-const Cities = lazy(() => import ("./pages/Admin/Cities/Cities"));
+const Hotels = lazy(() => import("./pages/Admin/Hotels/Hotels"));
+const Permissions = lazy(() => import("./pages/Admin/Permissions/Permissions"));
+const Roles = lazy(() => import("./pages/Admin/Roles/Roles"));
+const Airports = lazy(() => import("./pages/Admin/Airports/Airports"));
+const Cities = lazy(() => import("./pages/Admin/Cities/Cities"));
 
 // Auth Pages
 const Login = lazy(() => import("./pages/Auth/Login/Login"));
@@ -53,6 +53,9 @@ const FlightFavorites = lazy(() => import("./pages/Flight/FlightFavorites"));
 const Profile = lazy(() => import("./pages/User/Profile"));
 const Settings = lazy(() => import("./pages/User/Settings"));
 const Payments = lazy(() => import("./pages/User/Payments"));
+
+// Favorites Page
+const Favorites = lazy(() => import("./pages/Favorites/Favorites"));
 
 export const routes = createBrowserRouter([
   //* Public Rotues
@@ -151,6 +154,15 @@ export const routes = createBrowserRouter([
             ),
           },
         ],
+      },
+      // Unified Favorites Route
+      {
+        path: "favorites",
+        element: (
+          <Suspense fallback={<LoadingSpinner />}>
+            <Favorites />
+          </Suspense>
+        ),
       },
       // User Routes
       {

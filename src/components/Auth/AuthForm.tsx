@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { FaGoogle, FaEye, FaEyeSlash } from "react-icons/fa";
 import travelImage from "../../assets/Auth/travel-photo.png";
@@ -16,6 +16,7 @@ const AuthForm = ({ type }: AuthFormProps) => {
     password: "",
     password_confirmation: "",
   });
+  const [rememberMe, setRememberMe] = useState(false);
 
   const { handleLogin, handleRegister, handleGoogleRedirect, loading } =
     useAuth();
@@ -28,10 +29,31 @@ const AuthForm = ({ type }: AuthFormProps) => {
     e.preventDefault();
     if (type === "login") {
       await handleLogin(formData.email, formData.password);
+      if (rememberMe) {
+        localStorage.setItem("rememberEmail", formData.email);
+        localStorage.setItem("rememberPassword", formData.password); // ⚠️ أقل أمانًا
+      } else {
+        localStorage.removeItem("rememberEmail");
+        localStorage.removeItem("rememberPassword");
+      }
     } else {
       await handleRegister(formData);
     }
   };
+
+  useEffect(() => {
+    const savedEmail = localStorage.getItem("rememberEmail");
+    const savedPassword = localStorage.getItem("rememberPassword");
+
+    if (savedEmail && savedPassword) {
+      setFormData((prev) => ({
+        ...prev,
+        email: savedEmail,
+        password: savedPassword,
+      }));
+      setRememberMe(true);
+    }
+  }, []);
 
   return (
     <div className="flex bg-white rounded-lg shadow-lg">
@@ -174,7 +196,12 @@ const AuthForm = ({ type }: AuthFormProps) => {
             {type === "login" ? (
               <div className="flex justify-between items-center">
                 <div className="flex items-center">
-                  <input type="checkbox" id="remember" className="mr-2" />
+                  <input
+                    type="checkbox"
+                    id="remember"
+                    className="mr-2"
+                    onChange={(e) => setRememberMe(e.target.checked)}
+                  />
                   <label htmlFor="remember" className="text-sm">
                     Remember Me
                   </label>
