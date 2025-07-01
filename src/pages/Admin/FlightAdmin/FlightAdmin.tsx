@@ -166,11 +166,6 @@ const FlightAdmin = () => {
         enableSorting: true,
       },
       {
-        header: "Flight Number",
-        accessorKey: "flight_number",
-        enableSorting: true,
-      },
-      {
         header: "Actions",
         id: "actions",
         cell: ({ row }) => (
