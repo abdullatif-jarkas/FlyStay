@@ -6,6 +6,7 @@ import {
   FaUsersCog,
   FaBars,
   FaHotel,
+  FaBed,
   FaPlaneDeparture,
   FaCity,
   FaSignOutAlt,
@@ -106,6 +107,13 @@ const AdminLayout = () => {
                 Hotels
               </MenuItem>
               <MenuItem
+                icon={<FaBed />}
+                onClick={() => navigate("/admin/rooms")}
+                active={currentPath === "/admin/rooms"}
+              >
+                Rooms
+              </MenuItem>
+              <MenuItem
                 icon={<FaCity />}
                 onClick={() => navigate("/admin/cities")}
                 active={currentPath === "/admin/cities"}
@@ -123,7 +131,11 @@ const AdminLayout = () => {
           </div>
 
           {/* Bottom: Logout */}
-          <div className={`p-4 border-t ${collapsed && "flex justify-center" } border-[#07679f33]`}>
+          <div
+            className={`p-4 border-t ${
+              collapsed && "flex justify-center"
+            } border-[#07679f33]`}
+          >
             <button
               onClick={handleLogout}
               className="flex items-center gap-2 text-[#07689f] hover:text-[#f2b203] cursor-pointer transition-colors"

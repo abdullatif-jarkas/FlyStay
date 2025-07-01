@@ -7,31 +7,26 @@ import {
   FaEdit,
   FaTrash,
   FaImages,
-  FaStar,
+  FaBed,
+  FaUsers,
+  FaDollarSign,
 } from "react-icons/fa";
 import { TableContainer } from "../../../components/ui/table";
 import { ActionButtons } from "../../../components/ui/table";
-import { Hotel } from "../../../types/hotel";
-import CreateHotelModal from "./CreateHotelModal";
-import EditHotelModal from "./EditHotelModal";
-import ShowHotelModal from "./ShowHotelModal";
-import DeleteHotelModal from "./DeleteHotelModal";
-import UpdateHotelImagesModal from "./UpdateHotelImagesModal";
+import { Room } from "../../../types/room";
+import ShowRoomModal from "./ShowRoomModal";
+import EditRoomModal from "./EditRoomModal";
+import CreateRoomModal from "./CreateRoomModal";
+import DeleteRoomModal from "./DeleteRoomModal";
+import UpdateRoomImagesModal from "./UpdateRoomImagesModal";
 
-export interface Pagination {
-  current_page: number;
-  total_pages: number;
-  next_page_url: string | null;
-  prev_page_url: string | null;
-}
-
-const Hotels = () => {
-  const [data, setData] = useState<Hotel[]>([]);
+const Rooms = () => {
+  const [data, setData] = useState<Room[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [pagination, setPagination] = useState<Pagination | null>(null);
-  const [page, setPage] = useState(1);
   const [sorting, setSorting] = useState<SortingState>([]);
+  const [page, setPage] = useState(1);
+  const [pagination, setPagination] = useState<any>(null);
 
   // Modal states
   const [createModalOpen, setCreateModalOpen] = useState(false);
@@ -39,19 +34,19 @@ const Hotels = () => {
   const [showModalOpen, setShowModalOpen] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [updateImagesModalOpen, setUpdateImagesModalOpen] = useState(false);
-  const [selectedHotel, setSelectedHotel] = useState<Hotel | null>(null);
-  const [selectedHotelId, setSelectedHotelId] = useState<number | null>(null);
+  const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
+  const [selectedRoomId, setSelectedRoomId] = useState<number | null>(null);
 
   const token = localStorage.getItem("token");
 
-  const fetchHotels = useCallback(async () => {
+  const fetchRooms = useCallback(async () => {
     setLoading(true);
     setError("");
     try {
       const params: any = {
         page,
       };
-      const res = await axios.get("http://127.0.0.1:8000/api/hotel", {
+      const res = await axios.get("http://127.0.0.1:8000/api/room", {
         headers: {
           Authorization: `Bearer ${token}`,
           Accept: "application/json",
@@ -62,10 +57,9 @@ const Hotels = () => {
       if (res.data.status === "success") {
         setData(res.data.data);
         setPagination(res.data.pagination);
-
         console.log(res.data.data);
       } else {
-        setError("Failed to load hotels");
+        setError("Failed to load rooms");
       }
     } catch (err) {
       setError("Failed to load data!");
@@ -76,112 +70,118 @@ const Hotels = () => {
   }, [page, token]);
 
   useEffect(() => {
-    fetchHotels();
-  }, [fetchHotels]);
+    fetchRooms();
+  }, [fetchRooms]);
 
   // Modal handlers
   const handleCreateSuccess = useCallback(() => {
-    fetchHotels();
+    fetchRooms();
     setCreateModalOpen(false);
-  }, [fetchHotels]);
+  }, [fetchRooms]);
 
   const handleEditSuccess = useCallback(() => {
-    fetchHotels();
+    fetchRooms();
     setEditModalOpen(false);
-    setSelectedHotel(null);
-  }, [fetchHotels]);
+    setSelectedRoom(null);
+  }, [fetchRooms]);
 
   const handleDeleteSuccess = useCallback(() => {
-    fetchHotels();
+    fetchRooms();
     setDeleteModalOpen(false);
-    setSelectedHotel(null);
-  }, [fetchHotels]);
+    setSelectedRoom(null);
+  }, [fetchRooms]);
 
   const handleUpdateImagesSuccess = useCallback(() => {
-    fetchHotels();
+    fetchRooms();
     setUpdateImagesModalOpen(false);
-    setSelectedHotel(null);
-  }, [fetchHotels]);
+    setSelectedRoom(null);
+  }, [fetchRooms]);
 
   // Action handlers
-  const handleView = useCallback((hotel: Hotel) => {
-    setSelectedHotelId(hotel.id);
+  const handleView = useCallback((room: Room) => {
+    setSelectedRoomId(room.id);
     setShowModalOpen(true);
   }, []);
 
-  const handleEdit = useCallback((hotel: Hotel) => {
-    setSelectedHotel(hotel);
+  const handleEdit = useCallback((room: Room) => {
+    setSelectedRoom(room);
     setEditModalOpen(true);
   }, []);
 
-  const handleDelete = useCallback((hotel: Hotel) => {
-    setSelectedHotel(hotel);
+  const handleDelete = useCallback((room: Room) => {
+    setSelectedRoom(room);
     setDeleteModalOpen(true);
   }, []);
 
-  const handleManageImages = useCallback((hotel: Hotel) => {
-    setSelectedHotel(hotel);
+  const handleManageImages = useCallback((room: Room) => {
+    setSelectedRoom(room);
     setUpdateImagesModalOpen(true);
   }, []);
 
-  const columns = useMemo<ColumnDef<Hotel>[]>(
+  const columns = useMemo<ColumnDef<Room>[]>(
     () => [
       {
-        header: "ID",
-        accessorKey: "id",
-        enableSorting: true,
+        header: "#",
+        accessorFn: (_, index) => index + 1,
+        id: "index",
+        enableSorting: false,
         cell: ({ row }) => (
-          <span className="font-mono text-sm">{row.original.id}</span>
+          <div className="text-gray-600 font-medium">
+            {row.index + 1 + (page - 1) * 10}
+          </div>
         ),
       },
       {
-        header: "Hotel Name",
-        accessorKey: "name",
+        header: "Room Type",
+        accessorKey: "room_type",
         enableSorting: true,
         cell: ({ row }) => (
-          <div className="font-medium text-gray-900">{row.original.name}</div>
+          <div className="flex items-center gap-2">
+            <FaBed className="text-primary-500" />
+            <div className="font-medium text-gray-800 capitalize">
+              {row.original.room_type.replace('_', ' ')}
+            </div>
+          </div>
         ),
       },
       {
-        header: "City",
-        accessorFn: (row) => `${row.city.name}`,
-        id: "city",
+        header: "Hotel",
+        accessorKey: "hotel.name",
         enableSorting: true,
         cell: ({ row }) => (
-          <div className="text-gray-700">{row.original.city.name}</div>
+          <div className="text-gray-700">{row.original.hotel.name}</div>
         ),
       },
       {
-        header: "Rating",
-        accessorKey: "rating",
+        header: "Price per Night",
+        accessorKey: "price_per_night",
         enableSorting: true,
         cell: ({ row }) => (
-          <div className="flex items-center gap-1">
-            {[1, 2, 3, 4, 5].map((star) => (
-              <FaStar
-                key={star}
-                className={`text-sm ${
-                  star <= row.original.rating
-                    ? "text-yellow-400"
-                    : "text-gray-300"
-                }`}
-              />
-            ))}
-            <span className="ml-1 text-gray-600">({row.original.rating})</span>
+          <div className="flex items-center gap-1 font-semibold text-green-600">
+            <FaDollarSign className="text-sm" />
+            {row.original.price_per_night}
+          </div>
+        ),
+      },
+      {
+        header: "Capacity",
+        accessorKey: "capacity",
+        enableSorting: true,
+        cell: ({ row }) => (
+          <div className="flex items-center gap-1 text-gray-700">
+            <FaUsers className="text-primary-500" />
+            {row.original.capacity} guests
           </div>
         ),
       },
       {
         header: "Images",
-        accessorFn: (row) => row.images?.length || 0,
-        id: "images",
-        enableSorting: true,
+        accessorKey: "images",
+        enableSorting: false,
         cell: ({ row }) => (
-          <div className="flex items-center gap-1">
-            <FaImages className="text-blue-500" />
-            <span className="text-gray-600">
-              {row.original.images?.length || 0}
-            </span>
+          <div className="flex items-center gap-1 text-gray-600">
+            <FaImages className="text-primary-500" />
+            {row.original.images?.length || 0} photos
           </div>
         ),
       },
@@ -206,7 +206,7 @@ const Hotels = () => {
         ),
       },
     ],
-    [handleView, handleEdit, handleDelete, handleManageImages]
+    [page, handleView, handleEdit, handleDelete, handleManageImages]
   );
 
   return (
@@ -216,10 +216,10 @@ const Hotels = () => {
           <div className="flex justify-between items-center">
             <div>
               <h1 className="text-2xl font-bold text-gray-800">
-                Hotels Management
+                Rooms Management
               </h1>
               <p className="text-gray-600 mt-1">
-                Manage hotel listings, images, and details
+                Manage room listings, images, and details
               </p>
             </div>
             <button
@@ -227,7 +227,7 @@ const Hotels = () => {
               className="flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 transition-colors"
             >
               <FaPlus />
-              Create New Hotel
+              Create New Room
             </button>
           </div>
         </div>
@@ -247,58 +247,58 @@ const Hotels = () => {
             onSortingChange={setSorting}
             pagination={pagination || undefined}
             onPageChange={pagination ? setPage : undefined}
-            emptyMessage="No hotels found"
+            emptyMessage="No rooms found"
           />
         </div>
       </div>
 
       {/* Modals */}
-      <CreateHotelModal
+      <CreateRoomModal
         isOpen={createModalOpen}
         onClose={() => setCreateModalOpen(false)}
         onSuccess={handleCreateSuccess}
       />
 
-      <EditHotelModal
+      <EditRoomModal
         isOpen={editModalOpen}
         onClose={() => {
           setEditModalOpen(false);
-          setSelectedHotel(null);
+          setSelectedRoom(null);
         }}
         onSuccess={handleEditSuccess}
-        hotel={selectedHotel}
+        room={selectedRoom}
       />
 
-      <ShowHotelModal
+      <ShowRoomModal
         isOpen={showModalOpen}
         onClose={() => {
           setShowModalOpen(false);
-          setSelectedHotelId(null);
+          setSelectedRoomId(null);
         }}
-        hotelId={selectedHotelId}
+        roomId={selectedRoomId}
       />
 
-      <DeleteHotelModal
+      <DeleteRoomModal
         isOpen={deleteModalOpen}
         onClose={() => {
           setDeleteModalOpen(false);
-          setSelectedHotel(null);
+          setSelectedRoom(null);
         }}
         onSuccess={handleDeleteSuccess}
-        hotel={selectedHotel}
+        room={selectedRoom}
       />
 
-      <UpdateHotelImagesModal
+      <UpdateRoomImagesModal
         isOpen={updateImagesModalOpen}
         onClose={() => {
           setUpdateImagesModalOpen(false);
-          setSelectedHotel(null);
+          setSelectedRoom(null);
         }}
         onSuccess={handleUpdateImagesSuccess}
-        hotel={selectedHotel}
+        room={selectedRoom}
       />
     </div>
   );
 };
 
-export default Hotels;
+export default Rooms;

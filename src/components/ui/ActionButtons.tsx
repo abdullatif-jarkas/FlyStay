@@ -3,6 +3,9 @@ import { FiEdit, FiTrash2, FiEye, FiMoreHorizontal } from "react-icons/fi";
 
 interface ActionButtonProps {
   onClick: () => void;
+  onView?: () => void;
+  onEdit?: () => void;
+  onDelete?: () => void;
   icon: React.ReactNode;
   label: string;
   variant?: "primary" | "secondary" | "danger" | "success";
@@ -10,8 +13,12 @@ interface ActionButtonProps {
 }
 
 interface ActionButtonsProps {
-  actions: ActionButtonProps[];
+  actions?: ActionButtonProps[];
   compact?: boolean;
+  onView?: () => void;
+  onEdit?: () => void;
+  onDelete?: () => void;
+  additionalActions?: ActionButtonProps[];
 }
 
 const ActionButton: React.FC<ActionButtonProps> = ({
@@ -21,8 +28,9 @@ const ActionButton: React.FC<ActionButtonProps> = ({
   variant = "secondary",
   disabled = false,
 }) => {
-  const baseClasses = "p-2 rounded-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed";
-  
+  const baseClasses =
+    "p-2 rounded-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed";
+
   const variantClasses = {
     primary: "text-primary-600 hover:bg-primary-50 focus:ring-primary-500",
     secondary: "text-gray-600 hover:bg-gray-100 focus:ring-gray-500",
@@ -43,11 +51,26 @@ const ActionButton: React.FC<ActionButtonProps> = ({
   );
 };
 
-const ActionButtons: React.FC<ActionButtonsProps> = ({ actions, compact = false }) => {
-  if (compact && actions.length > 3) {
+const ActionButtons: React.FC<ActionButtonsProps> = ({
+  actions,
+  compact = false,
+  onView,
+  onEdit,
+  onDelete,
+  additionalActions = [],
+}) => {
+  // Build actions array from props if not provided directly
+  const allActions = actions || [
+    ...(onView ? [createViewAction(onView)] : []),
+    ...(onEdit ? [createEditAction(onEdit)] : []),
+    ...(onDelete ? [createDeleteAction(onDelete)] : []),
+    ...additionalActions,
+  ];
+
+  if (compact && allActions.length > 3) {
     // Show first 2 actions and a dropdown for the rest
-    const visibleActions = actions.slice(0, 2);
-    const hiddenActions = actions.slice(2);
+    const visibleActions = allActions.slice(0, 2);
+    const hiddenActions = allActions.slice(2);
 
     return (
       <div className="flex items-center gap-1">
@@ -79,7 +102,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({ actions, compact = false 
 
   return (
     <div className="flex items-center gap-1">
-      {actions.map((action, index) => (
+      {allActions.map((action, index) => (
         <ActionButton key={index} {...action} />
       ))}
     </div>

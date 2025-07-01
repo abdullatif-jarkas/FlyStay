@@ -19,6 +19,7 @@ const CustomerService = lazy(
 // Admin Pages
 const Dashboard = lazy(() => import("./pages/Admin/Dashboard"));
 const Hotels = lazy(() => import("./pages/Admin/Hotels/Hotels"));
+const Rooms = lazy(() => import("./pages/Admin/Rooms/Rooms"));
 const Permissions = lazy(() => import("./pages/Admin/Permissions/Permissions"));
 const Roles = lazy(() => import("./pages/Admin/Roles/Roles"));
 const Airports = lazy(() => import("./pages/Admin/Airports/Airports"));
@@ -304,6 +305,14 @@ export const routes = createBrowserRouter([
         element: (
           <Suspense fallback={<LoadingSpinner />}>
             <Hotels />
+          </Suspense>
+        ),
+      },
+      {
+        path: "rooms",
+        element: (
+          <Suspense fallback={<LoadingSpinner />}>
+            <Rooms />
           </Suspense>
         ),
       },
