@@ -2,9 +2,9 @@ export interface Tour {
   id: string;
   image: string;
   title: string;
-  location: string;
-  dateRange: string;
-  description: string;
+  location?: string;
+  dateRange?: string;
+  description?: string;
   rating?: number;
 }
 

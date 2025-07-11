@@ -1,14 +1,13 @@
-import React, { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { SortingState } from "@tanstack/react-table";
 
-import { FaEye, FaPlus } from "react-icons/fa";
+import { FaPlus } from "react-icons/fa";
 import {
   TableContainer,
   ActionButtons,
   createViewAction,
   createEditAction,
   createDeleteAction,
-  Badge,
 } from "../../../components/ui/table";
 import CreatePermissionModal from "./CreatePermissionModal";
 import EditPermissionModal from "./EditPermissionModal";
@@ -31,6 +30,7 @@ interface Permission {
 
 import { useMemo } from "react";
 import { ColumnDef } from "@tanstack/react-table";
+import { toast } from "sonner";
 
 const Permissions = () => {
   const [data, setData] = useState<Permission[]>([]);
@@ -104,14 +104,17 @@ const Permissions = () => {
 
   const handleCreateSuccess = useCallback(() => {
     fetchPermissions(page); // Refresh the table
+    toast.success("Permission created successfully");
   }, [fetchPermissions, page]);
 
   const handleEditSuccess = useCallback(() => {
     fetchPermissions(page); // Refresh the table
+    toast.info("Permission updated successfully");
   }, [fetchPermissions, page]);
 
   const handleDeleteSuccess = useCallback(() => {
     fetchPermissions(page); // Refresh the table
+    toast.error("Permission deleted successfully");
   }, [fetchPermissions, page]);
 
   useEffect(() => {

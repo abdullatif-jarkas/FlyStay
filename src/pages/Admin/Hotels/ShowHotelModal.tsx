@@ -98,7 +98,7 @@ const ShowHotelModal: React.FC<ShowHotelModalProps> = ({
     <>
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
         <div className="bg-white rounded-lg w-full max-w-4xl max-h-[90vh] overflow-y-auto">
-          <div className="sticky top-0 bg-white border-b px-6 py-4">
+          <div className="sticky z-10 top-0 bg-white border-b px-6 py-4">
             <div className="flex justify-between items-center">
               <h2 className="text-xl font-bold text-gray-800 flex items-center gap-2">
                 <FaHotel className="text-primary-600" />
@@ -172,8 +172,9 @@ const ShowHotelModal: React.FC<ShowHotelModalProps> = ({
                     
                     <div className="relative">
                       <div className="aspect-video bg-gray-100 rounded-lg overflow-hidden">
+                        {console.log(hotel.images[currentImageIndex].image_path)}
                         <img
-                          src={hotel.images[currentImageIndex].url}
+                          src={hotel.images[currentImageIndex].image_path}
                           alt={hotel.images[currentImageIndex].alt || `Hotel image ${currentImageIndex + 1}`}
                           className="w-full h-full object-cover cursor-pointer"
                           onClick={() => setShowImageModal(true)}

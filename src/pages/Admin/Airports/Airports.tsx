@@ -30,10 +30,9 @@ const Airports = () => {
   const columns = useMemo<ColumnDef<Airport>[]>(
     () => [
       {
-        header: "#",
-        accessorFn: (_, index) => index + 1,
-        id: "index",
-        enableSorting: false,
+        header: "ID",
+        accessorKey: "id",
+        enableSorting: true,
       },
       {
         header: "Name",
@@ -41,18 +40,28 @@ const Airports = () => {
         enableSorting: true,
       },
       {
-        header: "Code",
-        accessorKey: "code",
+        header: "IATA Code",
+        accessorKey: "IATA_code",
         enableSorting: true,
       },
       {
-        header: "City",
-        accessorKey: "city",
+        header: "Location",
+        accessorFn: (row) => {
+          const city = row.city?.name ?? "";
+          const country = row.country?.name ?? "";
+          console.log(country)
+          return city && country ? `${city}, ${country}` : city || country;
+        },
         enableSorting: true,
       },
       {
-        header: "Country",
-        accessorKey: "country",
+        header: "City ID",
+        accessorFn: (row) => row.city_id,
+        enableSorting: true,
+      },
+      {
+        header: "Country ISO2",
+        accessorFn: (row) => row.country?.iso2 ?? "",
         enableSorting: true,
       },
     ],
