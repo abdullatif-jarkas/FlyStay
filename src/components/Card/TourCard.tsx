@@ -6,9 +6,9 @@ interface TourCardProps {
   id: string;
   image: string;
   title: string;
-  location: string;
-  dateRange: string;
-  description: string;
+  location?: string;
+  dateRange?: string;
+  description?: string;
   rating?: number;
 }
 
@@ -53,7 +53,7 @@ const TourCard = ({
         
         {/* Rating stars */}
         <div className="absolute bottom-2 left-2 flex">
-          {[1, 2, 3, 4, 5].map((star) => (
+          {rating && [1, 2, 3, 4, 5].map((star) => (
             <span key={star}>
               {star <= rating ? (
                 <FaStar className="text-yellow-400" />
@@ -65,9 +65,9 @@ const TourCard = ({
         </div>
         
         {/* Fullscreen button */}
-        <button className="absolute bottom-2 right-2 p-2 rounded-full bg-black bg-opacity-30 hover:bg-opacity-50 transition-all">
+        {/* <button className="absolute bottom-2 right-2 p-2 rounded-full bg-black bg-opacity-30 hover:bg-opacity-50 transition-all">
           <BsFullscreen className="text-white" />
-        </button>
+        </button> */}
       </div>
       
       {/* Content */}

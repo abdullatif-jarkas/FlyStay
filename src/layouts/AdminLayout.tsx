@@ -75,6 +75,7 @@ const AdminLayout = () => {
                 icon={<FaTachometerAlt />}
                 onClick={() => navigate("/admin")}
                 active={currentPath === "/admin"}
+                title="Dashboard"
               >
                 Dashboard
               </MenuItem>
@@ -82,6 +83,7 @@ const AdminLayout = () => {
                 icon={<FaKey />}
                 onClick={() => navigate("/admin/permissions")}
                 active={currentPath === "/admin/permissions"}
+                title="Permissions"
               >
                 Permissions
               </MenuItem>
@@ -89,6 +91,7 @@ const AdminLayout = () => {
                 icon={<FaUsersCog />}
                 onClick={() => navigate("/admin/roles")}
                 active={currentPath === "/admin/roles"}
+                title="Roles"
               >
                 Roles
               </MenuItem>
@@ -96,6 +99,7 @@ const AdminLayout = () => {
                 icon={<FaPlaneDeparture />}
                 onClick={() => navigate("/admin/airports")}
                 active={currentPath === "/admin/airports"}
+                title="Airports"
               >
                 Airports
               </MenuItem>
@@ -103,6 +107,7 @@ const AdminLayout = () => {
                 icon={<FaHotel />}
                 onClick={() => navigate("/admin/hotels")}
                 active={currentPath === "/admin/hotels"}
+                title="Hotels"
               >
                 Hotels
               </MenuItem>
@@ -110,6 +115,7 @@ const AdminLayout = () => {
                 icon={<FaBed />}
                 onClick={() => navigate("/admin/rooms")}
                 active={currentPath === "/admin/rooms"}
+                title="Rooms"
               >
                 Rooms
               </MenuItem>
@@ -117,6 +123,7 @@ const AdminLayout = () => {
                 icon={<FaCity />}
                 onClick={() => navigate("/admin/cities")}
                 active={currentPath === "/admin/cities"}
+                title="Cities"
               >
                 Cities
               </MenuItem>
@@ -124,6 +131,7 @@ const AdminLayout = () => {
                 icon={<MdFlight />}
                 onClick={() => navigate("/admin/flights")}
                 active={currentPath === "/admin/flights"}
+                title="Flights"
               >
                 Flights
               </MenuItem>

@@ -2,8 +2,6 @@ import axios from "axios";
 import { useEffect, useState, useMemo, useCallback } from "react";
 import { ColumnDef, SortingState } from "@tanstack/react-table";
 import {
-  FaChevronDown,
-  FaChevronUp,
   FaPlus,
 } from "react-icons/fa";
 import {
@@ -12,12 +10,12 @@ import {
   createViewAction,
   createEditAction,
   createDeleteAction,
-  Badge,
 } from "../../../components/ui/table";
 import CreateRoleModal from "./CreateRoleModal";
 import EditRoleModal from "./EditRoleModal";
 import ShowRoleModal from "./ShowRoleModal";
 import DeleteRoleModal from "./DeleteRoleModal";
+import { toast } from "sonner";
 
 type Permission = {
   id: number;
@@ -92,14 +90,17 @@ const Roles = () => {
 
   const handleCreateSuccess = useCallback(() => {
     fetchRoles(); // Refresh the table
+    toast.success("Role created successfully");
   }, [fetchRoles]);
 
   const handleEditSuccess = useCallback(() => {
     fetchRoles(); // Refresh the table
+    toast.info("Role updated successfully");
   }, [fetchRoles]);
 
   const handleDeleteSuccess = useCallback(() => {
     fetchRoles(); // Refresh the table
+    toast.error("Role deleted successfully");
   }, [fetchRoles]);
 
   const toggleExpand = (id: number) => {

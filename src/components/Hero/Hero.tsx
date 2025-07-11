@@ -1,6 +1,6 @@
 
 import HotelSearchBar from '../Search/HotelSearchBar';
-import heroBackground from '../../assets/Hero/Landing Page Banner.png';
+import heroBackground from '../../assets/Home/Hero/Landing Page Banner.png';
 
 const Hero = () => {
   return (

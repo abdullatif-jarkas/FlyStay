@@ -12,6 +12,7 @@ import {
 import CreateFlightModal from "./CreateFlightModal";
 import EditFlightModal from "./EditFlightModal";
 import ShowFlightModal from "./ShowFlightModal";
+import { toast } from "sonner";
 
 interface Flight {
   id: number;
@@ -118,6 +119,7 @@ const FlightAdmin = () => {
         });
 
         fetchFlights(); // Refresh the table
+        toast.error("Flight deleted successfully");
       } catch (err) {
         console.error("Error deleting flight:", err);
         alert("Failed to delete flight");
@@ -128,10 +130,12 @@ const FlightAdmin = () => {
 
   const handleCreateSuccess = useCallback(() => {
     fetchFlights(); // Refresh the table
+    toast.success("Flight created successfully");
   }, [fetchFlights]);
 
   const handleEditSuccess = useCallback(() => {
     fetchFlights(); // Refresh the table
+    toast.info("Flight updated successfully");
   }, [fetchFlights]);
 
   const columns = useMemo<ColumnDef<Flight>[]>(
