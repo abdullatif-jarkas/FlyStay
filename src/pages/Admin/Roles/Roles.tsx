@@ -1,9 +1,7 @@
 import axios from "axios";
 import { useEffect, useState, useMemo, useCallback } from "react";
 import { ColumnDef, SortingState } from "@tanstack/react-table";
-import {
-  FaPlus,
-} from "react-icons/fa";
+import { FaPlus, FaKey, FaUserPlus, FaUserMinus } from "react-icons/fa";
 import {
   TableContainer,
   ActionButtons,
@@ -15,18 +13,14 @@ import CreateRoleModal from "./CreateRoleModal";
 import EditRoleModal from "./EditRoleModal";
 import ShowRoleModal from "./ShowRoleModal";
 import DeleteRoleModal from "./DeleteRoleModal";
+import AssignPermissionToRoleModal from "./AssignPermissionToRoleModal";
+import RemovePermissionFromRoleModal from "./RemovePermissionFromRoleModal";
 import { toast } from "sonner";
-
-type Permission = {
-  id: number;
-  name: string;
-};
-
-type Role = {
-  id: number;
-  name: string;
-  permissions: Permission[];
-};
+import {
+  Permission,
+  Role,
+  ROLE_PERMISSION_ENDPOINTS,
+} from "../../../types/rolePermission";
 
 const Roles = () => {
   const [roles, setRoles] = useState<Role[]>([]);
@@ -35,13 +29,25 @@ const Roles = () => {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [error, setError] = useState("");
 
+  // Available permissions for dropdowns
+  const [availablePermissions, setAvailablePermissions] = useState<
+    Permission[]
+  >([]);
+
   // Modal states
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isShowModalOpen, setIsShowModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isAssignPermissionModalOpen, setIsAssignPermissionModalOpen] =
+    useState(false);
+  const [isRemovePermissionModalOpen, setIsRemovePermissionModalOpen] =
+    useState(false);
+
   const [selectedRole, setSelectedRole] = useState<Role | null>(null);
   const [selectedRoleId, setSelectedRoleId] = useState<number | null>(null);
+  const [selectedPermission, setSelectedPermission] =
+    useState<Permission | null>(null);
 
   const token = localStorage.getItem("token");
 
@@ -68,9 +74,27 @@ const Roles = () => {
     }
   }, [token]);
 
+  const fetchPermissions = useCallback(async () => {
+    try {
+      const res = await axios.get(ROLE_PERMISSION_ENDPOINTS.PERMISSIONS, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          Accept: "application/json",
+        },
+      });
+
+      if (res.data.status === "success") {
+        setAvailablePermissions(res.data.data);
+      }
+    } catch (err: any) {
+      console.error("Error fetching permissions:", err);
+    }
+  }, [token]);
+
   useEffect(() => {
     fetchRoles();
-  }, [fetchRoles]);
+    fetchPermissions();
+  }, [fetchRoles, fetchPermissions]);
 
   // Handler functions
   const handleView = useCallback((role: Role) => {
@@ -88,6 +112,20 @@ const Roles = () => {
     setIsDeleteModalOpen(true);
   }, []);
 
+  const handleAssignPermission = useCallback((role: Role) => {
+    setSelectedRole(role);
+    setIsAssignPermissionModalOpen(true);
+  }, []);
+
+  const handleRemovePermission = useCallback(
+    (role: Role, permission: Permission) => {
+      setSelectedRole(role);
+      setSelectedPermission(permission);
+      setIsRemovePermissionModalOpen(true);
+    },
+    []
+  );
+
   const handleCreateSuccess = useCallback(() => {
     fetchRoles(); // Refresh the table
     toast.success("Role created successfully");
@@ -101,6 +139,11 @@ const Roles = () => {
   const handleDeleteSuccess = useCallback(() => {
     fetchRoles(); // Refresh the table
     toast.error("Role deleted successfully");
+  }, [fetchRoles]);
+
+  const handlePermissionSuccess = useCallback(() => {
+    fetchRoles(); // Refresh the table
+    toast.success("Permission operation completed successfully");
   }, [fetchRoles]);
 
   const toggleExpand = (id: number) => {
@@ -143,12 +186,20 @@ const Roles = () => {
               createEditAction(() => handleEdit(row.original)),
               createDeleteAction(() => handleDelete(row.original)),
             ]}
+            additionalActions={[
+              {
+                label: "Assign Permission",
+                onClick: () => handleAssignPermission(row.original),
+                icon: <FaKey className="w-4 h-4" />,
+                variant: "primary",
+              },
+            ]}
           />
         ),
         enableSorting: false,
       },
     ],
-    [expandedRows, handleView, handleEdit, handleDelete]
+    [expandedRows, handleView, handleEdit, handleDelete, handleAssignPermission]
   );
 
   return (
@@ -203,6 +254,22 @@ const Roles = () => {
         onClose={() => setIsDeleteModalOpen(false)}
         onSuccess={handleDeleteSuccess}
         role={selectedRole}
+      />
+
+      <AssignPermissionToRoleModal
+        isOpen={isAssignPermissionModalOpen}
+        onClose={() => setIsAssignPermissionModalOpen(false)}
+        onSuccess={handlePermissionSuccess}
+        role={selectedRole}
+        availablePermissions={availablePermissions}
+      />
+
+      <RemovePermissionFromRoleModal
+        isOpen={isRemovePermissionModalOpen}
+        onClose={() => setIsRemovePermissionModalOpen(false)}
+        onSuccess={handlePermissionSuccess}
+        role={selectedRole}
+        permissionToRemove={selectedPermission}
       />
     </div>
   );

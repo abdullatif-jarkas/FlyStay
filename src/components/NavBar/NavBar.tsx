@@ -116,7 +116,7 @@ const NavBar = ({ isAuth }: { isAuth?: boolean }) => {
                 className="cursor-pointer flex items-center gap-2"
               >
                 <div className="hidden md:block">
-                  <div className="text-xs text-gray-600">Your Account</div>
+                  {/* <div className="text-xs text-gray-600">Your Account</div> */}
                   <div className="text-sm font-medium">
                     {user?.name || "User"}
                   </div>

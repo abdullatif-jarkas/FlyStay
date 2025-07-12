@@ -4,6 +4,7 @@ import {
   FaTachometerAlt,
   FaKey,
   FaUsersCog,
+  FaUsers,
   FaBars,
   FaHotel,
   FaBed,
@@ -94,6 +95,14 @@ const AdminLayout = () => {
                 title="Roles"
               >
                 Roles
+              </MenuItem>
+              <MenuItem
+                icon={<FaUsers />}
+                onClick={() => navigate("/admin/users")}
+                active={currentPath === "/admin/users"}
+                title="Users"
+              >
+                Users
               </MenuItem>
               <MenuItem
                 icon={<FaPlaneDeparture />}
