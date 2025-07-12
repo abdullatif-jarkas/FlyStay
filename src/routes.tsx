@@ -22,6 +22,7 @@ const Hotels = lazy(() => import("./pages/Admin/Hotels/Hotels"));
 const Rooms = lazy(() => import("./pages/Admin/Rooms/Rooms"));
 const Permissions = lazy(() => import("./pages/Admin/Permissions/Permissions"));
 const Roles = lazy(() => import("./pages/Admin/Roles/Roles"));
+const Users = lazy(() => import("./pages/Admin/Users/Users"));
 const Airports = lazy(() => import("./pages/Admin/Airports/Airports"));
 const Cities = lazy(() => import("./pages/Admin/Cities/Cities"));
 
@@ -289,6 +290,14 @@ export const routes = createBrowserRouter([
         element: (
           <Suspense fallback={<LoadingSpinner />}>
             <Roles />
+          </Suspense>
+        ),
+      },
+      {
+        path: "users",
+        element: (
+          <Suspense fallback={<LoadingSpinner />}>
+            <Users />
           </Suspense>
         ),
       },
