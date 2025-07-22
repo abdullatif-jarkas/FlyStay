@@ -1,16 +1,8 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-
-interface Permission {
-  id: number;
-  name: string;
-}
-
-interface Role {
-  id: number;
-  name: string;
-  permissions?: Permission[];
-}
+import { FaTimes } from "react-icons/fa";
+import { Role, Permission } from "../../../types/rolePermission";
+import RemovePermissionFromRoleModal from "./RemovePermissionFromRoleModal";
 
 interface EditRoleModalProps {
   isOpen: boolean;
@@ -34,6 +26,12 @@ const EditRoleModal: React.FC<EditRoleModalProps> = ({
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  // State for remove permission modal
+  const [isRemovePermissionModalOpen, setIsRemovePermissionModalOpen] =
+    useState(false);
+  const [selectedPermission, setSelectedPermission] =
+    useState<Permission | null>(null);
 
   const token = localStorage.getItem("token");
 
@@ -90,9 +88,22 @@ const EditRoleModal: React.FC<EditRoleModalProps> = ({
     }));
   };
 
+  const handleRemovePermission = (permission: Permission) => {
+    setSelectedPermission(permission);
+    setIsRemovePermissionModalOpen(true);
+  };
+
+  const handleRemovePermissionSuccess = () => {
+    setIsRemovePermissionModalOpen(false);
+    setSelectedPermission(null);
+    onSuccess(); // This will refresh the role data
+  };
+
   const handleClose = () => {
     setFormData({ name: "" });
     setError("");
+    setIsRemovePermissionModalOpen(false);
+    setSelectedPermission(null);
     onClose();
   };
 
@@ -133,20 +144,34 @@ const EditRoleModal: React.FC<EditRoleModalProps> = ({
             />
           </div>
 
-          {/* Display current permissions (read-only) */}
+          {/* Display current permissions (interactive) */}
           {role.permissions && role.permissions.length > 0 && (
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Current Permissions
+                <span className="text-xs text-gray-500 ml-2">
+                  (hover to remove)
+                </span>
               </label>
               <div className="flex flex-wrap gap-2">
                 {role.permissions.map((permission) => (
-                  <span
+                  <div
                     key={permission.id}
-                    className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
+                    className="group relative inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 hover:bg-blue-200 transition-colors"
                   >
-                    {permission.name}
-                  </span>
+                    <span>{permission.name}</span>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleRemovePermission(permission);
+                      }}
+                      className="ml-1 opacity-0 group-hover:opacity-100 transition-opacity text-blue-600 hover:text-red-600"
+                      title={`Remove permission: ${permission.name}`}
+                    >
+                      <FaTimes className="w-3 h-3" />
+                    </button>
+                  </div>
                 ))}
               </div>
             </div>
@@ -170,6 +195,15 @@ const EditRoleModal: React.FC<EditRoleModalProps> = ({
           </div>
         </form>
       </div>
+
+      {/* Remove Permission from Role Modal */}
+      <RemovePermissionFromRoleModal
+        isOpen={isRemovePermissionModalOpen}
+        onClose={() => setIsRemovePermissionModalOpen(false)}
+        onSuccess={handleRemovePermissionSuccess}
+        role={role}
+        permissionToRemove={selectedPermission}
+      />
     </div>
   );
 };
