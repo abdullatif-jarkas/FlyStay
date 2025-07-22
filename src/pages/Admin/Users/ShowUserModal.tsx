@@ -17,9 +17,7 @@ const ShowUserModal: React.FC<ShowUserModalProps> = ({
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-
   const token = localStorage.getItem("token");
-
   useEffect(() => {
     if (isOpen && userId) {
       fetchUserDetails();
@@ -39,9 +37,8 @@ const ShowUserModal: React.FC<ShowUserModalProps> = ({
           Accept: "application/json",
         },
       });
-
       if (response.data.status === "success") {
-        setUser(response.data.data);
+        setUser(response.data.data[0]);
       } else {
         setError("Failed to load user details");
       }

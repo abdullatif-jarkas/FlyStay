@@ -1,4 +1,4 @@
-import { Sidebar, Menu, MenuItem } from "react-pro-sidebar";
+import { Sidebar, Menu, MenuItem, SubMenu } from "react-pro-sidebar";
 import { Outlet, useNavigate, useLocation, Link } from "react-router-dom";
 import {
   FaTachometerAlt,
@@ -72,6 +72,7 @@ const AdminLayout = () => {
                 },
               }}
             >
+              {/* 1. General */}
               <MenuItem
                 icon={<FaTachometerAlt />}
                 onClick={() => navigate("/admin")}
@@ -80,70 +81,74 @@ const AdminLayout = () => {
               >
                 Dashboard
               </MenuItem>
-              <MenuItem
-                icon={<FaKey />}
-                onClick={() => navigate("/admin/permissions")}
-                active={currentPath === "/admin/permissions"}
-                title="Permissions"
-              >
-                Permissions
-              </MenuItem>
-              <MenuItem
-                icon={<FaUsersCog />}
-                onClick={() => navigate("/admin/roles")}
-                active={currentPath === "/admin/roles"}
-                title="Roles"
-              >
-                Roles
-              </MenuItem>
-              <MenuItem
-                icon={<FaUsers />}
-                onClick={() => navigate("/admin/users")}
-                active={currentPath === "/admin/users"}
-                title="Users"
-              >
-                Users
-              </MenuItem>
-              <MenuItem
-                icon={<FaPlaneDeparture />}
-                onClick={() => navigate("/admin/airports")}
-                active={currentPath === "/admin/airports"}
-                title="Airports"
-              >
-                Airports
-              </MenuItem>
-              <MenuItem
-                icon={<FaHotel />}
-                onClick={() => navigate("/admin/hotels")}
-                active={currentPath === "/admin/hotels"}
-                title="Hotels"
-              >
-                Hotels
-              </MenuItem>
-              <MenuItem
-                icon={<FaBed />}
-                onClick={() => navigate("/admin/rooms")}
-                active={currentPath === "/admin/rooms"}
-                title="Rooms"
-              >
-                Rooms
-              </MenuItem>
-              <MenuItem
-                icon={<FaCity />}
-                onClick={() => navigate("/admin/cities")}
-                active={currentPath === "/admin/cities"}
-                title="Cities"
-              >
-                Cities
-              </MenuItem>
-              <MenuItem
-                icon={<MdFlight />}
-                onClick={() => navigate("/admin/flights")}
-                active={currentPath === "/admin/flights"}
-                title="Flights"
-              >
-                Flights
-              </MenuItem>
+
+              {/* 2. User Management */}
+              <SubMenu icon={<FaUsersCog />} label="User Management">
+                <MenuItem
+                  icon={<FaKey />}
+                  onClick={() => navigate("/admin/permissions")}
+                  active={currentPath === "/admin/permissions"}
+                >
+                  Permissions
+                </MenuItem>
+                <MenuItem
+                  icon={<FaUsersCog />}
+                  onClick={() => navigate("/admin/roles")}
+                  active={currentPath === "/admin/roles"}
+                >
+                  Roles
+                </MenuItem>
+                <MenuItem
+                  icon={<FaUsers />}
+                  onClick={() => navigate("/admin/users")}
+                  active={currentPath === "/admin/users"}
+                >
+                  Users
+                </MenuItem>
+              </SubMenu>
+
+              {/* 3. Travel */}
+              <SubMenu icon={<MdFlight />} label="Travel">
+                <MenuItem
+                  icon={<MdFlight />}
+                  onClick={() => navigate("/admin/flights")}
+                  active={currentPath === "/admin/flights"}
+                >
+                  Flights
+                </MenuItem>
+                <MenuItem
+                  icon={<FaPlaneDeparture />}
+                  onClick={() => navigate("/admin/airports")}
+                  active={currentPath === "/admin/airports"}
+                >
+                  Airports
+                </MenuItem>
+                <MenuItem
+                  icon={<FaCity />}
+                  onClick={() => navigate("/admin/cities")}
+                  active={currentPath === "/admin/cities"}
+                >
+                  Cities
+                </MenuItem>
+              </SubMenu>
+
+              {/* 4. Accommodation */}
+              <SubMenu icon={<FaHotel />} label="Accommodation">
+                <MenuItem
+                  icon={<FaHotel />}
+                  onClick={() => navigate("/admin/hotels")}
+                  active={currentPath === "/admin/hotels"}
+                >
+                  Hotels
+                </MenuItem>
+                <MenuItem
+                  icon={<FaBed />}
+                  onClick={() => navigate("/admin/rooms")}
+                  active={currentPath === "/admin/rooms"}
+                >
+                  Rooms
+                </MenuItem>
+              </SubMenu>
             </Menu>
           </div>
 

@@ -1,14 +1,15 @@
 import { useEffect, useMemo, useState, useCallback } from "react";
 import { ColumnDef, SortingState } from "@tanstack/react-table";
 import axios from "axios";
-import {
-  FaKey,
-  FaUserPlus,
-  FaUsers,
-} from "react-icons/fa";
+import { FaKey, FaUserPlus, FaUsers, FaTimes } from "react-icons/fa";
 import { TableContainer, ActionButtons } from "../../../components/ui/table";
 import { toast } from "sonner";
-import { User, Role, Permission, ROLE_PERMISSION_ENDPOINTS } from "../../../types/rolePermission";
+import {
+  User,
+  Role,
+  Permission,
+  ROLE_PERMISSION_ENDPOINTS,
+} from "../../../types/rolePermission";
 import AssignRoleModal from "./AssignRoleModal";
 import RemoveRoleModal from "./RemoveRoleModal";
 import AssignPermissionToUserModal from "./AssignPermissionToUserModal";
@@ -26,49 +27,60 @@ const Users = () => {
 
   // Available roles and permissions for dropdowns
   const [availableRoles, setAvailableRoles] = useState<Role[]>([]);
-  const [availablePermissions, setAvailablePermissions] = useState<Permission[]>([]);
+  const [availablePermissions, setAvailablePermissions] = useState<
+    Permission[]
+  >([]);
 
   // Modal states
   const [isAssignRoleModalOpen, setIsAssignRoleModalOpen] = useState(false);
   const [isRemoveRoleModalOpen, setIsRemoveRoleModalOpen] = useState(false);
-  const [isAssignPermissionModalOpen, setIsAssignPermissionModalOpen] = useState(false);
-  const [isRemovePermissionModalOpen, setIsRemovePermissionModalOpen] = useState(false);
+  const [isAssignPermissionModalOpen, setIsAssignPermissionModalOpen] =
+    useState(false);
+  const [isRemovePermissionModalOpen, setIsRemovePermissionModalOpen] =
+    useState(false);
   const [isShowModalOpen, setIsShowModalOpen] = useState(false);
-  
+
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
-  const [selectedRole] = useState<Role | null>(null);
-  const [selectedPermission] = useState<Permission | null>(null);
+  const [selectedRole, setSelectedRole] = useState<Role | null>(null);
+  const [selectedPermission, setSelectedPermission] =
+    useState<Permission | null>(null);
 
   const token = localStorage.getItem("token");
 
-  const fetchUsers = useCallback(async (currentPage = 1) => {
-    try {
-      setError("");
-      setLoading(true);
-      const res = await axios.get(`${ROLE_PERMISSION_ENDPOINTS.USERS}?page=${currentPage}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          Accept: "application/json",
-        },
-      });
+  const fetchUsers = useCallback(
+    async (currentPage = 1) => {
+      try {
+        setError("");
+        setLoading(true);
+        const res = await axios.get(
+          `${ROLE_PERMISSION_ENDPOINTS.USERS}?page=${currentPage}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              Accept: "application/json",
+            },
+          }
+        );
 
-      if (res.data.status === "success") {
-        setUsers(res.data.data);
-        if (res.data.pagination) {
-          setTotalPages(res.data.pagination.total_pages);
-          setTotalResults(res.data.pagination.total);
+        if (res.data.status === "success") {
+          setUsers(res.data.data);
+          if (res.data.pagination) {
+            setTotalPages(res.data.pagination.total_pages);
+            setTotalResults(res.data.pagination.total);
+          }
+        } else {
+          setError("Failed to load users");
         }
-      } else {
+      } catch (err: any) {
         setError("Failed to load users");
+        console.error("Error fetching users:", err);
+      } finally {
+        setLoading(false);
       }
-    } catch (err: any) {
-      setError("Failed to load users");
-      console.error("Error fetching users:", err);
-    } finally {
-      setLoading(false);
-    }
-  }, [token]);
+    },
+    [token]
+  );
 
   const fetchRoles = useCallback(async () => {
     try {
@@ -121,22 +133,25 @@ const Users = () => {
     setIsAssignRoleModalOpen(true);
   }, []);
 
-  // const handleRemoveRole = useCallback((user: User, role: Role) => {
-  //   setSelectedUser(user);
-  //   setSelectedRole(role);
-  //   setIsRemoveRoleModalOpen(true);
-  // }, []);
+  const handleRemoveRole = useCallback((user: User, role: Role) => {
+    setSelectedUser(user);
+    setSelectedRole(role);
+    setIsRemoveRoleModalOpen(true);
+  }, []);
 
   const handleAssignPermission = useCallback((user: User) => {
     setSelectedUser(user);
     setIsAssignPermissionModalOpen(true);
   }, []);
 
-  // const handleRemovePermission = useCallback((user: User, permission: Permission) => {
-  //   setSelectedUser(user);
-  //   setSelectedPermission(permission);
-  //   setIsRemovePermissionModalOpen(true);
-  // }, []);
+  const handleRemovePermission = useCallback(
+    (user: User, permission: Permission) => {
+      setSelectedUser(user);
+      setSelectedPermission(permission);
+      setIsRemovePermissionModalOpen(true);
+    },
+    []
+  );
 
   const handleSuccess = useCallback(() => {
     fetchUsers(page);
@@ -167,12 +182,22 @@ const Users = () => {
         cell: ({ row }) => (
           <div className="flex flex-wrap gap-1">
             {row.original.roles?.map((role) => (
-              <span
+              <div
                 key={role.id}
-                className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full"
+                className="group relative inline-flex items-center px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full hover:bg-blue-200 transition-colors"
               >
-                {role.name}
-              </span>
+                <span>{role.name}</span>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleRemoveRole(row.original, role);
+                  }}
+                  className="ml-1 opacity-0 group-hover:opacity-100 transition-opacity text-blue-600 hover:text-red-600"
+                  title={`Remove role: ${role.name}`}
+                >
+                  <FaTimes className="w-3 h-3" />
+                </button>
+              </div>
             ))}
           </div>
         ),
@@ -185,12 +210,22 @@ const Users = () => {
         cell: ({ row }) => (
           <div className="flex flex-wrap gap-1">
             {row.original.permissions?.slice(0, 3).map((permission) => (
-              <span
+              <div
                 key={permission.id}
-                className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full"
+                className="group relative inline-flex items-center px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full hover:bg-green-200 transition-colors"
               >
-                {permission.name}
-              </span>
+                <span>{permission.name}</span>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleRemovePermission(row.original, permission);
+                  }}
+                  className="ml-1 opacity-0 group-hover:opacity-100 transition-opacity text-green-600 hover:text-red-600"
+                  title={`Remove permission: ${permission.name}`}
+                >
+                  <FaTimes className="w-3 h-3" />
+                </button>
+              </div>
             ))}
             {(row.original.permissions?.length || 0) > 3 && (
               <span className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full">
@@ -226,7 +261,13 @@ const Users = () => {
         enableSorting: false,
       },
     ],
-    [handleView, handleAssignRole, handleAssignPermission]
+    [
+      handleView,
+      handleAssignRole,
+      handleAssignPermission,
+      handleRemoveRole,
+      handleRemovePermission,
+    ]
   );
 
   return (
