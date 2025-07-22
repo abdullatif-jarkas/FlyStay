@@ -1,7 +1,7 @@
 import axios from "axios";
 import { useEffect, useState, useMemo, useCallback } from "react";
 import { ColumnDef, SortingState } from "@tanstack/react-table";
-import { FaPlus, FaKey } from "react-icons/fa";
+import { FaPlus, FaKey, FaKeybase } from "react-icons/fa";
 import {
   TableContainer,
   ActionButtons,
@@ -46,8 +46,7 @@ const Roles = () => {
 
   const [selectedRole, setSelectedRole] = useState<Role | null>(null);
   const [selectedRoleId, setSelectedRoleId] = useState<number | null>(null);
-  const [selectedPermission] =
-    useState<Permission | null>(null);
+  const [selectedPermission] = useState<Permission | null>(null);
 
   const token = localStorage.getItem("token");
 
@@ -180,21 +179,22 @@ const Roles = () => {
         header: "Actions",
         id: "actions",
         cell: ({ row }) => (
-          <ActionButtons
-            actions={[
-              createViewAction(() => handleView(row.original)),
-              createEditAction(() => handleEdit(row.original)),
-              createDeleteAction(() => handleDelete(row.original)),
-            ]}
-            additionalActions={[
-              {
-                label: "Assign Permission",
-                onClick: () => handleAssignPermission(row.original),
-                icon: <FaKey className="w-4 h-4" />,
-                variant: "primary",
-              },
-            ]}
-          />
+          <>
+            {}
+            <ActionButtons
+              onView={() => handleView(row.original)}
+              onEdit={() => handleEdit(row.original)}
+              onDelete={() => handleDelete(row.original)}
+              additionalActions={[
+                {
+                  label: "Assign Permission",
+                  onClick: () => handleAssignPermission(row.original),
+                  icon: <FaKeybase className="w-4 h-4" />,
+                  variant: "primary",
+                },
+              ]}
+            />
+          </>
         ),
         enableSorting: false,
       },

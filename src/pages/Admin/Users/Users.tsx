@@ -370,6 +370,8 @@ const Users = () => {
         isOpen={isShowModalOpen}
         onClose={() => setIsShowModalOpen(false)}
         userId={selectedUserId}
+        onRemoveRole={handleRemoveRole}
+        onRemovePermission={handleRemovePermission}
       />
 
       <DeleteUserModal
