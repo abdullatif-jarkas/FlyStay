@@ -78,8 +78,8 @@ const FlightCard: React.FC<FlightCardProps> = ({
                 flight.flight_class
               )}`}
             >
-              {flight.flight_class.charAt(0).toUpperCase() +
-                flight.flight_class.slice(1)}
+              {/* {flight.flight_class.charAt(0).toUpperCase() +
+                flight.flight_class.slice(1)} */}
             </span>
             <button
               onClick={() => onAddToFavorites(flight)}
@@ -105,7 +105,7 @@ const FlightCard: React.FC<FlightCardProps> = ({
               {flight.departure_airport.IATA_code}
             </div>
             <div className="text-xs text-gray-400">
-              {flight.departure_airport.city.name}
+              {/* {flight.departure_airport.city.name} */}
             </div>
           </div>
 
@@ -135,7 +135,7 @@ const FlightCard: React.FC<FlightCardProps> = ({
               {flight.arrival_airport.IATA_code}
             </div>
             <div className="text-xs text-gray-400">
-              {flight.arrival_airport.city.name}
+              {/* {flight.arrival_airport.city.name} */}
             </div>
           </div>
         </div>

@@ -93,7 +93,7 @@ const SettingsSection = () => {
       </div> */}
 
       {/* Language & Region Section */}
-      <div className="bg-white rounded-lg shadow-sm p-6">
+      {/* <div className="bg-white rounded-lg shadow-sm p-6">
         <div className="flex items-center gap-3 mb-6">
           <FiGlobe className="w-6 h-6 text-blue-600" />
           <h2 className="text-xl font-semibold text-gray-900">Language</h2>
@@ -113,7 +113,7 @@ const SettingsSection = () => {
             </select>
           </div>
           
-          {/* <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+          <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
             <div>
               <h3 className="font-medium text-gray-900">Currency</h3>
               <p className="text-sm text-gray-600">Display prices in your currency</p>
@@ -137,9 +137,9 @@ const SettingsSection = () => {
               <option>UTC-7 (Mountain Time)</option>
               <option>UTC-8 (Pacific Time)</option>
             </select>
-          </div> */}
+          </div>
         </div>
-      </div>
+      </div> */}
 
       {/* Privacy Settings Section */}
       {/* <div className="bg-white rounded-lg shadow-sm p-6">

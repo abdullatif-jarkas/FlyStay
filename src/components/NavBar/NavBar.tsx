@@ -84,14 +84,14 @@ const NavBar = ({ isAuth }: { isAuth?: boolean }) => {
           <SearchInput />
           <div className="flex items-center gap-6">
             {/* Language selector */}
-            <div className="flex items-center gap-2">
+            {/* <div className="flex items-center gap-2">
               <img src={UnitedKingdom} alt="English" className="w-6 h-6" />
-            </div>
+            </div> */}
 
             {/* Help */}
-            <Link to="/help" className="text-primary-500">
+            {/* <Link to="/help" className="text-primary-500">
               <IoMdHelpCircleOutline className="text-xl" />
-            </Link>
+            </Link> */}
 
             {/* Favorites */}
             <Link to="/favorites" className="text-primary-500">
@@ -120,7 +120,8 @@ const NavBar = ({ isAuth }: { isAuth?: boolean }) => {
               >
                 <div className="hidden md:block">
                   {/* <div className="text-xs text-gray-600">Your Account</div> */}
-                  <div className="text-sm font-medium">
+                  <div className="border-l-3 pl-2 text-sm flex flex-col items-start text-primary-500">
+                    <span className="font-extrabold">Your Account</span>
                     {user?.name || "User"}
                   </div>
                 </div>
