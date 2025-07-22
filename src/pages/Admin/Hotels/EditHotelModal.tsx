@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { FaStar, FaEdit } from "react-icons/fa";
-import { EditHotelModalProps, EditHotelFormData, City, Hotel, HotelFormErrors } from "../../../types/hotel";
+import { EditHotelModalProps, EditHotelFormData, City, HotelFormErrors } from "../../../types/hotel";
 
 const EditHotelModal: React.FC<EditHotelModalProps> = ({
   isOpen,

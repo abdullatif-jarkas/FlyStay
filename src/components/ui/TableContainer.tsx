@@ -1,7 +1,7 @@
 import React from "react";
 import DataTable from "./DataTable";
 import TablePagination, { PaginationData } from "./TablePagination";
-import { ColumnDef, SortingState } from "@tanstack/react-table";
+import { ColumnDef, OnChangeFn, SortingState } from "@tanstack/react-table";
 
 interface TableContainerProps<T> {
   title?: string;
@@ -9,7 +9,7 @@ interface TableContainerProps<T> {
   columns: ColumnDef<T>[];
   loading?: boolean;
   sorting?: SortingState;
-  onSortingChange?: (sorting: SortingState) => void;
+  onSortingChange?: OnChangeFn<SortingState>;
   pagination?: PaginationData;
   onPageChange?: (page: number) => void;
   emptyMessage?: string;

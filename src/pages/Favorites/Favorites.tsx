@@ -1,20 +1,11 @@
 import { useState, useEffect } from "react";
-import {
-  FaHeart,
-  FaPlane,
-  FaHotel,
-  FaCity,
-  FaFilter,
-  FaSort,
-} from "react-icons/fa";
-import { MdLocationOn } from "react-icons/md";
-
-import LoadingSpinner from "../../components/LoadingSpinner/LoadingSpinner";
+import { FaHeart, FaPlane, FaHotel, FaCity, FaSort } from "react-icons/fa";
 import FavoriteCard from "../../components/Card/FavoriteCard";
 import FavoritesSkeleton from "../../components/ui/FavoritesSkeleton";
 import {
   favoritesService,
   FavoriteItem,
+  FavoriteFlight,
 } from "../../services/favoritesService";
 
 // Types are now imported from the service
@@ -77,15 +68,7 @@ const Favorites = () => {
     .filter((item) => filter === "all" || item.type === filter)
     .sort((a, b) => {
       switch (sortBy) {
-        case "newest":
-          return (
-            new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-          );
-        case "oldest":
-          return (
-            new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
-          );
-        case "name":
+        case "name": {
           const aName =
             a.type === "flight"
               ? (a as FavoriteFlight).flight_number
@@ -95,6 +78,16 @@ const Favorites = () => {
               ? (b as FavoriteFlight).flight_number
               : (b as any).name;
           return aName.localeCompare(bName);
+        }
+
+        case "newest":
+          return (
+            new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+          );
+        case "oldest":
+          return (
+            new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+          );
         default:
           return 0;
       }

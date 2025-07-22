@@ -5,7 +5,7 @@ import SearchInput from "../ui/SearchInput";
 import LogoImg from "./../../assets/Logo/Logo.png";
 import UnitedKingdom from "./../../assets/Navbar/united-kingdom.png";
 import { navbarLinks } from "../../data/Navbar";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState, useRef } from "react";
 import { FaRegHeart } from "react-icons/fa";
 import { IoMdHelpCircleOutline } from "react-icons/io";
@@ -18,12 +18,21 @@ import { MdDashboard } from "react-icons/md";
 const NavBar = ({ isAuth }: { isAuth?: boolean }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [showUserDropdown, setShowUserDropdown] = useState(false);
-  const { user, refetchUser } = useUser();
+  const { user } = useUser();
   const navigate = useNavigate();
+  const location = useLocation();
   const dropdownRef = useRef<HTMLDivElement>(null);
 
+  const hiddenRoutes = ["/user"];
+  const hideBottomSection = hiddenRoutes.some((route) =>
+    location.pathname.includes(route)
+  );
+  
   useEffect(() => {
     // Check if user is logged in by looking for token in localStorage
+    if (location.pathname.includes("/user")) {
+      console.log("first");
+    }
     const token = localStorage.getItem("token");
     setIsLoggedIn(!!token);
   }, []);
@@ -47,7 +56,7 @@ const NavBar = ({ isAuth }: { isAuth?: boolean }) => {
 
   const handleLogout = async () => {
     try {
-      await logout();
+      // await logout();
       localStorage.removeItem("token");
       localStorage.removeItem("userData");
       setIsLoggedIn(false);
@@ -77,12 +86,6 @@ const NavBar = ({ isAuth }: { isAuth?: boolean }) => {
             {/* Language selector */}
             <div className="flex items-center gap-2">
               <img src={UnitedKingdom} alt="English" className="w-6 h-6" />
-              <span className="hidden md:inline">EN</span>
-            </div>
-            {/* Currency */}
-            <div className="flex items-center gap-1">
-              <span className="text-xl font-bold">$</span>
-              <span className="hidden md:inline">USD</span>
             </div>
 
             {/* Help */}
@@ -129,7 +132,7 @@ const NavBar = ({ isAuth }: { isAuth?: boolean }) => {
             </div>
           </div>
         </nav>
-        {isAuth ? (
+        {isAuth || hideBottomSection ? (
           ""
         ) : (
           <div className="lower-nav pb-10">

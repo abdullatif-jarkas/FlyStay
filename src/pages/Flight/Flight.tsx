@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useCallback } from "react";
 import { toast } from "sonner";
 import axios from "axios";
 import FlightSearchBar from "../../components/Search/FlightSearchBar";
@@ -88,7 +88,7 @@ const Flight = () => {
             setDurationRange(data.filters.duration_range);
           }
         } else {
-          setError(data.message || "Failed to search flights");
+          setError("Failed to search flights");
           setFlights([]);
         }
       } catch (err: any) {

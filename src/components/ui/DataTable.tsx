@@ -1,4 +1,3 @@
-import React from "react";
 import {
   useReactTable,
   getCoreRowModel,
@@ -6,8 +5,9 @@ import {
   flexRender,
   ColumnDef,
   SortingState,
+  OnChangeFn,
 } from "@tanstack/react-table";
-import { FiChevronUp, FiChevronDown, FiChevronsRight } from "react-icons/fi";
+import { FiChevronUp, FiChevronDown } from "react-icons/fi";
 import LoadingSpinner from "../LoadingSpinner/LoadingSpinner";
 import { LuChevronsLeftRight } from "react-icons/lu";
 
@@ -16,7 +16,7 @@ interface DataTableProps<T> {
   columns: ColumnDef<T>[];
   loading?: boolean;
   sorting?: SortingState;
-  onSortingChange?: (sorting: SortingState) => void;
+  onSortingChange?: OnChangeFn<SortingState>;
   emptyMessage?: string;
   className?: string;
 }

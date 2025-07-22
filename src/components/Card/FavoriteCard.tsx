@@ -1,5 +1,5 @@
 import React from "react";
-import { FaHeart, FaPlane, FaHotel, FaCity, FaStar, FaTrash, FaEye } from "react-icons/fa";
+import { FaPlane, FaHotel, FaCity, FaStar, FaTrash, FaEye } from "react-icons/fa";
 import { MdLocationOn, MdAccessTime } from "react-icons/md";
 import { Link } from "react-router-dom";
 
@@ -65,18 +65,18 @@ const FavoriteCard: React.FC<FavoriteCardProps> = ({ item, onRemove }) => {
     });
   };
 
-  const getCardIcon = () => {
-    switch (item.type) {
-      case 'hotel':
-        return <FaHotel className="text-blue-500" />;
-      case 'flight':
-        return <FaPlane className="text-green-500" />;
-      case 'city':
-        return <FaCity className="text-purple-500" />;
-      default:
-        return <FaHeart className="text-red-500" />;
-    }
-  };
+  // const getCardIcon = () => {
+  //   switch (item.type) {
+  //     case 'hotel':
+  //       return <FaHotel className="text-blue-500" />;
+  //     case 'flight':
+  //       return <FaPlane className="text-green-500" />;
+  //     case 'city':
+  //       return <FaCity className="text-purple-500" />;
+  //     default:
+  //       return <FaHeart className="text-red-500" />;
+  //   }
+  // };
 
   const getViewLink = () => {
     switch (item.type) {

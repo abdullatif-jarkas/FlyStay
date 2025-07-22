@@ -4,7 +4,6 @@ import {
   FaTimes, 
   FaExclamationTriangle, 
   FaBed, 
-  FaHotel, 
   FaDollarSign, 
   FaUsers,
   FaImages

@@ -19,7 +19,6 @@ export interface Airline {
   code: string;
   logo?: string;
 }
-
 export interface Flight {
   id: number;
   airline: string;

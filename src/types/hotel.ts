@@ -9,6 +9,10 @@ export interface Country {
 export interface City {
   id: number;
   name: string;
+  country: {
+    id: number;
+    name: string;
+  };
 }
 
 export interface HotelImage {
@@ -17,6 +21,7 @@ export interface HotelImage {
   alt?: string;
   is_primary?: boolean;
   created_at: string;
+  image_path: string;
 }
 
 export interface Hotel {

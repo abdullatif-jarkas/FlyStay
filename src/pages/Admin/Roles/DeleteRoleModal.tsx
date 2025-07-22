@@ -10,7 +10,7 @@ interface Permission {
 interface Role {
   id: number;
   name: string;
-  permissions: Permission[];
+  permissions?: Permission[];
 }
 
 interface DeleteRoleModalProps {
@@ -49,9 +49,9 @@ const DeleteRoleModal: React.FC<DeleteRoleModalProps> = ({
       onClose();
     } catch (err: any) {
       setError(
-        err.response?.data?.message || 
-        err.response?.data?.error || 
-        "Failed to delete role"
+        err.response?.data?.message ||
+          err.response?.data?.error ||
+          "Failed to delete role"
       );
     } finally {
       setLoading(false);
@@ -74,7 +74,9 @@ const DeleteRoleModal: React.FC<DeleteRoleModalProps> = ({
           </div>
           <div>
             <h2 className="text-xl font-bold text-gray-800">Delete Role</h2>
-            <p className="text-gray-600 text-sm">This action cannot be undone</p>
+            <p className="text-gray-600 text-sm">
+              This action cannot be undone
+            </p>
           </div>
         </div>
 
@@ -86,13 +88,15 @@ const DeleteRoleModal: React.FC<DeleteRoleModalProps> = ({
 
         <div className="mb-6">
           <p className="text-gray-700 mb-4">
-            Are you sure you want to delete the role <strong>"{role.name}"</strong>?
+            Are you sure you want to delete the role{" "}
+            <strong>"{role.name}"</strong>?
           </p>
-          
-          {role.permissions.length > 0 && (
+
+          {role.permissions && role.permissions.length > 0 && (
             <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
               <p className="text-yellow-800 text-sm font-medium mb-2">
-                ⚠️ This role has {role.permissions.length} permission(s) assigned:
+                ⚠️ This role has {role.permissions.length} permission(s)
+                assigned:
               </p>
               <div className="flex flex-wrap gap-1">
                 {role.permissions.slice(0, 3).map((permission) => (

@@ -7,8 +7,16 @@ interface Airport {
   id: number;
   name: string;
   code: string;
-  city: string;
-  country: string;
+  city: {
+    id: number;
+    name: string;
+  };
+  city_id: number;
+  country: {
+    id: number;
+    name: string;
+    iso2: string;
+  };
 }
 
 const Airports = () => {
