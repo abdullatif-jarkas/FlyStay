@@ -149,7 +149,7 @@ const FlightSearchBar: React.FC<FlightSearchBarProps> = ({
       {/* Trip Type Selector */}
       <div className="mb-4">
         <div className="flex gap-4">
-          {TRIP_TYPES.map((type) => (
+          {/* {TRIP_TYPES.map((type) => (
             <label key={type.value} className="flex items-center gap-2 cursor-pointer">
               <input
                 type="radio"
@@ -161,7 +161,7 @@ const FlightSearchBar: React.FC<FlightSearchBarProps> = ({
               />
               <span className="text-sm font-medium text-gray-700">{type.label}</span>
             </label>
-          ))}
+          ))} */}
         </div>
       </div>
 
