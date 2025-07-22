@@ -1,13 +1,10 @@
 import axios from "axios";
 import { useEffect, useState, useMemo, useCallback } from "react";
 import { ColumnDef, SortingState } from "@tanstack/react-table";
-import { FaPlus, FaKey, FaKeybase } from "react-icons/fa";
+import { FaPlus, FaKey } from "react-icons/fa";
 import {
   TableContainer,
   ActionButtons,
-  createViewAction,
-  createEditAction,
-  createDeleteAction,
 } from "../../../components/ui/table";
 import CreateRoleModal from "./CreateRoleModal";
 import EditRoleModal from "./EditRoleModal";
@@ -189,7 +186,7 @@ const Roles = () => {
                 {
                   label: "Assign Permission",
                   onClick: () => handleAssignPermission(row.original),
-                  icon: <FaKeybase className="w-4 h-4" />,
+                  icon: <FaKey className="w-4 h-4" />,
                   variant: "primary",
                 },
               ]}
