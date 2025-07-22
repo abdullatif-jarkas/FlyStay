@@ -172,7 +172,6 @@ const ShowHotelModal: React.FC<ShowHotelModalProps> = ({
                     
                     <div className="relative">
                       <div className="aspect-video bg-gray-100 rounded-lg overflow-hidden">
-                        {console.log(hotel.images[currentImageIndex].image_path)}
                         <img
                           src={hotel.images[currentImageIndex].image_path}
                           alt={hotel.images[currentImageIndex].alt || `Hotel image ${currentImageIndex + 1}`}

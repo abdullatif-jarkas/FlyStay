@@ -1,7 +1,7 @@
 import axios from "axios";
 import { useEffect, useState, useMemo, useCallback } from "react";
 import { ColumnDef, SortingState } from "@tanstack/react-table";
-import { FaPlus, FaKey, FaUserPlus, FaUserMinus } from "react-icons/fa";
+import { FaPlus, FaKey } from "react-icons/fa";
 import {
   TableContainer,
   ActionButtons,
@@ -24,7 +24,7 @@ import {
 
 const Roles = () => {
   const [roles, setRoles] = useState<Role[]>([]);
-  const [expandedRows, setExpandedRows] = useState<number[]>([]);
+  const [expandedRows] = useState<number[]>([]);
   const [loading, setLoading] = useState(true);
   const [sorting, setSorting] = useState<SortingState>([]);
   const [error, setError] = useState("");
@@ -46,7 +46,7 @@ const Roles = () => {
 
   const [selectedRole, setSelectedRole] = useState<Role | null>(null);
   const [selectedRoleId, setSelectedRoleId] = useState<number | null>(null);
-  const [selectedPermission, setSelectedPermission] =
+  const [selectedPermission] =
     useState<Permission | null>(null);
 
   const token = localStorage.getItem("token");
@@ -117,14 +117,14 @@ const Roles = () => {
     setIsAssignPermissionModalOpen(true);
   }, []);
 
-  const handleRemovePermission = useCallback(
-    (role: Role, permission: Permission) => {
-      setSelectedRole(role);
-      setSelectedPermission(permission);
-      setIsRemovePermissionModalOpen(true);
-    },
-    []
-  );
+  // const handleRemovePermission = useCallback(
+  //   (role: Role, permission: Permission) => {
+  //     setSelectedRole(role);
+  //     setSelectedPermission(permission);
+  //     setIsRemovePermissionModalOpen(true);
+  //   },
+  //   []
+  // );
 
   const handleCreateSuccess = useCallback(() => {
     fetchRoles(); // Refresh the table
@@ -146,11 +146,11 @@ const Roles = () => {
     toast.success("Permission operation completed successfully");
   }, [fetchRoles]);
 
-  const toggleExpand = (id: number) => {
-    setExpandedRows((prev) =>
-      prev.includes(id) ? prev.filter((rowId) => rowId !== id) : [...prev, id]
-    );
-  };
+  // const toggleExpand = (id: number) => {
+  //   setExpandedRows((prev) =>
+  //     prev.includes(id) ? prev.filter((rowId) => rowId !== id) : [...prev, id]
+  //   );
+  // };
 
   const columns = useMemo<ColumnDef<Role>[]>(
     () => [
@@ -172,7 +172,7 @@ const Roles = () => {
       },
       {
         header: "Permissions Count",
-        accessorFn: (row) => row.permissions.length,
+        accessorFn: (row) => row.permissions?.length ?? 0,
         id: "permissionsCount",
         enableSorting: true,
       },

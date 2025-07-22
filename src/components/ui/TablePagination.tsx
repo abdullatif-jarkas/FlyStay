@@ -9,6 +9,7 @@ export interface PaginationData {
   total?: number;
   per_page?: number;
   from?: number;
+  total_results?: number; 
   to?: number;
 }
 

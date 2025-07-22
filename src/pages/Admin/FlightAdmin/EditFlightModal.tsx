@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { Flight } from "../../../types/flight";
 
 interface Airport {
   id: number;
@@ -9,16 +10,6 @@ interface Airport {
     name: string;
   };
   country: string;
-}
-
-interface Flight {
-  id: number;
-  airline: string;
-  flight_number: string;
-  departure_airport_id: number;
-  arrival_airport_id: number;
-  departure_time: string;
-  arrival_time: string;
 }
 
 interface EditFlightModalProps {

@@ -131,9 +131,9 @@ const FlightSearchBar: React.FC<FlightSearchBarProps> = ({
     onSearch(searchParams);
   };
 
-  const getTotalPassengers = () => {
-    return searchParams.passengers.adults + searchParams.passengers.children + searchParams.passengers.infants;
-  };
+  // const getTotalPassengers = () => {
+  //   return searchParams.passengers.adults + searchParams.passengers.children + searchParams.passengers.infants;
+  // };
 
   const getPassengerText = () => {
     const { adults, children, infants } = searchParams.passengers;

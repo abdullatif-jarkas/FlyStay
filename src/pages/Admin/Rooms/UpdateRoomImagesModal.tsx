@@ -8,13 +8,11 @@ import {
   FaPlus,
   FaExclamationTriangle,
   FaBed,
-  FaHotel
 } from "react-icons/fa";
 import { 
   UpdateRoomImagesModalProps, 
   ImagePreview, 
-  DeleteImageConfirmation,
-  RoomImage
+  // DeleteImageConfirmation,
 } from "../../../types/room";
 
 const UpdateRoomImagesModal: React.FC<UpdateRoomImagesModalProps> = ({
@@ -26,7 +24,7 @@ const UpdateRoomImagesModal: React.FC<UpdateRoomImagesModalProps> = ({
   const [newImages, setNewImages] = useState<File[]>([]);
   const [newImagePreviews, setNewImagePreviews] = useState<ImagePreview[]>([]);
   const [imagesToDelete, setImagesToDelete] = useState<number[]>([]);
-  const [deleteConfirmations, setDeleteConfirmations] = useState<DeleteImageConfirmation[]>([]);
+  // const [deleteConfirmations, setDeleteConfirmations] = useState<DeleteImageConfirmation[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -35,12 +33,12 @@ const UpdateRoomImagesModal: React.FC<UpdateRoomImagesModalProps> = ({
   useEffect(() => {
     if (isOpen && room) {
       // Initialize delete confirmations for existing images
-      const confirmations = room.images?.map(img => ({
-        id: img.id,
-        url: img.url,
-        confirmed: false
-      })) || [];
-      setDeleteConfirmations(confirmations);
+      // const confirmations = room.images?.map(img => ({
+      //   id: img.id,
+      //   url: img.url,
+      //   confirmed: false
+      // })) || [];
+      // setDeleteConfirmations(confirmations);
     }
   }, [isOpen, room]);
 
@@ -86,13 +84,13 @@ const UpdateRoomImagesModal: React.FC<UpdateRoomImagesModalProps> = ({
   };
 
   const toggleDeleteImage = (imageId: number) => {
-    setDeleteConfirmations(prev => 
-      prev.map(conf => 
-        conf.id === imageId 
-          ? { ...conf, confirmed: !conf.confirmed }
-          : conf
-      )
-    );
+    // setDeleteConfirmations(prev => 
+    //   prev.map((conf: any) => 
+    //     conf.id === imageId 
+    //       ? { ...conf, confirmed: !conf.confirmed }
+    //       : conf
+    //   )
+    // );
 
     setImagesToDelete(prev => {
       if (prev.includes(imageId)) {
@@ -110,7 +108,7 @@ const UpdateRoomImagesModal: React.FC<UpdateRoomImagesModalProps> = ({
     setNewImages([]);
     setNewImagePreviews([]);
     setImagesToDelete([]);
-    setDeleteConfirmations([]);
+    // setDeleteConfirmations([]);
     setError("");
     onClose();
   };

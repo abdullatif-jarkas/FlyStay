@@ -9,7 +9,7 @@ interface Permission {
 interface Role {
   id: number;
   name: string;
-  permissions: Permission[];
+  permissions?: Permission[];
 }
 
 interface EditRoleModalProps {
@@ -57,21 +57,25 @@ const EditRoleModal: React.FC<EditRoleModalProps> = ({
       const urlEncodedData = new URLSearchParams();
       urlEncodedData.append("name", formData.name);
 
-      await axios.put(`http://127.0.0.1:8000/api/role/${role.id}`, urlEncodedData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          Accept: "application/json",
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-      });
+      await axios.put(
+        `http://127.0.0.1:8000/api/role/${role.id}`,
+        urlEncodedData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: "application/json",
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+        }
+      );
 
       onSuccess();
       onClose();
     } catch (err: any) {
       setError(
-        err.response?.data?.message || 
-        err.response?.data?.error || 
-        "Failed to update role"
+        err.response?.data?.message ||
+          err.response?.data?.error ||
+          "Failed to update role"
       );
     } finally {
       setLoading(false);
@@ -80,7 +84,7 @@ const EditRoleModal: React.FC<EditRoleModalProps> = ({
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       [name]: value,
     }));
@@ -130,7 +134,7 @@ const EditRoleModal: React.FC<EditRoleModalProps> = ({
           </div>
 
           {/* Display current permissions (read-only) */}
-          {role.permissions.length > 0 && (
+          {role.permissions && role.permissions.length > 0 && (
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Current Permissions

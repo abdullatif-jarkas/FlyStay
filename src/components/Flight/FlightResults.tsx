@@ -1,8 +1,5 @@
 import { useState } from 'react';
 import { 
-  FaSort, 
-  FaSortUp, 
-  FaSortDown, 
   FaSpinner,
   FaExclamationTriangle,
   FaPlane
@@ -28,10 +25,10 @@ const FlightResults: React.FC<FlightResultsProps> = ({
     onFlightSelect(flight);
   };
 
-  const getSortIcon = (sortOption: string) => {
-    if (sortBy !== sortOption) return <FaSort className="text-gray-400" />;
-    return sortOption.includes('_asc') ? <FaSortUp /> : <FaSortDown />;
-  };
+  // const getSortIcon = (sortOption: string) => {
+  //   if (sortBy !== sortOption) return <FaSort className="text-gray-400" />;
+  //   return sortOption.includes('_asc') ? <FaSortUp /> : <FaSortDown />;
+  // };
 
   if (loading) {
     return (

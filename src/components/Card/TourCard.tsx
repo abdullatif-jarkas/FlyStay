@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { FaHeart, FaRegHeart, FaStar, FaRegStar } from 'react-icons/fa';
-import { BsFullscreen } from 'react-icons/bs';
 
 interface TourCardProps {
   id: string;
@@ -13,7 +12,6 @@ interface TourCardProps {
 }
 
 const TourCard = ({ 
-  id, 
   image, 
   title, 
   location, 

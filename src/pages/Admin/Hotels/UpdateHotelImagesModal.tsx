@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { FaUpload, FaTrash, FaImages, FaPlus, FaEye } from "react-icons/fa";
-import { UpdateHotelImagesModalProps, ImagePreview, HotelImage } from "../../../types/hotel";
+import { FaUpload, FaTrash, FaImages, FaEye } from "react-icons/fa";
+import { UpdateHotelImagesModalProps, ImagePreview } from "../../../types/hotel";
 
 const UpdateHotelImagesModal: React.FC<UpdateHotelImagesModalProps> = ({
   isOpen,

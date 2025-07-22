@@ -1,30 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-
-interface Flight {
-  id: number;
-  airline: string;
-  flight_number: string;
-  departure_airport_id: number;
-  arrival_airport_id: number;
-  departure_time: string;
-  arrival_time: string;
-  created_at: string;
-  updated_at: string;
-  departure_airport: {
-    id: number;
-    name: string;
-    city_id: number;
-    IATA_code: string;
-  };
-  arrival_airport: {
-    id: number;
-    name: string;
-    city_id: number;
-    IATA_code: string;
-  };
-}
-
+import { Flight } from "../../../types/flight";
 interface ShowFlightModalProps {
   isOpen: boolean;
   onClose: () => void;

@@ -13,30 +13,7 @@ import CreateFlightModal from "./CreateFlightModal";
 import EditFlightModal from "./EditFlightModal";
 import ShowFlightModal from "./ShowFlightModal";
 import { toast } from "sonner";
-
-interface Flight {
-  id: number;
-  airline: string;
-  flight_number: string;
-  departure_airport_id: number;
-  arrival_airport_id: number;
-  departure_time: Date;
-  arrival_time: Date;
-  created_at: Date;
-  updated_at: Date;
-  departure_airport: {
-    id: number;
-    name: string;
-    city_id: number;
-    IATA_code: string;
-  };
-  arrival_airport: {
-    id: number;
-    name: string;
-    city_id: number;
-    IATA_code: string;
-  };
-}
+import { Flight } from "../../../types/flight";
 
 const FlightAdmin = () => {
   const [data, setData] = useState<Flight[]>([]);

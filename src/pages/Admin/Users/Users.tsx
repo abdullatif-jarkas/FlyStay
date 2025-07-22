@@ -37,8 +37,8 @@ const Users = () => {
   
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
-  const [selectedRole, setSelectedRole] = useState<Role | null>(null);
-  const [selectedPermission, setSelectedPermission] = useState<Permission | null>(null);
+  const [selectedRole] = useState<Role | null>(null);
+  const [selectedPermission] = useState<Permission | null>(null);
 
   const token = localStorage.getItem("token");
 
@@ -121,22 +121,22 @@ const Users = () => {
     setIsAssignRoleModalOpen(true);
   }, []);
 
-  const handleRemoveRole = useCallback((user: User, role: Role) => {
-    setSelectedUser(user);
-    setSelectedRole(role);
-    setIsRemoveRoleModalOpen(true);
-  }, []);
+  // const handleRemoveRole = useCallback((user: User, role: Role) => {
+  //   setSelectedUser(user);
+  //   setSelectedRole(role);
+  //   setIsRemoveRoleModalOpen(true);
+  // }, []);
 
   const handleAssignPermission = useCallback((user: User) => {
     setSelectedUser(user);
     setIsAssignPermissionModalOpen(true);
   }, []);
 
-  const handleRemovePermission = useCallback((user: User, permission: Permission) => {
-    setSelectedUser(user);
-    setSelectedPermission(permission);
-    setIsRemovePermissionModalOpen(true);
-  }, []);
+  // const handleRemovePermission = useCallback((user: User, permission: Permission) => {
+  //   setSelectedUser(user);
+  //   setSelectedPermission(permission);
+  //   setIsRemovePermissionModalOpen(true);
+  // }, []);
 
   const handleSuccess = useCallback(() => {
     fetchUsers(page);

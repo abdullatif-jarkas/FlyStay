@@ -3,9 +3,6 @@ import { ColumnDef, SortingState } from "@tanstack/react-table";
 import axios from "axios";
 import {
   FaPlus,
-  FaEye,
-  FaEdit,
-  FaTrash,
   FaImages,
   FaBed,
   FaUsers,
