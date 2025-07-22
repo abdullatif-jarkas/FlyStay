@@ -1,18 +1,35 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { FaUser, FaTimes, FaSpinner, FaUserShield, FaKey, FaCalendarAlt, FaEnvelope } from "react-icons/fa";
-import { User, ROLE_PERMISSION_ENDPOINTS } from "../../../types/rolePermission";
+import {
+  FaUser,
+  FaTimes,
+  FaSpinner,
+  FaUserShield,
+  FaKey,
+  FaCalendarAlt,
+  FaEnvelope,
+} from "react-icons/fa";
+import {
+  User,
+  Role,
+  Permission,
+  ROLE_PERMISSION_ENDPOINTS,
+} from "../../../types/rolePermission";
 
 interface ShowUserModalProps {
   isOpen: boolean;
   onClose: () => void;
   userId: number | null;
+  onRemoveRole?: (user: User, role: Role) => void;
+  onRemovePermission?: (user: User, permission: Permission) => void;
 }
 
 const ShowUserModal: React.FC<ShowUserModalProps> = ({
   isOpen,
   onClose,
   userId,
+  onRemoveRole,
+  onRemovePermission,
 }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(false);
@@ -31,12 +48,15 @@ const ShowUserModal: React.FC<ShowUserModalProps> = ({
     setError("");
 
     try {
-      const response = await axios.get(`${ROLE_PERMISSION_ENDPOINTS.USERS}/${userId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          Accept: "application/json",
-        },
-      });
+      const response = await axios.get(
+        `${ROLE_PERMISSION_ENDPOINTS.USERS}/${userId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: "application/json",
+          },
+        }
+      );
       if (response.data.status === "success") {
         setUser(response.data.data[0]);
       } else {
@@ -100,18 +120,24 @@ const ShowUserModal: React.FC<ShowUserModalProps> = ({
                 </h4>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-600">Name</label>
+                    <label className="block text-sm font-medium text-gray-600">
+                      Name
+                    </label>
                     <p className="text-gray-900 font-medium">{user.name}</p>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-600">Email</label>
+                    <label className="block text-sm font-medium text-gray-600">
+                      Email
+                    </label>
                     <p className="text-gray-900 flex items-center">
                       <FaEnvelope className="mr-2 text-gray-400" />
                       {user.email}
                     </p>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-600">Email Verified</label>
+                    <label className="block text-sm font-medium text-gray-600">
+                      Email Verified
+                    </label>
                     <p className="text-gray-900">
                       {user.email_verified_at ? (
                         <span className="text-green-600">✓ Verified</span>
@@ -121,7 +147,9 @@ const ShowUserModal: React.FC<ShowUserModalProps> = ({
                     </p>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-600">Member Since</label>
+                    <label className="block text-sm font-medium text-gray-600">
+                      Member Since
+                    </label>
                     <p className="text-gray-900 flex items-center">
                       <FaCalendarAlt className="mr-2 text-gray-400" />
                       {new Date(user.created_at).toLocaleDateString()}
@@ -139,25 +167,47 @@ const ShowUserModal: React.FC<ShowUserModalProps> = ({
                 {user.roles && user.roles.length > 0 ? (
                   <div className="space-y-3">
                     {user.roles.map((role) => (
-                      <div key={role.id} className="bg-white rounded-lg p-3 border border-blue-200">
+                      <div
+                        key={role.id}
+                        className="group bg-white rounded-lg p-3 border border-blue-200 hover:border-blue-300 transition-colors"
+                      >
                         <div className="flex items-center justify-between">
                           <div>
-                            <p className="font-medium text-gray-900">{role.name}</p>
+                            <p className="font-medium text-gray-900">
+                              {role.name}
+                            </p>
                             {role.permissions && (
                               <p className="text-sm text-gray-600">
                                 {role.permissions.length} permission(s)
                               </p>
                             )}
                           </div>
-                          {role.created_at && (
-                            <p className="text-xs text-gray-500">
-                              Since {new Date(role.created_at).toLocaleDateString()}
-                            </p>
-                          )}
+                          <div className="flex items-center gap-2">
+                            {role.created_at && (
+                              <p className="text-xs text-gray-500">
+                                Since{" "}
+                                {new Date(role.created_at).toLocaleDateString()}
+                              </p>
+                            )}
+                            {onRemoveRole && (
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  onRemoveRole(user, role);
+                                }}
+                                className="opacity-0 group-hover:opacity-100 transition-opacity text-red-600 hover:text-red-700 p-1"
+                                title={`Remove role: ${role.name}`}
+                              >
+                                <FaTimes className="w-3 h-3" />
+                              </button>
+                            )}
+                          </div>
                         </div>
                         {role.permissions && role.permissions.length > 0 && (
                           <div className="mt-2">
-                            <p className="text-xs text-gray-600 mb-1">Permissions from this role:</p>
+                            <p className="text-xs text-gray-600 mb-1">
+                              Permissions from this role:
+                            </p>
                             <div className="flex flex-wrap gap-1">
                               {role.permissions.map((permission) => (
                                 <span
@@ -187,16 +237,30 @@ const ShowUserModal: React.FC<ShowUserModalProps> = ({
                 {user.permissions && user.permissions.length > 0 ? (
                   <div className="flex flex-wrap gap-2">
                     {user.permissions.map((permission) => (
-                      <span
+                      <div
                         key={permission.id}
-                        className="px-3 py-1 bg-green-100 text-green-800 text-sm rounded-full"
+                        className="group relative inline-flex items-center px-3 py-1 bg-green-100 text-green-800 text-sm rounded-full hover:bg-green-200 transition-colors"
                       >
-                        {permission.name}
-                      </span>
+                        <span>{permission.name}</span>
+                        {onRemovePermission && (
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onRemovePermission(user, permission);
+                            }}
+                            className="ml-1 opacity-0 group-hover:opacity-100 transition-opacity text-green-600 hover:text-red-600"
+                            title={`Remove permission: ${permission.name}`}
+                          >
+                            <FaTimes className="w-3 h-3" />
+                          </button>
+                        )}
+                      </div>
                     ))}
                   </div>
                 ) : (
-                  <p className="text-gray-600 italic">No direct permissions assigned</p>
+                  <p className="text-gray-600 italic">
+                    No direct permissions assigned
+                  </p>
                 )}
               </div>
 
@@ -205,16 +269,23 @@ const ShowUserModal: React.FC<ShowUserModalProps> = ({
                 <h4 className="font-semibold text-gray-900 mb-3">Summary</h4>
                 <div className="grid grid-cols-3 gap-4 text-center">
                   <div>
-                    <p className="text-2xl font-bold text-blue-600">{user.roles?.length || 0}</p>
+                    <p className="text-2xl font-bold text-blue-600">
+                      {user.roles?.length || 0}
+                    </p>
                     <p className="text-sm text-gray-600">Roles</p>
                   </div>
                   <div>
-                    <p className="text-2xl font-bold text-green-600">{user.permissions?.length || 0}</p>
+                    <p className="text-2xl font-bold text-green-600">
+                      {user.permissions?.length || 0}
+                    </p>
                     <p className="text-sm text-gray-600">Direct Permissions</p>
                   </div>
                   <div>
                     <p className="text-2xl font-bold text-purple-600">
-                      {(user.roles?.reduce((acc, role) => acc + (role.permissions?.length || 0), 0) || 0) + (user.permissions?.length || 0)}
+                      {(user.roles?.reduce(
+                        (acc, role) => acc + (role.permissions?.length || 0),
+                        0
+                      ) || 0) + (user.permissions?.length || 0)}
                     </p>
                     <p className="text-sm text-gray-600">Total Permissions</p>
                   </div>

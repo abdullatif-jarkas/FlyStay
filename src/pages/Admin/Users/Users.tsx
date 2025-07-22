@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState, useCallback } from "react";
 import { ColumnDef, SortingState } from "@tanstack/react-table";
 import axios from "axios";
-import { FaKey, FaUserPlus, FaUsers, FaTimes } from "react-icons/fa";
+import { FaKey, FaUserPlus, FaUsers, FaTimes, FaTrash } from "react-icons/fa";
 import { TableContainer, ActionButtons } from "../../../components/ui/table";
 import { toast } from "sonner";
 import {
@@ -15,6 +15,7 @@ import RemoveRoleModal from "./RemoveRoleModal";
 import AssignPermissionToUserModal from "./AssignPermissionToUserModal";
 import RemovePermissionFromUserModal from "./RemovePermissionFromUserModal";
 import ShowUserModal from "./ShowUserModal";
+import DeleteUserModal from "./DeleteUserModal";
 
 const Users = () => {
   const [users, setUsers] = useState<User[]>([]);
@@ -39,6 +40,7 @@ const Users = () => {
   const [isRemovePermissionModalOpen, setIsRemovePermissionModalOpen] =
     useState(false);
   const [isShowModalOpen, setIsShowModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
@@ -153,6 +155,11 @@ const Users = () => {
     []
   );
 
+  const handleDeleteUser = useCallback((user: User) => {
+    setSelectedUser(user);
+    setIsDeleteModalOpen(true);
+  }, []);
+
   const handleSuccess = useCallback(() => {
     fetchUsers(page);
     toast.success("Operation completed successfully");
@@ -255,6 +262,12 @@ const Users = () => {
                 icon: <FaKey className="w-4 h-4" />,
                 variant: "secondary",
               },
+              {
+                label: "Delete User",
+                onClick: () => handleDeleteUser(row.original),
+                icon: <FaTrash className="w-4 h-4" />,
+                variant: "danger",
+              },
             ]}
           />
         ),
@@ -267,6 +280,7 @@ const Users = () => {
       handleAssignPermission,
       handleRemoveRole,
       handleRemovePermission,
+      handleDeleteUser,
     ]
   );
 
@@ -356,6 +370,13 @@ const Users = () => {
         isOpen={isShowModalOpen}
         onClose={() => setIsShowModalOpen(false)}
         userId={selectedUserId}
+      />
+
+      <DeleteUserModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onSuccess={handleSuccess}
+        user={selectedUser}
       />
     </div>
   );

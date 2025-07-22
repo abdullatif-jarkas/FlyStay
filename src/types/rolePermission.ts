@@ -149,7 +149,13 @@ export interface RemovePermissionFromRoleModalProps {
 
 // Utility types
 export interface RolePermissionAction {
-  type: 'assign_role' | 'remove_role' | 'assign_permission_to_user' | 'remove_permission_from_user' | 'assign_permission_to_role' | 'remove_permission_from_role';
+  type:
+    | "assign_role"
+    | "remove_role"
+    | "assign_permission_to_user"
+    | "remove_permission_from_user"
+    | "assign_permission_to_role"
+    | "remove_permission_from_role";
   user?: User;
   role?: Role;
   permission?: Permission;
@@ -165,15 +171,20 @@ export interface RolePermissionFormData {
 
 // Constants
 export const ROLE_PERMISSION_ENDPOINTS = {
-  ASSIGN_ROLE: 'http://127.0.0.1:8000/api/assign-role',
-  REMOVE_ROLE: 'http://127.0.0.1:8000/api/remove-role',
-  ASSIGN_PERMISSION_TO_USER: 'http://127.0.0.1:8000/api/assign-permission-to-user',
-  REMOVE_PERMISSION_FROM_USER: 'http://127.0.0.1:8000/api/remove-permission-from-user',
-  ASSIGN_PERMISSION_TO_ROLE: 'http://127.0.0.1:8000/api/assign-permission-to-role',
-  REMOVE_PERMISSION_FROM_ROLE: 'http://127.0.0.1:8000/api/remove-permission-from-role',
-  USERS: 'http://127.0.0.1:8000/api/user',
-  ROLES: 'http://127.0.0.1:8000/api/role',
-  PERMISSIONS: 'http://127.0.0.1:8000/api/permission'
+  ASSIGN_ROLE: "http://127.0.0.1:8000/api/assign-role",
+  REMOVE_ROLE: "http://127.0.0.1:8000/api/remove-role",
+  ASSIGN_PERMISSION_TO_USER:
+    "http://127.0.0.1:8000/api/assign-permission-to-user",
+  REMOVE_PERMISSION_FROM_USER:
+    "http://127.0.0.1:8000/api/remove-permission-from-user",
+  ASSIGN_PERMISSION_TO_ROLE:
+    "http://127.0.0.1:8000/api/assign-permission-to-role",
+  REMOVE_PERMISSION_FROM_ROLE:
+    "http://127.0.0.1:8000/api/remove-permission-from-role",
+  USERS: "http://127.0.0.1:8000/api/user",
+  DELETE_USER: "http://127.0.0.1:8000/api/user",
+  ROLES: "http://127.0.0.1:8000/api/role",
+  PERMISSIONS: "http://127.0.0.1:8000/api/permission",
 } as const;
 
 // Helper function types
@@ -188,6 +199,6 @@ export interface RolePermissionActionButton {
   label: string;
   onClick: () => void;
   icon: React.ReactNode;
-  variant: 'primary' | 'secondary' | 'danger' | 'success';
+  variant: "primary" | "secondary" | "danger" | "success";
   disabled?: boolean;
 }
