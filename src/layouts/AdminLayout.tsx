@@ -11,6 +11,7 @@ import {
   FaPlaneDeparture,
   FaCity,
   FaSignOutAlt,
+  FaChair,
 } from "react-icons/fa";
 import { useState } from "react";
 import Logo from "../components/ui/Logo";
@@ -115,6 +116,13 @@ const AdminLayout = () => {
                   active={currentPath === "/admin/flights"}
                 >
                   Flights
+                </MenuItem>
+                <MenuItem
+                  icon={<FaChair />}
+                  onClick={() => navigate("/admin/flight-cabins")}
+                  active={currentPath === "/admin/flight-cabins"}
+                >
+                  Flight Cabins
                 </MenuItem>
                 <MenuItem
                   icon={<FaPlaneDeparture />}

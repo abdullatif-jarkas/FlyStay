@@ -8,7 +8,6 @@ import { navbarLinks } from "../../data/Navbar";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState, useRef } from "react";
 import { FaRegHeart } from "react-icons/fa";
-import { IoMdHelpCircleOutline } from "react-icons/io";
 import { FaPhoneAlt } from "react-icons/fa";
 import { useUser } from "../../hooks/useUser";
 import { toast } from "sonner";

@@ -11,7 +11,6 @@ import {
   FlightSearchBarProps, 
   FlightSearchParams, 
   Airport,
-  TRIP_TYPES,
   FLIGHT_CLASSES
 } from '../../types/flight';
 import axios from 'axios';

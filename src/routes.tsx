@@ -25,6 +25,9 @@ const Roles = lazy(() => import("./pages/Admin/Roles/Roles"));
 const Users = lazy(() => import("./pages/Admin/Users/Users"));
 const Airports = lazy(() => import("./pages/Admin/Airports/Airports"));
 const Cities = lazy(() => import("./pages/Admin/Cities/Cities"));
+const FlightCabins = lazy(
+  () => import("./pages/Admin/FlightCabins/FlightCabins")
+);
 
 // Auth Pages
 const Login = lazy(() => import("./pages/Auth/Login/Login"));
@@ -338,6 +341,14 @@ export const routes = createBrowserRouter([
         element: (
           <Suspense fallback={<LoadingSpinner />}>
             <FlightAdmin />
+          </Suspense>
+        ),
+      },
+      {
+        path: "flight-cabins",
+        element: (
+          <Suspense fallback={<LoadingSpinner />}>
+            <FlightCabins />
           </Suspense>
         ),
       },
