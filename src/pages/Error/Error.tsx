@@ -6,7 +6,7 @@ const Error = () => {
     <section
       className="w-full h-screen bg-cover bg-center flex items-center justify-center relative"
       style={{
-        backgroundImage: "url('/imgs/error/404.jpg')",
+        backgroundImage: "url('/imgs/error/404.webp')",
         backgroundSize: "cover",
         backgroundPosition: "center -800px",
       }}

@@ -158,7 +158,6 @@ const Flight = () => {
     [sortBy]
   );
 
-  // Fetch all flights on component mount
   useEffect(() => {
     fetchAllFlights(1);
   }, [fetchAllFlights]);
@@ -244,7 +243,7 @@ const Flight = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Search Bar Section */}
-      <div className="bg-white shadow-sm">
+      {/* <div className="bg-white shadow-sm">
         <div className="container mx-auto px-4 py-6">
           <div className="flex items-center justify-between mb-6">
             <h1 className="text-3xl font-bold text-gray-900">
@@ -261,7 +260,7 @@ const Flight = () => {
           </div>
           <FlightSearchBar onSearch={handleSearch} loading={loading} />
         </div>
-      </div>
+      </div> */}
 
       {/* Results Section */}
       {(searchParams || showAllFlights) && (
@@ -298,6 +297,7 @@ const Flight = () => {
                 onFlightSelect={handleFlightSelect}
                 onViewDetails={handleViewDetails}
                 onAddToFavorites={handleAddToFavorites}
+                // onBookNow={handleBookNow}
                 pagination={{
                   current_page: currentPage,
                   total_pages: totalPages,
@@ -347,6 +347,15 @@ const Flight = () => {
           </div>
         </div>
       )}
+
+      {/* Flight Booking Modal */}
+      {/* <FlightBookingModal
+        isOpen={bookingModalOpen}
+        onClose={handleCloseBookingModal}
+        flight={selectedFlightForBooking}
+        flightCabin={selectedFlightCabin}
+        onBookingSuccess={handleBookingSuccess}
+      /> */}
     </div>
   );
 };

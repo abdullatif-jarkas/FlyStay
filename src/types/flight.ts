@@ -4,7 +4,7 @@ export interface Airport {
   id: number;
   name: string;
   IATA_code: string;
-  city_id: number;
+  city_name: number;
   city: {
     id: number;
     name: string;
@@ -30,7 +30,15 @@ export interface Flight {
   price: number;
   available_seats: number;
   aircraft_type?: string;
-  flight_class: 'economy' | 'business' | 'first';
+  flight_details: {
+    id: number;
+    flight_id: number;
+    class_name: string;
+    price: string;
+    available_seats: number;
+    note?: string;
+  }[];
+  flight_class: "economy" | "business" | "first";
   duration_minutes: number;
   stops: number;
   created_at: string;
@@ -45,13 +53,13 @@ export interface FlightSearchParams {
   destination: string;
   departure_date: string;
   return_date?: string;
-  trip_type: 'one-way' | 'round-trip' | 'multi-city';
+  trip_type: "one-way" | "round-trip" | "multi-city";
   passengers: {
     adults: number;
     children: number;
     infants: number;
   };
-  flight_class: 'economy' | 'business' | 'first';
+  flight_class: "economy" | "business" | "first";
 }
 
 // Filter parameters
@@ -63,7 +71,7 @@ export interface FlightFilters {
   airlines: string[];
   departure_time_range: {
     start: string; // HH:MM format
-    end: string;   // HH:MM format
+    end: string; // HH:MM format
   };
   arrival_time_range: {
     start: string;
@@ -80,15 +88,15 @@ export interface FlightFilters {
 }
 
 // Sort options
-export type FlightSortOption = 
-  | 'price_asc' 
-  | 'price_desc' 
-  | 'duration_asc' 
-  | 'duration_desc' 
-  | 'departure_time_asc' 
-  | 'departure_time_desc'
-  | 'arrival_time_asc'
-  | 'arrival_time_desc';
+export type FlightSortOption =
+  | "price_asc"
+  | "price_desc"
+  | "duration_asc"
+  | "duration_desc"
+  | "departure_time_asc"
+  | "departure_time_desc"
+  | "arrival_time_asc"
+  | "arrival_time_desc";
 
 // API response interfaces
 export interface FlightSearchResponse {
@@ -136,6 +144,7 @@ export interface FlightCardProps {
   onSelect: (flight: Flight) => void;
   onViewDetails: (flight: Flight) => void;
   onAddToFavorites: (flight: Flight) => void;
+  onBookNow?: (flight: Flight) => void;
   isSelected?: boolean;
   isFavorite?: boolean;
 }
@@ -149,6 +158,7 @@ export interface FlightResultsProps {
   onFlightSelect: (flight: Flight) => void;
   onViewDetails: (flight: Flight) => void;
   onAddToFavorites: (flight: Flight) => void;
+  onBookNow?: (flight: Flight) => void;
   pagination?: {
     current_page: number;
     total_pages: number;
@@ -179,30 +189,30 @@ export type FlightSearchErrors = {
 
 // Constants
 export const TRIP_TYPES = [
-  { value: 'one-way', label: 'One Way' },
-  { value: 'round-trip', label: 'Round Trip' },
-  { value: 'multi-city', label: 'Multi City' },
+  { value: "one-way", label: "One Way" },
+  { value: "round-trip", label: "Round Trip" },
+  { value: "multi-city", label: "Multi City" },
 ] as const;
 
 export const FLIGHT_CLASSES = [
-  { value: 'economy', label: 'Economy' },
-  { value: 'business', label: 'Business' },
-  { value: 'first', label: 'First Class' },
+  { value: "economy", label: "Economy" },
+  { value: "business", label: "Business" },
+  { value: "first", label: "First Class" },
 ] as const;
 
 export const SORT_OPTIONS = [
-  { value: 'price_asc', label: 'Price: Low to High' },
-  { value: 'price_desc', label: 'Price: High to Low' },
-  { value: 'duration_asc', label: 'Duration: Shortest' },
-  { value: 'duration_desc', label: 'Duration: Longest' },
-  { value: 'departure_time_asc', label: 'Departure: Earliest' },
-  { value: 'departure_time_desc', label: 'Departure: Latest' },
+  { value: "price_asc", label: "Price: Low to High" },
+  { value: "price_desc", label: "Price: High to Low" },
+  { value: "duration_asc", label: "Duration: Shortest" },
+  { value: "duration_desc", label: "Duration: Longest" },
+  { value: "departure_time_asc", label: "Departure: Earliest" },
+  { value: "departure_time_desc", label: "Departure: Latest" },
 ] as const;
 
 export const STOPS_OPTIONS = [
-  { value: 0, label: 'Direct' },
-  { value: 1, label: '1 Stop' },
-  { value: 2, label: '2+ Stops' },
+  { value: 0, label: "Direct" },
+  { value: 1, label: "1 Stop" },
+  { value: 2, label: "2+ Stops" },
 ] as const;
 
 // Helper functions types

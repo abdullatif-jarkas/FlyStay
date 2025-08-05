@@ -1,357 +1,130 @@
+// routes.tsx
 import { lazy, Suspense } from "react";
 import { createBrowserRouter } from "react-router-dom";
 import LoadingSpinner from "./components/LoadingSpinner/LoadingSpinner";
-import FlightAdmin from "./pages/Admin/FlightAdmin/FlightAdmin";
+
+// Lazy Import Helper
+const lazyImport = (path: string) => lazy(() => import(path));
 
 // Layouts
-const Layout = lazy(() => import("./layouts/Layout"));
-const AuthLayout = lazy(() => import("./layouts/AuthLayout"));
-const AdminLayout = lazy(() => import("./layouts/AdminLayout"));
+const Layout = lazyImport("./layouts/Layout");
+const AuthLayout = lazyImport("./layouts/AuthLayout");
+const AdminLayout = lazyImport("./layouts/AdminLayout");
 
-// Home & Main Pages
-const Home = lazy(() => import("./pages/Home/Home"));
-const Error = lazy(() => import("./pages/Error/Error"));
-const AboutUs = lazy(() => import("./pages/AboutUs/AboutUs"));
-const CustomerService = lazy(
-  () => import("./pages/CustomerService/CustomerService")
-);
-
-// Admin Pages
-const Dashboard = lazy(() => import("./pages/Admin/Dashboard"));
-const Hotels = lazy(() => import("./pages/Admin/Hotels/Hotels"));
-const Rooms = lazy(() => import("./pages/Admin/Rooms/Rooms"));
-const Permissions = lazy(() => import("./pages/Admin/Permissions/Permissions"));
-const Roles = lazy(() => import("./pages/Admin/Roles/Roles"));
-const Users = lazy(() => import("./pages/Admin/Users/Users"));
-const Airports = lazy(() => import("./pages/Admin/Airports/Airports"));
-const Cities = lazy(() => import("./pages/Admin/Cities/Cities"));
-const FlightCabins = lazy(
-  () => import("./pages/Admin/FlightCabins/FlightCabins")
-);
+// Pages
+const Home = lazyImport("./pages/Home/Home");
+const Error = lazyImport("./pages/Error/Error");
+const AboutUs = lazyImport("./pages/AboutUs/AboutUs");
+const CustomerService = lazyImport("./pages/CustomerService/CustomerService");
 
 // Auth Pages
-const Login = lazy(() => import("./pages/Auth/Login/Login"));
-const Register = lazy(() => import("./pages/Auth/Register/Register"));
-const ForgotPassword = lazy(
-  () => import("./pages/Auth/ForgotPassword/ForgotPassword")
-);
-const ResetPassword = lazy(
-  () => import("./pages/Auth/ResetPassword/ResetPassword")
-);
+const Login = lazyImport("./pages/Auth/Login/Login");
+const Register = lazyImport("./pages/Auth/Register/Register");
+const ForgotPassword = lazyImport("./pages/Auth/ForgotPassword/ForgotPassword");
+const ResetPassword = lazyImport("./pages/Auth/ResetPassword/ResetPassword");
 
 // Hotel Pages
-const Hotel = lazy(() => import("./pages/Hotel/Hotel"));
-const HotelSearchResult = lazy(() => import("./pages/Hotel/HotelSearchResult"));
-const HotelFavorites = lazy(() => import("./pages/Hotel/HotelFavorites"));
-const HotelInfo = lazy(() => import("./pages/Hotel/HotelInfo"));
-const HotelPayment = lazy(() => import("./pages/Hotel/HotelPayment"));
+const Hotel = lazyImport("./pages/Hotel/Hotel");
+const HotelSearchResult = lazyImport("./pages/Hotel/HotelSearchResult");
+const HotelFavorites = lazyImport("./pages/Hotel/HotelFavorites");
+const HotelInfo = lazyImport("./pages/Hotel/HotelInfo");
+const HotelPayment = lazyImport("./pages/Hotel/HotelPayment");
 
 // Flight Pages
-const Flight = lazy(() => import("./pages/Flight/Flight"));
-const FlightSearchResult = lazy(
-  () => import("./pages/Flight/FlightSearchResult")
-);
-const FlightPurchase = lazy(() => import("./pages/Flight/FlightPurchase"));
-const FlightFavorites = lazy(() => import("./pages/Flight/FlightFavorites"));
+const Flight = lazyImport("./pages/Flight/Flight");
+const FlightSearchResult = lazyImport("./pages/Flight/FlightSearchResult");
+const FlightPurchase = lazyImport("./pages/Flight/FlightPurchase");
+const FlightFavorites = lazyImport("./pages/Flight/FlightFavorites");
 
 // User Pages
-const Profile = lazy(() => import("./pages/User/Profile"));
-const Settings = lazy(() => import("./pages/User/Settings"));
-const Payments = lazy(() => import("./pages/User/Payments"));
+const Profile = lazyImport("./pages/User/Profile");
+const Settings = lazyImport("./pages/User/Settings");
+const Payments = lazyImport("./pages/User/Payments");
 
-// Favorites Page
-const Favorites = lazy(() => import("./pages/Favorites/Favorites"));
+// Favorites
+const Favorites = lazyImport("./pages/Favorites/Favorites");
 
+// Admin Pages
+const Dashboard = lazyImport("./pages/Admin/Dashboard");
+const Hotels = lazyImport("./pages/Admin/Hotels/Hotels");
+const Rooms = lazyImport("./pages/Admin/Rooms/Rooms");
+const Permissions = lazyImport("./pages/Admin/Permissions/Permissions");
+const Roles = lazyImport("./pages/Admin/Roles/Roles");
+const Users = lazyImport("./pages/Admin/Users/Users");
+const Airports = lazyImport("./pages/Admin/Airports/Airports");
+const Cities = lazyImport("./pages/Admin/Cities/Cities");
+const FlightCabins = lazyImport("./pages/Admin/FlightCabins/FlightCabins");
+const FlightAdmin = lazyImport("./pages/Admin/FlightAdmin/FlightAdmin");
+
+// Wrapper Component
+const withSuspense = (element: React.ReactNode) => (
+  <Suspense fallback={<LoadingSpinner />}>{element}</Suspense>
+);
+
+// Router
 export const routes = createBrowserRouter([
-  //* Public Rotues
   {
     path: "/",
-    element: <Layout />,
+    element: withSuspense(<Layout />),
     children: [
-      {
-        index: true,
-        element: (
-          <Suspense fallback={<LoadingSpinner />}>
-            <Home />
-          </Suspense>
-        ),
-      },
-      // Hotel Routes
+      { index: true, element: withSuspense(<Home />) },
       {
         path: "hotel",
         children: [
-          {
-            index: true,
-            element: (
-              <Suspense fallback={<LoadingSpinner />}>
-                <Hotel />
-              </Suspense>
-            ),
-          },
-          {
-            path: "search",
-            element: (
-              <Suspense fallback={<LoadingSpinner />}>
-                <HotelSearchResult />
-              </Suspense>
-            ),
-          },
-          {
-            path: "favorites",
-            element: (
-              <Suspense fallback={<LoadingSpinner />}>
-                <HotelFavorites />
-              </Suspense>
-            ),
-          },
-          {
-            path: ":hotelId",
-            element: (
-              <Suspense fallback={<LoadingSpinner />}>
-                <HotelInfo />
-              </Suspense>
-            ),
-          },
-          {
-            path: ":hotelId/payment",
-            element: (
-              <Suspense fallback={<LoadingSpinner />}>
-                <HotelPayment />
-              </Suspense>
-            ),
-          },
+          { index: true, element: withSuspense(<Hotel />) },
+          { path: "search", element: withSuspense(<HotelSearchResult />) },
+          { path: "favorites", element: withSuspense(<HotelFavorites />) },
+          { path: ":hotelId", element: withSuspense(<HotelInfo />) },
+          { path: ":hotelId/payment", element: withSuspense(<HotelPayment />) },
         ],
       },
-      // Flight Routes
       {
         path: "flight",
         children: [
-          {
-            index: true,
-            element: (
-              <Suspense fallback={<LoadingSpinner />}>
-                <Flight />
-              </Suspense>
-            ),
-          },
-          {
-            path: "search",
-            element: (
-              <Suspense fallback={<LoadingSpinner />}>
-                <FlightSearchResult />
-              </Suspense>
-            ),
-          },
-          {
-            path: "purchase/:flightId",
-            element: (
-              <Suspense fallback={<LoadingSpinner />}>
-                <FlightPurchase />
-              </Suspense>
-            ),
-          },
-          {
-            path: "favorites",
-            element: (
-              <Suspense fallback={<LoadingSpinner />}>
-                <FlightFavorites />
-              </Suspense>
-            ),
-          },
+          { index: true, element: withSuspense(<Flight />) },
+          { path: "search", element: withSuspense(<FlightSearchResult />) },
+          { path: "purchase/:flightId", element: withSuspense(<FlightPurchase />) },
+          { path: "favorites", element: withSuspense(<FlightFavorites />) },
         ],
       },
-      // Unified Favorites Route
-      {
-        path: "favorites",
-        element: (
-          <Suspense fallback={<LoadingSpinner />}>
-            <Favorites />
-          </Suspense>
-        ),
-      },
-      // User Routes
+      { path: "favorites", element: withSuspense(<Favorites />) },
       {
         path: "user",
         children: [
-          {
-            path: "profile",
-            element: (
-              <Suspense fallback={<LoadingSpinner />}>
-                <Profile />
-              </Suspense>
-            ),
-          },
-          {
-            path: "settings",
-            element: (
-              <Suspense fallback={<LoadingSpinner />}>
-                <Settings />
-              </Suspense>
-            ),
-          },
-          {
-            path: "payments",
-            element: (
-              <Suspense fallback={<LoadingSpinner />}>
-                <Payments />
-              </Suspense>
-            ),
-          },
+          { path: "profile", element: withSuspense(<Profile />) },
+          { path: "settings", element: withSuspense(<Settings />) },
+          { path: "payments", element: withSuspense(<Payments />) },
         ],
       },
-      // Info Pages
-      {
-        path: "about-us",
-        element: (
-          <Suspense fallback={<LoadingSpinner />}>
-            <AboutUs />
-          </Suspense>
-        ),
-      },
-      // Customer Service
-      {
-        path: "customer-service",
-        element: (
-          <Suspense fallback={<LoadingSpinner />}>
-            <CustomerService />
-          </Suspense>
-        ),
-      },
-      // 404 Route
-      {
-        path: "*",
-        element: (
-          <Suspense fallback={<LoadingSpinner />}>
-            <Error />
-          </Suspense>
-        ),
-      },
+      { path: "about-us", element: withSuspense(<AboutUs />) },
+      { path: "customer-service", element: withSuspense(<CustomerService />) },
+      { path: "*", element: withSuspense(<Error />) },
     ],
   },
-  //? Auth Routes
   {
     path: "auth",
-    element: <AuthLayout />,
+    element: withSuspense(<AuthLayout />),
     children: [
-      {
-        path: "login",
-        element: (
-          <Suspense fallback={<LoadingSpinner />}>
-            <Login />
-          </Suspense>
-        ),
-      },
-      {
-        path: "register",
-        element: (
-          <Suspense fallback={<LoadingSpinner />}>
-            <Register />
-          </Suspense>
-        ),
-      },
-      {
-        path: "forgot-password",
-        element: (
-          <Suspense fallback={<LoadingSpinner />}>
-            <ForgotPassword />
-          </Suspense>
-        ),
-      },
-      {
-        path: "reset-password",
-        element: (
-          <Suspense fallback={<LoadingSpinner />}>
-            <ResetPassword />
-          </Suspense>
-        ),
-      },
+      { path: "login", element: withSuspense(<Login />) },
+      { path: "register", element: withSuspense(<Register />) },
+      { path: "forgot-password", element: withSuspense(<ForgotPassword />) },
+      { path: "reset-password", element: withSuspense(<ResetPassword />) },
     ],
   },
-  //^ Admin Routes
   {
     path: "/admin",
-    element: <AdminLayout />,
+    element: withSuspense(<AdminLayout />),
     children: [
-      {
-        index: true,
-        element: (
-          <Suspense fallback={<LoadingSpinner />}>
-            <Dashboard />
-          </Suspense>
-        ),
-      },
-      {
-        path: "permissions",
-        element: (
-          <Suspense fallback={<LoadingSpinner />}>
-            <Permissions />
-          </Suspense>
-        ),
-      },
-      {
-        path: "roles",
-        element: (
-          <Suspense fallback={<LoadingSpinner />}>
-            <Roles />
-          </Suspense>
-        ),
-      },
-      {
-        path: "users",
-        element: (
-          <Suspense fallback={<LoadingSpinner />}>
-            <Users />
-          </Suspense>
-        ),
-      },
-      {
-        path: "airports",
-        element: (
-          <Suspense fallback={<LoadingSpinner />}>
-            <Airports />
-          </Suspense>
-        ),
-      },
-      {
-        path: "hotels",
-        element: (
-          <Suspense fallback={<LoadingSpinner />}>
-            <Hotels />
-          </Suspense>
-        ),
-      },
-      {
-        path: "rooms",
-        element: (
-          <Suspense fallback={<LoadingSpinner />}>
-            <Rooms />
-          </Suspense>
-        ),
-      },
-      {
-        path: "cities",
-        element: (
-          <Suspense fallback={<LoadingSpinner />}>
-            <Cities />
-          </Suspense>
-        ),
-      },
-      {
-        path: "flights",
-        element: (
-          <Suspense fallback={<LoadingSpinner />}>
-            <FlightAdmin />
-          </Suspense>
-        ),
-      },
-      {
-        path: "flight-cabins",
-        element: (
-          <Suspense fallback={<LoadingSpinner />}>
-            <FlightCabins />
-          </Suspense>
-        ),
-      },
+      { index: true, element: withSuspense(<Dashboard />) },
+      { path: "permissions", element: withSuspense(<Permissions />) },
+      { path: "roles", element: withSuspense(<Roles />) },
+      { path: "users", element: withSuspense(<Users />) },
+      { path: "airports", element: withSuspense(<Airports />) },
+      { path: "hotels", element: withSuspense(<Hotels />) },
+      { path: "rooms", element: withSuspense(<Rooms />) },
+      { path: "cities", element: withSuspense(<Cities />) },
+      { path: "flights", element: withSuspense(<FlightAdmin />) },
+      { path: "flight-cabins", element: withSuspense(<FlightCabins />) },
     ],
   },
 ]);

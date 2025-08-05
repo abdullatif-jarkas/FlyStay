@@ -1,12 +1,10 @@
 import {
   FaPlane,
-  FaClock,
   FaHeart,
   FaRegHeart,
   FaInfoCircle,
   FaArrowRight,
-  FaWifi,
-  FaUtensils,
+  FaCreditCard,
 } from "react-icons/fa";
 import { FlightCardProps } from "../../types/flight";
 
@@ -15,6 +13,7 @@ const FlightCard: React.FC<FlightCardProps> = ({
   onSelect,
   onViewDetails,
   onAddToFavorites,
+  onBookNow,
   isSelected = false,
   isFavorite = false,
 }) => {
@@ -26,31 +25,16 @@ const FlightCard: React.FC<FlightCardProps> = ({
     });
   };
 
-  const formatDuration = (minutes: number) => {
-    const hours = Math.floor(minutes / 60);
-    const mins = minutes % 60;
-    return `${hours}h ${mins}m`;
-  };
+  const prices =
+    flight.flight_details && flight.flight_details.length > 0
+      ? flight.flight_details.map((detail) => parseFloat(detail.price))
+      : [];
 
-  const getStopsText = (stops: number) => {
-    if (stops === 0) return "Direct";
-    if (stops === 1) return "1 Stop";
-    return `${stops} Stops`;
-  };
-
-  const getFlightClassBadge = (flightClass: string) => {
-    const classes = {
-      economy: "bg-blue-100 text-blue-800",
-      business: "bg-purple-100 text-purple-800",
-      first: "bg-gold-100 text-gold-800",
-    };
-    return classes[flightClass as keyof typeof classes] || classes.economy;
-  };
+  const minPrice = prices.length > 0 ? Math.min(...prices) : null;
+  const maxPrice = prices.length > 0 ? Math.max(...prices) : null;
 
   const departureTime = formatTime(flight.departure_time);
   const arrivalTime = formatTime(flight.arrival_time);
-  const duration = formatDuration(flight.duration_minutes);
-  const stopsText = getStopsText(flight.stops);
 
   return (
     <div
@@ -73,14 +57,6 @@ const FlightCard: React.FC<FlightCardProps> = ({
             </div>
           </div>
           <div className="flex items-center space-x-2">
-            <span
-              className={`px-2 py-1 rounded-full text-xs font-medium ${getFlightClassBadge(
-                flight.flight_class
-              )}`}
-            >
-              {/* {flight.flight_class.charAt(0).toUpperCase() +
-                flight.flight_class.slice(1)} */}
-            </span>
             <button
               onClick={() => onAddToFavorites(flight)}
               className="p-2 rounded-full hover:bg-gray-100 transition-colors"
@@ -105,7 +81,7 @@ const FlightCard: React.FC<FlightCardProps> = ({
               {flight.departure_airport.IATA_code}
             </div>
             <div className="text-xs text-gray-400">
-              {/* {flight.departure_airport.city.name} */}
+              {flight.departure_airport.city_name}
             </div>
           </div>
 
@@ -118,12 +94,6 @@ const FlightCard: React.FC<FlightCardProps> = ({
               </div>
               <div className="flex-1 h-px bg-gray-300"></div>
             </div>
-            <div className="text-center mt-2">
-              <div className="text-sm font-medium text-gray-700">
-                {duration}
-              </div>
-              <div className="text-xs text-gray-500">{stopsText}</div>
-            </div>
           </div>
 
           {/* Arrival */}
@@ -135,60 +105,58 @@ const FlightCard: React.FC<FlightCardProps> = ({
               {flight.arrival_airport.IATA_code}
             </div>
             <div className="text-xs text-gray-400">
-              {/* {flight.arrival_airport.city.name} */}
+              {flight.arrival_airport.city_name}
             </div>
-          </div>
-        </div>
-
-        {/* Additional Flight Info */}
-        <div className="flex items-center justify-between mb-4 py-3 bg-gray-50 rounded-lg px-4">
-          <div className="flex items-center space-x-4 text-sm text-gray-600">
-            {flight.aircraft_type && (
-              <span className="flex items-center">
-                <FaPlane className="mr-1 text-xs" />
-                {flight.aircraft_type}
-              </span>
-            )}
-            <span className="flex items-center">
-              <FaClock className="mr-1 text-xs" />
-              {duration}
-            </span>
-            <span className="text-green-600 font-medium">
-              {flight.available_seats} seats left
-            </span>
-          </div>
-
-          {/* Amenities */}
-          <div className="flex items-center space-x-2 text-gray-400">
-            <FaWifi className="text-sm" />
-            <FaUtensils className="text-sm" />
           </div>
         </div>
 
         {/* Price and Actions */}
         <div className="flex items-center justify-between">
           <div className="text-right">
-            <div className="text-2xl font-bold text-gray-900">
-              ${flight.price}
+            <div className="text-2xl font-bold text-green-500">
+              {minPrice === null || maxPrice === null ? (
+                <span className="text-gray-400 text-sm italic">
+                  Price not available
+                </span>
+              ) : minPrice === maxPrice ? (
+                <>${minPrice.toFixed(2)}</>
+              ) : (
+                <>
+                  <span className="text-sm font-normal text-gray-500">from </span>$
+                  {minPrice.toFixed(2)}
+                  <span className="text-sm font-normal text-gray-500"> to </span>$
+                  {maxPrice.toFixed(2)}
+                </>
+              )}
             </div>
-            <div className="text-sm text-gray-500">per person</div>
+
+            <div className="text-sm text-gray-500 text-left">per person</div>
           </div>
 
-          <div className="flex space-x-3">
+          <div className="flex space-x-2">
             <button
               onClick={() => onViewDetails(flight)}
-              className="px-4 py-2 border border-primary-500 text-primary-500 rounded-lg hover:bg-primary-50 transition-colors flex items-center"
+              className="px-3 py-2 border border-primary-500 text-primary-500 rounded-lg hover:bg-primary-50 transition-colors flex items-center"
             >
-              <FaInfoCircle className="mr-2" />
+              <FaInfoCircle className="mr-1" />
               Details
             </button>
             <button
               onClick={() => onSelect(flight)}
-              className="px-6 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors flex items-center"
+              className="px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors flex items-center"
             >
-              Select Flight
-              <FaArrowRight className="ml-2" />
+              Select
+              <FaArrowRight className="ml-1" />
             </button>
+            {onBookNow && (
+              <button
+                onClick={() => onBookNow(flight)}
+                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center"
+              >
+                <FaCreditCard className="mr-1" />
+                Book Now
+              </button>
+            )}
           </div>
         </div>
 

@@ -12,7 +12,7 @@ export const useAuth = () => {
     try {
       const response = await login({ email, password });
       toast.success("Login successful!");
-      const token = response.data.data[0];
+      const token = response.data.data.token;
       localStorage.setItem("token", token);
       
       // Fetch user data after successful login
@@ -22,7 +22,7 @@ export const useAuth = () => {
       } catch (err) {
         console.error("Error fetching user data after login:", err);
       }
-      
+
       navigate("/");
       return response.data;
     } catch (error: any) {
