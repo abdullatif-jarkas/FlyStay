@@ -27,7 +27,7 @@ const ResetPassword = lazyImport("./pages/Auth/ResetPassword/ResetPassword");
 const Hotel = lazyImport("./pages/Hotel/Hotel");
 const HotelSearchResult = lazyImport("./pages/Hotel/HotelSearchResult");
 const HotelFavorites = lazyImport("./pages/Hotel/HotelFavorites");
-const HotelInfo = lazyImport("./pages/Hotel/HotelInfo");
+const HotelDetails = lazyImport("./pages/Hotel/HotelDetails");
 const HotelPayment = lazyImport("./pages/Hotel/HotelPayment");
 
 // Flight Pages
@@ -74,7 +74,7 @@ export const routes = createBrowserRouter([
           { index: true, element: withSuspense(<Hotel />) },
           { path: "search", element: withSuspense(<HotelSearchResult />) },
           { path: "favorites", element: withSuspense(<HotelFavorites />) },
-          { path: ":hotelId", element: withSuspense(<HotelInfo />) },
+          { path: ":hotelId", element: withSuspense(<HotelDetails />) },
           { path: ":hotelId/payment", element: withSuspense(<HotelPayment />) },
         ],
       },
@@ -83,7 +83,10 @@ export const routes = createBrowserRouter([
         children: [
           { index: true, element: withSuspense(<Flight />) },
           { path: "search", element: withSuspense(<FlightSearchResult />) },
-          { path: "purchase/:flightId", element: withSuspense(<FlightPurchase />) },
+          {
+            path: "purchase/:flightId",
+            element: withSuspense(<FlightPurchase />),
+          },
           { path: "favorites", element: withSuspense(<FlightFavorites />) },
         ],
       },

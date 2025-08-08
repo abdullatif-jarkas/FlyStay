@@ -22,6 +22,18 @@ export interface HotelImage {
   is_primary?: boolean;
   created_at: string;
   image_path: string;
+  imageable_type?: string;
+}
+
+export interface Room {
+  id: number;
+  hotel_id: number;
+  room_type: string;
+  price_per_night: string; // decimal as string
+  capacity: number;
+  description: string;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface Hotel {
@@ -34,6 +46,7 @@ export interface Hotel {
   rating: number;
   description: string;
   images?: HotelImage[];
+  rooms?: Room[];
   created_at: string;
   updated_at?: string;
 }

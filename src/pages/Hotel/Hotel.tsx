@@ -27,20 +27,13 @@ const Hotel = () => {
   } = useHotels();
 
   // Handle hotel details view
-  const handleViewDetails = useCallback((hotel: IHotel) => {
-    // Navigate to hotel details page or show modal
-    toast.info(`Viewing details for ${hotel.name}`);
-    // You can implement navigation to hotel details page here
-    navigate(`/hotel/${hotel.id}`);
-  }, []);
-
-  // Handle hotel booking
-  const handleBookNow = useCallback((hotel: IHotel) => {
-    // Navigate to hotel booking page or show booking modal
-    toast.info(`Booking ${hotel.name}`);
-    // You can implement navigation to hotel booking page here
-    navigate(`/hotel/${hotel.id}/book`);
-  }, []);
+  const handleViewDetails = useCallback(
+    (hotel: IHotel) => {
+      // Navigate to hotel details page
+      navigate(`/hotel/${hotel.id}`);
+    },
+    [navigate]
+  );
 
   // Handle add to favorites
   const handleAddToFavorites = useCallback(async (hotel: IHotel) => {
@@ -135,9 +128,8 @@ const Hotel = () => {
             <HotelResults
               hotels={hotels}
               loading={loading}
-              error={error}
+              error={error || undefined}
               onViewDetails={handleViewDetails}
-              onBookNow={handleBookNow}
               onAddToFavorites={handleAddToFavorites}
               hasFilters={hasFilters}
             />
