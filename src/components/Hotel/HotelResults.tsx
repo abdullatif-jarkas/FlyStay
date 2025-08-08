@@ -13,7 +13,6 @@ export interface HotelResultsProps {
   loading: boolean;
   error?: string;
   onViewDetails: (hotel: Hotel) => void;
-  onBookNow?: (hotel: Hotel) => void;
   onAddToFavorites?: (hotel: Hotel) => void;
   hasFilters?: boolean;
 }
@@ -23,7 +22,6 @@ const HotelResults: React.FC<HotelResultsProps> = ({
   loading,
   error,
   onViewDetails,
-  onBookNow,
   onAddToFavorites,
   hasFilters = false,
 }) => {
@@ -42,7 +40,9 @@ const HotelResults: React.FC<HotelResultsProps> = ({
     return (
       <div className="flex flex-col items-center justify-center py-16">
         <FaExclamationTriangle className="text-4xl text-red-500 mb-4" />
-        <h3 className="text-lg font-semibold text-gray-900 mb-2">Search Error</h3>
+        <h3 className="text-lg font-semibold text-gray-900 mb-2">
+          Search Error
+        </h3>
         <p className="text-gray-600 text-center max-w-md">{error}</p>
       </div>
     );
@@ -93,7 +93,6 @@ const HotelResults: React.FC<HotelResultsProps> = ({
             key={hotel.id}
             hotel={hotel}
             onViewDetails={onViewDetails}
-            onBookNow={onBookNow}
             onAddToFavorites={onAddToFavorites}
             isFavorite={false} // You can implement favorite logic here
           />

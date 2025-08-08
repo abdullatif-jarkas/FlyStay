@@ -14,9 +14,4 @@ export const navbarLinks = [
     to: "/flight",
     styles: "w-[121px] inline-block rounded-30 py-[9px] border border-gray-button text",
   },
-  {
-    title: "Apartment",
-    to: "/apartment",
-    styles: "w-[121px] inline-block rounded-30 py-[9px] border border-gray-button text",
-  },
 ];

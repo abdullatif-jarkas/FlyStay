@@ -6,7 +6,6 @@ import {
   FaInfoCircle,
   FaHeart,
   FaRegHeart,
-  FaCreditCard,
   FaImage,
 } from "react-icons/fa";
 import { Hotel } from "../../types/hotel";
@@ -14,7 +13,6 @@ import { Hotel } from "../../types/hotel";
 export interface HotelCardProps {
   hotel: Hotel;
   onViewDetails: (hotel: Hotel) => void;
-  onBookNow?: (hotel: Hotel) => void;
   onAddToFavorites?: (hotel: Hotel) => void;
   isFavorite?: boolean;
 }
@@ -22,13 +20,13 @@ export interface HotelCardProps {
 const HotelCard: React.FC<HotelCardProps> = ({
   hotel,
   onViewDetails,
-  onBookNow,
   onAddToFavorites,
   isFavorite = false,
 }) => {
   // Get primary image or first image
-  const primaryImage = hotel.images?.find(img => img.is_primary) || hotel.images?.[0];
-  
+  const primaryImage =
+    hotel.images?.find((img) => img.is_primary) || hotel.images?.[0];
+
   // Generate star rating display
   const renderStars = (rating: number) => {
     const stars = [];
@@ -36,22 +34,16 @@ const HotelCard: React.FC<HotelCardProps> = ({
     const hasHalfStar = rating % 1 !== 0;
 
     for (let i = 0; i < fullStars; i++) {
-      stars.push(
-        <FaStar key={`full-${i}`} className="text-yellow-400" />
-      );
+      stars.push(<FaStar key={`full-${i}`} className="text-yellow-400" />);
     }
 
     if (hasHalfStar) {
-      stars.push(
-        <FaStar key="half" className="text-yellow-400 opacity-50" />
-      );
+      stars.push(<FaStar key="half" className="text-yellow-400 opacity-50" />);
     }
 
     const emptyStars = 5 - Math.ceil(rating);
     for (let i = 0; i < emptyStars; i++) {
-      stars.push(
-        <FaStar key={`empty-${i}`} className="text-gray-300" />
-      );
+      stars.push(<FaStar key={`empty-${i}`} className="text-gray-300" />);
     }
 
     return stars;
@@ -74,14 +66,18 @@ const HotelCard: React.FC<HotelCardProps> = ({
             className="w-full h-full object-cover"
             onError={(e) => {
               // Fallback if image fails to load
-              e.currentTarget.style.display = 'none';
-              e.currentTarget.nextElementSibling?.classList.remove('hidden');
+              e.currentTarget.style.display = "none";
+              e.currentTarget.nextElementSibling?.classList.remove("hidden");
             }}
           />
         ) : null}
-        
+
         {/* Fallback when no image or image fails to load */}
-        <div className={`absolute inset-0 flex items-center justify-center bg-gray-100 ${primaryImage ? 'hidden' : ''}`}>
+        <div
+          className={`absolute inset-0 flex items-center justify-center bg-gray-100 ${
+            primaryImage ? "hidden" : ""
+          }`}
+        >
           <FaImage className="text-4xl text-gray-400" />
         </div>
 
@@ -117,7 +113,7 @@ const HotelCard: React.FC<HotelCardProps> = ({
           <h3 className="text-xl font-bold text-gray-900 mb-2 line-clamp-1">
             {hotel.name}
           </h3>
-          
+
           <div className="flex items-center text-gray-600 mb-2">
             <FaMapMarkerAlt className="mr-2 text-primary-500" />
             <span className="text-sm">
@@ -137,9 +133,7 @@ const HotelCard: React.FC<HotelCardProps> = ({
           <div className="flex items-center space-x-1 mr-2">
             {renderStars(hotel.rating)}
           </div>
-          <span className="text-sm text-gray-600">
-            ({hotel.rating} stars)
-          </span>
+          <span className="text-sm text-gray-600">({hotel.rating} stars)</span>
         </div>
 
         {/* Description */}
@@ -153,9 +147,19 @@ const HotelCard: React.FC<HotelCardProps> = ({
 
         {/* Hotel Features/Amenities */}
         <div className="mb-6">
-          <div className="flex items-center text-sm text-gray-600">
-            <FaHotel className="mr-2 text-primary-500" />
-            <span>Hotel ID: {hotel.id}</span>
+          <div className="flex items-center justify-between text-sm text-gray-600">
+            <div className="flex items-center">
+              <FaHotel className="mr-2 text-primary-500" />
+              <span>Hotel ID: {hotel.id}</span>
+            </div>
+            {hotel.rooms && hotel.rooms.length > 0 && (
+              <div className="flex items-center">
+                <span className="text-primary-600 font-medium">
+                  {hotel.rooms.length} room{hotel.rooms.length !== 1 ? "s" : ""}{" "}
+                  available
+                </span>
+              </div>
+            )}
           </div>
         </div>
 
@@ -163,29 +167,24 @@ const HotelCard: React.FC<HotelCardProps> = ({
         <div className="flex space-x-2">
           <button
             onClick={() => onViewDetails(hotel)}
-            className="flex-1 px-4 py-2 border border-primary-500 text-primary-500 rounded-lg hover:bg-primary-50 transition-colors flex items-center justify-center"
+            className="w-full px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors flex items-center justify-center"
           >
             <FaInfoCircle className="mr-2" />
             View Details
           </button>
-          
-          {onBookNow && (
-            <button
-              onClick={() => onBookNow(hotel)}
-              className="flex-1 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors flex items-center justify-center"
-            >
-              <FaCreditCard className="mr-2" />
-              Book Now
-            </button>
-          )}
         </div>
 
         {/* Additional Info */}
         <div className="mt-4 pt-4 border-t border-gray-200">
           <div className="flex items-center justify-between text-sm text-gray-500">
-            <span>Added: {new Date(hotel.created_at).toLocaleDateString()}</span>
+            <span>
+              Added: {new Date(hotel.created_at).toLocaleDateString()}
+            </span>
             {hotel.images && hotel.images.length > 0 && (
-              <span>{hotel.images.length} photo{hotel.images.length !== 1 ? 's' : ''}</span>
+              <span>
+                {hotel.images.length} photo
+                {hotel.images.length !== 1 ? "s" : ""}
+              </span>
             )}
           </div>
         </div>

@@ -81,14 +81,6 @@ const Home = () => {
       link: "/flight",
       color: "bg-green-500",
     },
-    {
-      icon: <FaBuilding className="text-3xl" />,
-      title: "Apartment Rentals",
-      description:
-        "Discover comfortable apartments and vacation rentals for extended stays and family trips.",
-      link: "/apartment",
-      color: "bg-purple-500",
-    },
   ];
 
   const features: Feature[] = [
@@ -218,7 +210,7 @@ const Home = () => {
                   <span className="text-primary-400">FlyStay</span>
                 </h1>
                 <p className="text-xl text-white mb-8 leading-relaxed">
-                  Discover amazing deals on flights, hotels, and apartments.
+                  Discover amazing deals on flights and hotels.
                   Book with confidence and create unforgettable memories.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4">
