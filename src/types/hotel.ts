@@ -32,8 +32,50 @@ export interface Room {
   price_per_night: string; // decimal as string
   capacity: number;
   description: string;
+  images?: RoomImage[];
+  amenities?: string[];
   created_at?: string;
   updated_at?: string;
+}
+
+export interface RoomImage {
+  id: number;
+  room_id: number;
+  image_path: string;
+  url?: string;
+  alt?: string;
+  is_primary?: boolean;
+  created_at?: string;
+}
+
+// Room booking interfaces
+export interface RoomBookingRequest {
+  room_id: number;
+  check_in_date: string; // YYYY-MM-DD format
+  check_out_date: string; // YYYY-MM-DD format
+}
+
+export interface RoomBookingResponse {
+  status: string;
+  message: string;
+  data: {
+    id: number;
+    room_id: number;
+    user_id: number;
+    check_in_date: string;
+    check_out_date: string;
+    total_price: string;
+    booking_reference: string;
+    status: string;
+    created_at: string;
+  };
+}
+
+// Room details API response
+export interface RoomDetailsResponse {
+  status: string;
+  message?: string;
+  data: Room;
 }
 
 export interface Hotel {

@@ -28,6 +28,7 @@ const Hotel = lazyImport("./pages/Hotel/Hotel");
 const HotelSearchResult = lazyImport("./pages/Hotel/HotelSearchResult");
 const HotelFavorites = lazyImport("./pages/Hotel/HotelFavorites");
 const HotelDetails = lazyImport("./pages/Hotel/HotelDetails");
+const RoomDetails = lazyImport("./pages/Hotel/RoomDetails");
 const HotelPayment = lazyImport("./pages/Hotel/HotelPayment");
 
 // Flight Pages
@@ -75,6 +76,10 @@ export const routes = createBrowserRouter([
           { path: "search", element: withSuspense(<HotelSearchResult />) },
           { path: "favorites", element: withSuspense(<HotelFavorites />) },
           { path: ":hotelId", element: withSuspense(<HotelDetails />) },
+          {
+            path: ":hotelId/room/:roomId",
+            element: withSuspense(<RoomDetails />),
+          },
           { path: ":hotelId/payment", element: withSuspense(<HotelPayment />) },
         ],
       },
