@@ -7,13 +7,13 @@ import {
   FaSpinner,
   FaExclamationTriangle,
   FaUsers,
-  FaDollarSign,
   FaArrowLeft,
   FaImage,
   FaCalendarAlt,
   FaCreditCard,
   FaInfoCircle,
   FaCheckCircle,
+  FaMoneyBill,
 } from "react-icons/fa";
 import {
   Room,
@@ -170,8 +170,9 @@ const RoomDetails = () => {
         );
 
         if (response.data.status === "success") {
+          console.log(response.data.data)
           toast.success(
-            `Booking confirmed! Reference: ${response.data.data.booking_reference}`
+            `Booking confirmed!`
           );
           // Navigate to booking confirmation or hotel page
           navigate(`/hotel/${hotelId}`);
@@ -296,7 +297,7 @@ const RoomDetails = () => {
                   <div className="flex items-center justify-between">
                     <span className="text-gray-600">Price per night:</span>
                     <div className="flex items-center">
-                      <FaDollarSign className="mr-2 text-green-500" />
+                      <FaMoneyBill className="mr-2 text-green-500" />
                       <span className="font-bold text-green-600 text-lg">
                         {formatPrice(room.price_per_night)}
                       </span>

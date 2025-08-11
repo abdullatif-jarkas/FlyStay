@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import { FaTrash, FaExclamationTriangle, FaHotel, FaMapMarkerAlt, FaStar } from "react-icons/fa";
 import { DeleteHotelModalProps } from "../../../types/hotel";
+import { toast } from "sonner";
 
 const DeleteHotelModal: React.FC<DeleteHotelModalProps> = ({
   isOpen,
@@ -42,6 +43,8 @@ const DeleteHotelModal: React.FC<DeleteHotelModalProps> = ({
         },
         data: urlEncodedData,
       });
+
+      toast.error("Hotel deleted successfully");
 
       onSuccess();
       handleClose();
