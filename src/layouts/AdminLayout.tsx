@@ -17,6 +17,7 @@ import { useState } from "react";
 import Logo from "../components/ui/Logo";
 import LogoImg from "./../assets/Logo/Logo.png";
 import { MdFlight } from "react-icons/md";
+import { useAppSelector } from "../store/hooks";
 
 const AdminLayout = () => {
   const navigate = useNavigate();
@@ -24,6 +25,8 @@ const AdminLayout = () => {
   const [collapsed, setCollapsed] = useState(false);
 
   const currentPath = location.pathname;
+
+  const role = useAppSelector((state) => state.user.role);
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -84,79 +87,84 @@ const AdminLayout = () => {
               </MenuItem>
 
               {/* 2. User Management */}
-              <SubMenu icon={<FaUsersCog />} label="User Management">
-                <MenuItem
-                  icon={<FaKey />}
-                  onClick={() => navigate("/admin/permissions")}
-                  active={currentPath === "/admin/permissions"}
-                >
-                  Permissions
-                </MenuItem>
-                <MenuItem
-                  icon={<FaUsersCog />}
-                  onClick={() => navigate("/admin/roles")}
-                  active={currentPath === "/admin/roles"}
-                >
-                  Roles
-                </MenuItem>
-                <MenuItem
-                  icon={<FaUsers />}
-                  onClick={() => navigate("/admin/users")}
-                  active={currentPath === "/admin/users"}
-                >
-                  Users
-                </MenuItem>
-              </SubMenu>
+              {role === "admin" && (
+                <SubMenu icon={<FaUsersCog />} label="User Management">
+                  <MenuItem
+                    icon={<FaKey />}
+                    onClick={() => navigate("/admin/permissions")}
+                    active={currentPath === "/admin/permissions"}
+                  >
+                    Permissions
+                  </MenuItem>
+                  <MenuItem
+                    icon={<FaUsersCog />}
+                    onClick={() => navigate("/admin/roles")}
+                    active={currentPath === "/admin/roles"}
+                  >
+                    Roles
+                  </MenuItem>
+                  <MenuItem
+                    icon={<FaUsers />}
+                    onClick={() => navigate("/admin/users")}
+                    active={currentPath === "/admin/users"}
+                  >
+                    Users
+                  </MenuItem>
+                </SubMenu>
+              )}
 
               {/* 3. Travel */}
-              <SubMenu icon={<MdFlight />} label="Travel">
-                <MenuItem
-                  icon={<MdFlight />}
-                  onClick={() => navigate("/admin/flights")}
-                  active={currentPath === "/admin/flights"}
-                >
-                  Flights
-                </MenuItem>
-                <MenuItem
-                  icon={<FaChair />}
-                  onClick={() => navigate("/admin/flight-cabins")}
-                  active={currentPath === "/admin/flight-cabins"}
-                >
-                  Flight Cabins
-                </MenuItem>
-                <MenuItem
-                  icon={<FaPlaneDeparture />}
-                  onClick={() => navigate("/admin/airports")}
-                  active={currentPath === "/admin/airports"}
-                >
-                  Airports
-                </MenuItem>
-                <MenuItem
-                  icon={<FaCity />}
-                  onClick={() => navigate("/admin/cities")}
-                  active={currentPath === "/admin/cities"}
-                >
-                  Cities
-                </MenuItem>
-              </SubMenu>
-
+              {(role === "flight_agent" || role === "admin") && (
+                <SubMenu icon={<MdFlight />} label="Travel">
+                  <MenuItem
+                    icon={<MdFlight />}
+                    onClick={() => navigate("/admin/flights")}
+                    active={currentPath === "/admin/flights"}
+                  >
+                    Flights
+                  </MenuItem>
+                  <MenuItem
+                    icon={<FaChair />}
+                    onClick={() => navigate("/admin/flight-cabins")}
+                    active={currentPath === "/admin/flight-cabins"}
+                  >
+                    Flight Cabins
+                  </MenuItem>
+                  <MenuItem
+                    icon={<FaPlaneDeparture />}
+                    onClick={() => navigate("/admin/airports")}
+                    active={currentPath === "/admin/airports"}
+                  >
+                    Airports
+                  </MenuItem>
+                  <MenuItem
+                    icon={<FaCity />}
+                    onClick={() => navigate("/admin/cities")}
+                    active={currentPath === "/admin/cities"}
+                  >
+                    Cities
+                  </MenuItem>
+                </SubMenu>
+              )}
               {/* 4. Accommodation */}
-              <SubMenu icon={<FaHotel />} label="Accommodation">
-                <MenuItem
-                  icon={<FaHotel />}
-                  onClick={() => navigate("/admin/hotels")}
-                  active={currentPath === "/admin/hotels"}
-                >
-                  Hotels
-                </MenuItem>
-                <MenuItem
-                  icon={<FaBed />}
-                  onClick={() => navigate("/admin/rooms")}
-                  active={currentPath === "/admin/rooms"}
-                >
-                  Rooms
-                </MenuItem>
-              </SubMenu>
+              {(role === "hotel_agent" || role === "admin") && (
+                <SubMenu icon={<FaHotel />} label="Accommodation">
+                  <MenuItem
+                    icon={<FaHotel />}
+                    onClick={() => navigate("/admin/hotels")}
+                    active={currentPath === "/admin/hotels"}
+                  >
+                    Hotels
+                  </MenuItem>
+                  <MenuItem
+                    icon={<FaBed />}
+                    onClick={() => navigate("/admin/rooms")}
+                    active={currentPath === "/admin/rooms"}
+                  >
+                    Rooms
+                  </MenuItem>
+                </SubMenu>
+              )}
             </Menu>
           </div>
 

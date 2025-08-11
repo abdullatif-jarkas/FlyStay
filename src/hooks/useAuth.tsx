@@ -1,24 +1,42 @@
 import { useState } from "react";
 import { toast } from "sonner";
-import { login, register, getGoogleRedirectUrl, getCurrentUser } from "../services/authService";
+import {
+  login,
+  register,
+  getGoogleRedirectUrl,
+  getCurrentUser,
+} from "../services/authService";
 import { useNavigate } from "react-router-dom";
+import { useAppDispatch } from "../store/hooks";
+import { setUser } from "../store/userSlice";
 
 export const useAuth = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-
+  const dispatch = useAppDispatch();
   const handleLogin = async (email: string, password: string) => {
     setLoading(true);
     try {
       const response = await login({ email, password });
-      toast.success("Login successful!");
-      const token = response.data.data.token;
-      localStorage.setItem("token", token);
       
+      toast.success("Login successful!");
+
+      const token = response.data.data.token;
+      const role = response.data.data.roles[0];
+      
+      localStorage.setItem("token", token);
+
+      dispatch(setUser({ role }));
+      
+      localStorage.setItem("role", role);
+
       // Fetch user data after successful login
       try {
         const userResponse = await getCurrentUser();
-        localStorage.setItem("userData", JSON.stringify(userResponse.data.data));
+        localStorage.setItem(
+          "userData",
+          JSON.stringify(userResponse.data.data[0])
+        );
       } catch (err) {
         console.error("Error fetching user data after login:", err);
       }
@@ -43,15 +61,18 @@ export const useAuth = () => {
       toast.success("Registration successful!");
       const token = response.data.data.token;
       localStorage.setItem("token", token);
-      
+
       // Fetch user data after successful registration
       try {
         const userResponse = await getCurrentUser();
-        localStorage.setItem("userData", JSON.stringify(userResponse.data.data));
+        localStorage.setItem(
+          "userData",
+          JSON.stringify(userResponse.data.data)
+        );
       } catch (err) {
         console.error("Error fetching user data after registration:", err);
       }
-      
+
       navigate("/");
       return response.data;
     } catch (error: any) {

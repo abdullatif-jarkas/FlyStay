@@ -13,6 +13,8 @@ import { useUser } from "../../hooks/useUser";
 import { toast } from "sonner";
 import UserDropdown from "./UserDropdown";
 import { MdDashboard } from "react-icons/md";
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import { logout } from "../../store/userSlice";
 
 const NavBar = ({ isAuth }: { isAuth?: boolean }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -21,12 +23,13 @@ const NavBar = ({ isAuth }: { isAuth?: boolean }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const dropdownRef = useRef<HTMLDivElement>(null);
-
+  const dispatch = useAppDispatch();
   const hiddenRoutes = ["/user"];
   const hideBottomSection = hiddenRoutes.some((route) =>
     location.pathname.includes(route)
   );
-  
+  const role = useAppSelector((state) => state.user.role);
+
   useEffect(() => {
     // Check if user is logged in by looking for token in localStorage
     if (location.pathname.includes("/user")) {
@@ -58,6 +61,7 @@ const NavBar = ({ isAuth }: { isAuth?: boolean }) => {
       // await logout();
       localStorage.removeItem("token");
       localStorage.removeItem("userData");
+      dispatch(logout());
       setIsLoggedIn(false);
       setShowUserDropdown(false);
       navigate("/");
@@ -103,14 +107,15 @@ const NavBar = ({ isAuth }: { isAuth?: boolean }) => {
             </Link>
 
             {/* Dashboard */}
-            <Link
-              to="/admin"
-              className="text-primary-500 flex items-center gap-1"
-            >
-              <MdDashboard className="text-xl" />
-              <span className="hidden md:inline">Dashboard</span>
-            </Link>
-
+            {!(role === "customer") && (
+              <Link
+                to="/admin"
+                className="text-primary-500 flex items-center gap-1"
+              >
+                <MdDashboard className="text-xl" />
+                <span className="hidden md:inline">Dashboard</span>
+              </Link>
+            )}
             {/* User account with dropdown */}
             <div className="relative" ref={dropdownRef}>
               <button

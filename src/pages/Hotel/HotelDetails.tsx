@@ -12,7 +12,6 @@ import {
   FaImage,
   FaBed,
   FaUsers,
-  FaCreditCard,
   FaInfoCircle,
 } from "react-icons/fa";
 import { Hotel, Room } from "../../types/hotel";
@@ -32,8 +31,6 @@ const HotelDetails = () => {
   const [hotel, setHotel] = useState<Hotel | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>("");
-  const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
-  const [bookingModalOpen, setBookingModalOpen] = useState(false);
 
   const token = localStorage.getItem("token");
 
@@ -86,13 +83,14 @@ const HotelDetails = () => {
     fetchHotelDetails();
   }, [fetchHotelDetails]);
 
-  // Handle room booking
-  const handleBookRoom = useCallback((room: Room) => {
-    setSelectedRoom(room);
-    setBookingModalOpen(true);
-    toast.info(`Booking ${room.room_type} room`);
-    // You can implement actual booking logic here
-  }, []);
+  // Handle room details navigation
+  const handleViewRoomDetails = useCallback(
+    (room: Room) => {
+      // Navigate to room details page
+      navigate(`/hotel/${hotelId}/room/${room.id}`);
+    },
+    [navigate, hotelId]
+  );
 
   // Generate star rating display
   const renderStars = (rating: number) => {
@@ -385,13 +383,13 @@ const HotelDetails = () => {
                           </div>
                         </div>
 
-                        {/* Book Room Button */}
+                        {/* View Room Details Button */}
                         <button
-                          onClick={() => handleBookRoom(room)}
+                          onClick={() => handleViewRoomDetails(room)}
                           className="w-full py-2 px-4 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors flex items-center justify-center"
                         >
-                          <FaCreditCard className="mr-2" />
-                          Book Room
+                          <FaInfoCircle className="mr-2" />
+                          View Room Details
                         </button>
                       </div>
                     ))}

@@ -2,6 +2,7 @@
 import { lazy, Suspense } from "react";
 import { createBrowserRouter } from "react-router-dom";
 import LoadingSpinner from "./components/LoadingSpinner/LoadingSpinner";
+import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute";
 
 // Lazy Import Helper
 const lazyImport = (path: string) => lazy(() => import(path));
@@ -28,6 +29,7 @@ const Hotel = lazyImport("./pages/Hotel/Hotel");
 const HotelSearchResult = lazyImport("./pages/Hotel/HotelSearchResult");
 const HotelFavorites = lazyImport("./pages/Hotel/HotelFavorites");
 const HotelDetails = lazyImport("./pages/Hotel/HotelDetails");
+const RoomDetails = lazyImport("./pages/Hotel/RoomDetails");
 const HotelPayment = lazyImport("./pages/Hotel/HotelPayment");
 
 // Flight Pages
@@ -75,6 +77,10 @@ export const routes = createBrowserRouter([
           { path: "search", element: withSuspense(<HotelSearchResult />) },
           { path: "favorites", element: withSuspense(<HotelFavorites />) },
           { path: ":hotelId", element: withSuspense(<HotelDetails />) },
+          {
+            path: ":hotelId/room/:roomId",
+            element: withSuspense(<RoomDetails />),
+          },
           { path: ":hotelId/payment", element: withSuspense(<HotelPayment />) },
         ],
       },
@@ -116,12 +122,37 @@ export const routes = createBrowserRouter([
   },
   {
     path: "/admin",
-    element: withSuspense(<AdminLayout />),
+    element: withSuspense(
+      <ProtectedRoute allowedRoles={["admin", "finance_officer", "hotel_agent", "flight_agent"]}>
+        <AdminLayout />
+      </ProtectedRoute>
+    ),
     children: [
       { index: true, element: withSuspense(<Dashboard />) },
-      { path: "permissions", element: withSuspense(<Permissions />) },
-      { path: "roles", element: withSuspense(<Roles />) },
-      { path: "users", element: withSuspense(<Users />) },
+      {
+        path: "permissions",
+        element: withSuspense(
+          <ProtectedRoute allowedRoles={["admin"]}>
+            <Permissions />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "roles",
+        element: withSuspense(
+          <ProtectedRoute allowedRoles={["admin"]}>
+            <Roles />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "users",
+        element: withSuspense(
+          <ProtectedRoute allowedRoles={["admin"]}>
+            <Users />
+          </ProtectedRoute>
+        ),
+      },
       { path: "airports", element: withSuspense(<Airports />) },
       { path: "hotels", element: withSuspense(<Hotels />) },
       { path: "rooms", element: withSuspense(<Rooms />) },
