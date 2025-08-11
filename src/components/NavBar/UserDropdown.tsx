@@ -12,17 +12,17 @@ const UserDropdown: FC<UserDropdownProps> = ({ user, onLogout }) => {
   return (
     <div className="absolute right-0 top-full mt-2 w-64 bg-white rounded-lg shadow-lg z-50 overflow-hidden">
       {/* User info header */}
-      <div className="p-4 border-b border-gray-200">
+      {/* <div className="p-4 border-b border-gray-200">
         <div className="flex items-center gap-3">
           <div>
             <div className="font-medium">{user?.name || "User"}</div>
             <div className="text-sm text-gray-500">{user?.email || "user@example.com"}</div>
           </div>
         </div>
-      </div>
+      </div> */}
       
       {/* Menu items */}
-      <div className="py-2">
+      {/* <div className="py-2">
         <Link to="/user/profile" className="flex items-center px-4 py-3 hover:bg-gray-100 transition-colors">
           <FiUser className="text-primary-500 mr-3" />
           <span>My Account</span>
@@ -46,7 +46,7 @@ const UserDropdown: FC<UserDropdownProps> = ({ user, onLogout }) => {
           <span>Support</span>
           <span className="ml-auto text-gray-400">›</span>
         </Link>
-      </div>
+      </div> */}
       
       {/* Sign out button */}
       <div className="border-t border-gray-200">
