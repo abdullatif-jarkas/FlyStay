@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { FaPlus, FaTrash, FaStar, FaUpload } from "react-icons/fa";
 import { CreateHotelModalProps, CreateHotelFormData, City, ImagePreview, HotelFormErrors } from "../../../types/hotel";
+import { toast } from "sonner";
 
 const CreateHotelModal: React.FC<CreateHotelModalProps> = ({
   isOpen,
@@ -178,7 +179,7 @@ const CreateHotelModal: React.FC<CreateHotelModalProps> = ({
           // Don't set Content-Type, let axios handle it for FormData
         },
       });
-
+      toast.success("Hotel created successfully");
       onSuccess();
       handleClose();
     } catch (err: any) {

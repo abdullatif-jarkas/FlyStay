@@ -140,7 +140,7 @@ export const ROOM_TYPES = [
   { value: 'twin', label: 'Twin Room' },
   { value: 'triple', label: 'Triple Room' },
   { value: 'quad', label: 'Quad Room' },
-  { value: 'suite', label: 'Suite' },
+  { value: 'Suite', label: 'Suite' },
   { value: 'deluxe', label: 'Deluxe Room' },
   { value: 'executive', label: 'Executive Room' },
   { value: 'presidential', label: 'Presidential Suite' },

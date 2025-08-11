@@ -1,13 +1,21 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { FaTimes, FaUpload, FaTrash, FaBed, FaHotel, FaDollarSign, FaUsers } from "react-icons/fa";
-import { 
-  CreateRoomModalProps, 
-  CreateRoomFormData, 
-  RoomFormErrors, 
+import {
+  FaTimes,
+  FaUpload,
+  FaTrash,
+  FaBed,
+  FaHotel,
+  FaDollarSign,
+  FaUsers,
+} from "react-icons/fa";
+import {
+  CreateRoomModalProps,
+  CreateRoomFormData,
+  RoomFormErrors,
   ImagePreview,
   Hotel,
-  ROOM_TYPES
+  ROOM_TYPES,
 } from "../../../types/room";
 
 const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
@@ -58,50 +66,52 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
   };
 
   const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >
   ) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-    
+    setFormData((prev) => ({ ...prev, [name]: value }));
+
     // Clear error when user starts typing
     if (errors[name as keyof RoomFormErrors]) {
-      setErrors(prev => ({ ...prev, [name]: undefined }));
+      setErrors((prev) => ({ ...prev, [name]: undefined }));
     }
   };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
-    
+
     // Validate file types and sizes
-    const validFiles = files.filter(file => {
-      const isValidType = file.type.startsWith('image/');
+    const validFiles = files.filter((file) => {
+      const isValidType = file.type.startsWith("image/");
       const isValidSize = file.size <= 5 * 1024 * 1024; // 5MB limit
       return isValidType && isValidSize;
     });
 
     if (validFiles.length !== files.length) {
-      setErrors(prev => ({
+      setErrors((prev) => ({
         ...prev,
-        images: "Some files were rejected. Only images under 5MB are allowed."
+        images: "Some files were rejected. Only images under 5MB are allowed.",
       }));
     }
 
     // Create previews
-    const newPreviews: ImagePreview[] = validFiles.map(file => ({
+    const newPreviews: ImagePreview[] = validFiles.map((file) => ({
       file,
       url: URL.createObjectURL(file),
       id: Math.random().toString(36).substr(2, 9),
     }));
 
-    setImagePreviews(prev => [...prev, ...newPreviews]);
-    setFormData(prev => ({
+    setImagePreviews((prev) => [...prev, ...newPreviews]);
+    setFormData((prev) => ({
       ...prev,
-      images: [...prev.images, ...validFiles]
+      images: [...prev.images, ...validFiles],
     }));
 
     // Clear image error
     if (errors.images) {
-      setErrors(prev => ({ ...prev, images: undefined }));
+      setErrors((prev) => ({ ...prev, images: undefined }));
     }
   };
 
@@ -109,10 +119,10 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
     const preview = imagePreviews[index];
     URL.revokeObjectURL(preview.url);
 
-    setImagePreviews(prev => prev.filter((_, i) => i !== index));
-    setFormData(prev => ({
+    setImagePreviews((prev) => prev.filter((_, i) => i !== index));
+    setFormData((prev) => ({
       ...prev,
-      images: prev.images.filter((_, i) => i !== index)
+      images: prev.images.filter((_, i) => i !== index),
     }));
   };
 
@@ -129,13 +139,19 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
 
     if (!formData.price_per_night.trim()) {
       newErrors.price_per_night = "Price per night is required";
-    } else if (isNaN(Number(formData.price_per_night)) || Number(formData.price_per_night) <= 0) {
+    } else if (
+      isNaN(Number(formData.price_per_night)) ||
+      Number(formData.price_per_night) <= 0
+    ) {
       newErrors.price_per_night = "Price must be a valid positive number";
     }
 
     if (!formData.capacity.trim()) {
       newErrors.capacity = "Capacity is required";
-    } else if (isNaN(Number(formData.capacity)) || Number(formData.capacity) <= 0) {
+    } else if (
+      isNaN(Number(formData.capacity)) ||
+      Number(formData.capacity) <= 0
+    ) {
       newErrors.capacity = "Capacity must be a valid positive number";
     }
 
@@ -145,8 +161,8 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
 
   const handleClose = () => {
     // Clean up image previews
-    imagePreviews.forEach(preview => URL.revokeObjectURL(preview.url));
-    
+    imagePreviews.forEach((preview) => URL.revokeObjectURL(preview.url));
+
     setFormData({
       hotel_id: "",
       room_type: "",
@@ -161,7 +177,7 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
@@ -171,32 +187,39 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
 
     try {
       const formDataToSend = new FormData();
-      formDataToSend.append("hotel_id", formData.hotel_id);
+      formDataToSend.append("hotel_id", formData.hotel_id.toString());
       formDataToSend.append("room_type", formData.room_type);
-      formDataToSend.append("price_per_night", formData.price_per_night);
-      formDataToSend.append("capacity", formData.capacity);
+      formDataToSend.append(
+        "price_per_night",
+        formData.price_per_night.toString()
+      );
+      formDataToSend.append("capacity", formData.capacity.toString());
 
-      // Append images
-      formData.images.forEach((image, index) => {
-        formDataToSend.append(`images[${index}]`, image);
+      // Append images with same key 'images[]'
+      formData.images.forEach((image) => {
+        formDataToSend.append("images[]", image);
       });
 
       await axios.post("http://127.0.0.1:8000/api/room", formDataToSend, {
         headers: {
           Authorization: `Bearer ${token}`,
           Accept: "application/json",
-          // Don't set Content-Type, let axios handle it for FormData
+          // لا تحدد Content-Type لأن axios يتعامل مع FormData
         },
       });
 
       onSuccess();
       handleClose();
     } catch (err: any) {
-      setErrors({
-        general: err.response?.data?.message || 
-                err.response?.data?.error || 
-                "Failed to create room"
-      });
+      if (err.response?.status === 422) {
+        setErrors(
+          err.response.data.errors || {
+            general: err.response.data.message || "Validation error",
+          }
+        );
+      } else {
+        setErrors({ general: err.message || "Failed to create room" });
+      }
     } finally {
       setLoading(false);
     }
@@ -208,7 +231,9 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
         <div className="flex justify-between items-center p-6 border-b border-gray-200">
-          <h2 className="text-xl font-semibold text-gray-800">Create New Room</h2>
+          <h2 className="text-xl font-semibold text-gray-800">
+            Create New Room
+          </h2>
           <button
             onClick={handleClose}
             className="text-gray-400 hover:text-gray-600 transition-colors"
@@ -300,7 +325,9 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
                 }`}
               />
               {errors.price_per_night && (
-                <p className="text-red-500 text-sm mt-1">{errors.price_per_night}</p>
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.price_per_night}
+                </p>
               )}
             </div>
 
@@ -343,7 +370,7 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
             {errors.images && (
               <p className="text-red-500 text-sm mt-1">{errors.images}</p>
             )}
-            
+
             {/* Image Previews */}
             {imagePreviews.length > 0 && (
               <div className="mt-4 grid grid-cols-2 md:grid-cols-3 gap-4">

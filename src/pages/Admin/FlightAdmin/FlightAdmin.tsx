@@ -127,16 +127,16 @@ const FlightAdmin = () => {
         accessorKey: "airline",
         enableSorting: true,
       },
-      {
-        header: "Arrival Airport",
-        accessorKey: "arrival_airport.name",
-        enableSorting: true,
-      },
-      {
-        header: "Departure Airport",
-        accessorKey: "departure_airport.name",
-        enableSorting: true,
-      },
+      // {
+      //   header: "Arrival Airport",
+      //   accessorKey: "arrival_airport.name",
+      //   enableSorting: true,
+      // },
+      // {
+      //   header: "Departure Airport",
+      //   accessorKey: "departure_airport.name",
+      //   enableSorting: true,
+      // },
       {
         header: "Departure Time",
         accessorKey: "departure_time",
