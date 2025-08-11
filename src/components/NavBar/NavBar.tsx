@@ -119,11 +119,13 @@ const NavBar = ({ isAuth }: { isAuth?: boolean }) => {
             {/* User account with dropdown */}
             <div className="relative" ref={dropdownRef}>
               <button
-                onClick={() => setShowUserDropdown(!showUserDropdown)}
+                onClick={() => {
+                  // setShowUserDropdown(!showUserDropdown)
+                  navigate("/user/profile");
+                }}
                 className="cursor-pointer flex items-center gap-2"
               >
                 <div className="hidden md:block">
-                  {/* <div className="text-xs text-gray-600">Your Account</div> */}
                   <div className="border-l-3 pl-2 text-sm flex flex-col items-start text-primary-500">
                     <span className="font-extrabold">Your Account</span>
                     {user?.name || "User"}
@@ -131,9 +133,9 @@ const NavBar = ({ isAuth }: { isAuth?: boolean }) => {
                 </div>
               </button>
 
-              {showUserDropdown && (
+              {/* {showUserDropdown && (
                 <UserDropdown user={user} onLogout={handleLogout} />
-              )}
+              )} */}
             </div>
           </div>
         </nav>

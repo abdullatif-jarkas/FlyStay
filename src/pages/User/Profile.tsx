@@ -10,9 +10,11 @@ import {
   FiChevronRight,
   FiLogOut,
 } from "react-icons/fi";
+import { FaCalendarCheck } from "react-icons/fa";
 
 // Dashboard sections
 import ProfileSection from "./Dashboard/ProfileSection";
+import BookingsSection from "./Dashboard/BookingsSection";
 // import PreferencesSection from "./Dashboard/PreferencesSection";
 // import PaymentSection from "./Dashboard/PaymentSection";
 // import HelpSection from "./Dashboard/HelpSection";
@@ -36,24 +38,12 @@ const Profile = () => {
       icon: FiUser,
       component: ProfileSection,
     },
-    // {
-    //   id: "preferences",
-    //   label: "Preferences",
-    //   icon: FiHeart,
-    //   component: PreferencesSection,
-    // },
-    // {
-    //   id: "payment",
-    //   label: "Payment",
-    //   icon: FiCreditCard,
-    //   component: PaymentSection,
-    // },
-    // {
-    //   id: "help",
-    //   label: "Help",
-    //   icon: FiHelpCircle,
-    //   component: HelpSection,
-    // },
+    {
+      id: "bookings",
+      label: "My Bookings",
+      icon: FaCalendarCheck,
+      component: BookingsSection,
+    },
     {
       id: "settings",
       label: "Setting",
