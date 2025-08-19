@@ -87,16 +87,6 @@ const Profile = () => {
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center gap-4 mb-4">
-            <div className="w-16 h-16 rounded-full overflow-hidden">
-              <img
-                src={
-                  user.profile_image ||
-                  "https://randomuser.me/api/portraits/men/1.jpg"
-                }
-                alt="Profile"
-                className="w-full h-full object-cover"
-              />
-            </div>
             <div>
               <h1 className="text-2xl font-bold text-gray-900">
                 Hi, {user.name}
@@ -104,10 +94,6 @@ const Profile = () => {
               <p className="text-gray-600">{user.email}</p>
             </div>
           </div>
-          <p className="text-gray-600">
-            Manage your profile, rewards, and preferences for all our brands in
-            one place.
-          </p>
         </div>
 
         {/* Dashboard Layout */}
