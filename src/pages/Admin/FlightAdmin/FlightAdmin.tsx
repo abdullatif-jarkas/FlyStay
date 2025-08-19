@@ -45,7 +45,6 @@ const FlightAdmin = () => {
         },
         params,
       });
-      console.log(res);
       if (res.data.data.length === 0) {
         setError("No flights found!");
         return;

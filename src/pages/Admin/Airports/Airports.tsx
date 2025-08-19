@@ -57,7 +57,6 @@ const Airports = () => {
         accessorFn: (row) => {
           const city = row.city?.name ?? "";
           const country = row.country?.name ?? "";
-          console.log(country)
           return city && country ? `${city}, ${country}` : city || country;
         },
         enableSorting: true,

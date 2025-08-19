@@ -31,10 +31,7 @@ const NavBar = ({ isAuth }: { isAuth?: boolean }) => {
   const role = useAppSelector((state) => state.user.role);
 
   useEffect(() => {
-    // Check if user is logged in by looking for token in localStorage
-    if (location.pathname.includes("/user")) {
-      console.log("first");
-    }
+    
     const token = localStorage.getItem("token");
     setIsLoggedIn(!!token);
   }, []);

@@ -59,8 +59,6 @@ const Hotels = () => {
       if (res.data.status === "success") {
         setData(res.data.data);
         setPagination(res.data.pagination);
-
-        console.log(res.data.data);
       } else {
         setError("Failed to load hotels");
       }

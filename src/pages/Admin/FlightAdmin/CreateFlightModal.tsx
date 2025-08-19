@@ -60,7 +60,6 @@ const CreateFlightModal: React.FC<CreateFlightModalProps> = ({
         },
       });
       setAirports(res.data.data || []);
-      console.log("Get all airports", res.data.data)
     } catch (error) {
       console.error("Error fetching airports:", error);
       setError("Failed to load airports");

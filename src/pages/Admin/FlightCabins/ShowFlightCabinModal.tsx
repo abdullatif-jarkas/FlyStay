@@ -29,7 +29,6 @@ const ShowFlightCabinModal: React.FC<ShowFlightCabinModalProps> = ({
   const [flightCabin, setFlightCabin] = useState<FlightCabin | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-
   const token = localStorage.getItem("token");
 
   useEffect(() => {
@@ -56,7 +55,7 @@ const ShowFlightCabinModal: React.FC<ShowFlightCabinModalProps> = ({
 
       if (response.data.status === "success") {
         const responseData: SingleFlightCabinResponse = response.data;
-        setFlightCabin(responseData.data);
+        setFlightCabin(responseData.data[0]);
       } else {
         setError("Failed to fetch flight cabin details");
       }
@@ -120,15 +119,15 @@ const ShowFlightCabinModal: React.FC<ShowFlightCabinModalProps> = ({
                   <div>
                     <label className="block text-sm font-medium text-gray-700">Airline & Flight Number</label>
                     <p className="text-gray-900 font-medium">
-                      {flightCabin.flight.airline} {flightCabin.flight.flight_number}
+                      {flightCabin.flight.airline} - {flightCabin.flight.flight_number}
                     </p>
                   </div>
-                  <div>
+                  {/* <div>
                     <label className="block text-sm font-medium text-gray-700">Route</label>
                     <p className="text-gray-900 font-medium">
                       {formatFlightRoute(flightCabin.flight)}
                     </p>
-                  </div>
+                  </div> */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700">Departure</label>
                     <p className="text-gray-900 flex items-center">
