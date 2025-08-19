@@ -382,7 +382,7 @@ const Home = () => {
 
           <div className="grid md:grid-cols-3 gap-8">
             {steps.map((step, index) => (
-              <div key={index} className="text-center relative">
+              <div key={index} className="text-center flex flex-col relative">
                 {/* Step Number */}
                 <div className="w-20 h-20 bg-primary-500 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-6">
                   {step.number}
@@ -393,7 +393,7 @@ const Home = () => {
                   <div className="hidden md:block absolute top-10 left-1/2 w-full h-0.5 bg-primary-200 transform translate-x-1/2"></div>
                 )}
 
-                <div className="relative z-10 bg-white rounded-lg p-6 shadow-lg">
+                <div className="relative grow z-10 bg-white rounded-lg p-6 shadow-lg">
                   <div className="w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center mx-auto mb-4 text-primary-500">
                     {step.icon}
                   </div>
