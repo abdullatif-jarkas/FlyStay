@@ -120,8 +120,8 @@ const NavBar = ({ isAuth }: { isAuth?: boolean }) => {
             <div className="relative" ref={dropdownRef}>
               <button
                 onClick={() => {
-                  // setShowUserDropdown(!showUserDropdown)
-                  navigate("/user/profile");
+                  setShowUserDropdown(!showUserDropdown)
+                  // navigate("/user/profile");
                 }}
                 className="cursor-pointer flex items-center gap-2"
               >
@@ -133,9 +133,9 @@ const NavBar = ({ isAuth }: { isAuth?: boolean }) => {
                 </div>
               </button>
 
-              {/* {showUserDropdown && (
+              {showUserDropdown && (
                 <UserDropdown user={user} onLogout={handleLogout} />
-              )} */}
+              )}
             </div>
           </div>
         </nav>

@@ -1,7 +1,13 @@
-import { FC } from 'react';
-import { Link } from 'react-router-dom';
-import { FiLogOut, FiSettings, FiUser, FiHelpCircle, FiCreditCard } from 'react-icons/fi';
-import { UserData } from '../../hooks/useUser';
+import { FC } from "react";
+import { Link } from "react-router-dom";
+import {
+  FiLogOut,
+  FiSettings,
+  FiUser,
+  FiHelpCircle,
+  FiCreditCard,
+} from "react-icons/fi";
+import { UserData } from "../../hooks/useUser";
 
 interface UserDropdownProps {
   user: UserData | null;
@@ -20,15 +26,18 @@ const UserDropdown: FC<UserDropdownProps> = ({ user, onLogout }) => {
           </div>
         </div>
       </div> */}
-      
+
       {/* Menu items */}
-      {/* <div className="py-2">
-        <Link to="/user/profile" className="flex items-center px-4 py-3 hover:bg-gray-100 transition-colors">
+      <div className="py-2">
+        <Link
+          to="/user/profile"
+          className="flex items-center px-4 py-3 hover:bg-gray-100 transition-colors"
+        >
           <FiUser className="text-primary-500 mr-3" />
           <span>My Account</span>
           <span className="ml-auto text-gray-400">›</span>
         </Link>
-        
+        {/*         
         <Link to="/user/payments" className="flex items-center px-4 py-3 hover:bg-gray-100 transition-colors">
           <FiCreditCard className="text-primary-500 mr-3" />
           <span>Payments</span>
@@ -45,12 +54,12 @@ const UserDropdown: FC<UserDropdownProps> = ({ user, onLogout }) => {
           <FiHelpCircle className="text-primary-500 mr-3" />
           <span>Support</span>
           <span className="ml-auto text-gray-400">›</span>
-        </Link>
-      </div> */}
-      
+        </Link> */}
+      </div>
+
       {/* Sign out button */}
       <div className="border-t border-gray-200">
-        <button 
+        <button
           onClick={onLogout}
           className="w-full flex items-center px-4 py-3 text-red-500 hover:bg-gray-100 transition-colors"
         >

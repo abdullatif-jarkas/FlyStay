@@ -3,13 +3,6 @@ import NavBar from "../components/NavBar/NavBar"
 import Footer from "../components/Footer/Footer"
 
 const Layout = () => {
-  // const [isLoggedIn, setIsLoggedIn] = useState(false);
-
-  // useEffect(() => {
-  //   // Check if user is logged in
-  //   const token = localStorage.getItem("token");
-  //   setIsLoggedIn(!!token);
-  // }, []);
 
   return (
     <div>
