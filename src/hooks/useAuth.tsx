@@ -45,7 +45,7 @@ export const useAuth = () => {
       return response.data;
     } catch (error: any) {
       if (error.response) {
-        toast.error(error.response.data.message || "Invalid credentials");
+        toast.error(error.response.data.errors[0] || "Invalid credentials");
       } else {
         toast.error("An error occurred during login.");
       }
