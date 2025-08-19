@@ -62,16 +62,16 @@ const Airports = () => {
         },
         enableSorting: true,
       },
-      {
-        header: "City ID",
-        accessorFn: (row) => row.city_id,
-        enableSorting: true,
-      },
-      {
-        header: "Country ISO2",
-        accessorFn: (row) => row.country?.iso2 ?? "",
-        enableSorting: true,
-      },
+      // {
+      //   header: "City ID",
+      //   accessorFn: (row) => row.city_id,
+      //   enableSorting: true,
+      // },
+      // {
+      //   header: "Country ISO2",
+      //   accessorFn: (row) => row.country?.iso2 ?? "",
+      //   enableSorting: true,
+      // },
     ],
     []
   );
