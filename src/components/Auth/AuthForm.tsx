@@ -5,6 +5,7 @@ import travelImage from "../../assets/Auth/travel-photo.png";
 import { AuthFormProps } from "../../types/components/Auth/Authform";
 import { useAuth } from "../../hooks/useAuth";
 import { BarLoader } from "react-spinners";
+import { AiOutlineInfoCircle } from "react-icons/ai";
 
 const AuthForm = ({ type }: AuthFormProps) => {
   const [showPassword, setShowPassword] = useState(false);
@@ -136,9 +137,27 @@ const AuthForm = ({ type }: AuthFormProps) => {
             </div>
 
             <div>
-              <label htmlFor="password" className="block mb-1 font-medium">
+              <label
+                htmlFor="password"
+                className="mb-1 font-medium flex items-center gap-2"
+              >
                 Password
+                {/* أيقونة Tooltip */}
+                <div className="relative group">
+                  <AiOutlineInfoCircle className="text-gray-400 hover:text-blue-600 cursor-pointer text-lg" />
+                  <div className="absolute left-6 top-1/2 -translate-y-1/2 w-64 p-3 text-xs text-gray-700 bg-white border rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity z-10">
+                    <p className="font-medium mb-1">Password must include:</p>
+                    <ul className="space-y-1 list-disc list-inside">
+                      <li>At least 1 letter</li>
+                      <li>At least 1 symbol</li>
+                      <li>At least 1 number</li>
+                      <li>Upper & lowercase</li>
+                      <li>Min 8 characters</li>
+                    </ul>
+                  </div>
+                </div>
               </label>
+
               <div className="relative">
                 <input
                   type={showPassword ? "text" : "password"}
