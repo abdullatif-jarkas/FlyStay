@@ -306,14 +306,14 @@ const Home = () => {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-2 text-center gap-8">
             {services.map((service, index) => (
               <div
                 key={index}
                 className="bg-white rounded-xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2"
               >
                 <div
-                  className={`w-16 h-16 ${service.color} rounded-lg flex items-center justify-center text-white mb-6`}
+                  className={`w-16 h-16 ${service.color} mx-auto rounded-lg flex items-center justify-center text-white mb-6`}
                 >
                   {service.icon}
                 </div>
