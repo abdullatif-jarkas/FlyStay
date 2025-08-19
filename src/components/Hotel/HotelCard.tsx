@@ -56,7 +56,7 @@ const HotelCard: React.FC<HotelCardProps> = ({
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden">
+    <div className="flex flex-col bg-white rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden">
       {/* Hotel Image */}
       <div className="relative h-48 bg-gray-200">
         {primaryImage ? (
@@ -107,85 +107,91 @@ const HotelCard: React.FC<HotelCardProps> = ({
       </div>
 
       {/* Hotel Information */}
-      <div className="p-6">
-        {/* Hotel Name and Location */}
-        <div className="mb-4">
-          <h3 className="text-xl font-bold text-gray-900 mb-2 line-clamp-1">
-            {hotel.name}
-          </h3>
+      <div className="p-6 flex flex-col grow justify-between">
+        <div>
+          {/* Hotel Name and Location */}
+          <div className="mb-4">
+            <h3 className="text-xl font-bold text-gray-900 mb-2 line-clamp-1">
+              {hotel.name}
+            </h3>
 
-          <div className="flex items-center text-gray-600 mb-2">
-            <FaMapMarkerAlt className="mr-2 text-primary-500" />
-            <span className="text-sm">
-              {hotel.city.name}, {hotel.country.name}
+            <div className="flex items-center text-gray-600 mb-2">
+              <FaMapMarkerAlt className="mr-2 text-primary-500" />
+              <span className="text-sm">
+                {hotel.city.name}, {hotel.country.name}
+              </span>
+            </div>
+
+            {hotel.address && (
+              <p className="text-sm text-gray-500 line-clamp-1">
+                {hotel.address}
+              </p>
+            )}
+          </div>
+
+          {/* Star Rating */}
+          <div className="flex items-center mb-4">
+            <div className="flex items-center space-x-1 mr-2">
+              {renderStars(hotel.rating)}
+            </div>
+            <span className="text-sm text-gray-600">
+              ({hotel.rating} stars)
             </span>
           </div>
 
-          {hotel.address && (
-            <p className="text-sm text-gray-500 line-clamp-1">
-              {hotel.address}
-            </p>
+          {/* Description */}
+          {hotel.description && (
+            <div className="mb-4">
+              <p className="text-gray-700 text-sm leading-relaxed">
+                {truncateDescription(hotel.description)}
+              </p>
+            </div>
           )}
         </div>
 
-        {/* Star Rating */}
-        <div className="flex items-center mb-4">
-          <div className="flex items-center space-x-1 mr-2">
-            {renderStars(hotel.rating)}
-          </div>
-          <span className="text-sm text-gray-600">({hotel.rating} stars)</span>
-        </div>
-
-        {/* Description */}
-        {hotel.description && (
-          <div className="mb-4">
-            <p className="text-gray-700 text-sm leading-relaxed">
-              {truncateDescription(hotel.description)}
-            </p>
-          </div>
-        )}
-
-        {/* Hotel Features/Amenities */}
-        <div className="mb-6">
-          <div className="flex items-center justify-between text-sm text-gray-600">
-            <div className="flex items-center">
-              <FaHotel className="mr-2 text-primary-500" />
-              <span>Hotel ID: {hotel.id}</span>
-            </div>
-            {hotel.rooms && hotel.rooms.length > 0 && (
+        <div>
+          {/* Hotel Features/Amenities */}
+          <div className="mb-6">
+            <div className="flex items-center justify-between text-sm text-gray-600">
               <div className="flex items-center">
-                <span className="text-primary-600 font-medium">
-                  {hotel.rooms.length} room{hotel.rooms.length !== 1 ? "s" : ""}{" "}
-                  available
-                </span>
+                <FaHotel className="mr-2 text-primary-500" />
+                <span>Hotel ID: {hotel.id}</span>
               </div>
-            )}
+              {hotel.rooms && hotel.rooms.length > 0 && (
+                <div className="flex items-center">
+                  <span className="text-primary-600 font-medium">
+                    {hotel.rooms.length} room
+                    {hotel.rooms.length !== 1 ? "s" : ""} available
+                  </span>
+                </div>
+              )}
+            </div>
           </div>
-        </div>
 
-        {/* Action Buttons */}
-        <div className="flex space-x-2">
-          <button
-            onClick={() => onViewDetails(hotel)}
-            className="w-full px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors flex items-center justify-center"
-          >
-            <FaInfoCircle className="mr-2" />
-            View Details
-          </button>
-        </div>
+          {/* Action Buttons */}
+          <div className="flex space-x-2">
+            <button
+              onClick={() => onViewDetails(hotel)}
+              className="w-full px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors flex items-center justify-center"
+            >
+              <FaInfoCircle className="mr-2" />
+              View Details
+            </button>
+          </div>
 
-        {/* Additional Info */}
-        <div className="mt-4 pt-4 border-t border-gray-200">
-          <div className="flex items-center justify-between text-sm text-gray-500">
-            <span>
-              Added: {new Date(hotel.created_at).toLocaleDateString()}
-            </span>
-            {hotel.images && hotel.images.length > 0 && (
+          {/* Additional Info */}
+          <div className="mt-4 pt-4 border-t border-gray-200">
+            <div className="flex items-center justify-between text-sm text-gray-500">
               <span>
-                {hotel.images.length} photo
-                {hotel.images.length !== 1 ? "s" : ""}
+                Added: {new Date(hotel.created_at).toLocaleDateString()}
               </span>
-            )}
+              {hotel.images && hotel.images.length > 0 && (
+                <span>
+                  {hotel.images.length} photo
+                  {hotel.images.length !== 1 ? "s" : ""}
+                </span>
+              )}
+            </div>
           </div>
         </div>
       </div>

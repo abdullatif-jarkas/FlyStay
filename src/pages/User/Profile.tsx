@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useUser } from "../../hooks/useUser";
 import {
   FiUser,
@@ -22,8 +22,17 @@ import SettingsSection from "./Dashboard/SettingsSection";
 
 const Profile = () => {
   const { user, loading } = useUser();
+  const [searchParams] = useSearchParams();
   const [activeSection, setActiveSection] = useState("profile");
   const navigate = useNavigate();
+
+  // Handle URL parameters for section navigation
+  useEffect(() => {
+    const section = searchParams.get("section");
+    if (section && ["profile", "bookings", "settings"].includes(section)) {
+      setActiveSection(section);
+    }
+  }, [searchParams]);
 
   const handleLogout = () => {
     localStorage.removeItem("token");

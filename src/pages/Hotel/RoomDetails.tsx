@@ -7,24 +7,32 @@ import {
   FaSpinner,
   FaExclamationTriangle,
   FaUsers,
+  FaDollarSign,
   FaArrowLeft,
   FaImage,
   FaCalendarAlt,
   FaCreditCard,
   FaInfoCircle,
   FaCheckCircle,
-  FaMoneyBill,
 } from "react-icons/fa";
 import {
   Room,
   RoomDetailsResponse,
   RoomBookingRequest,
-  RoomBookingResponse,
 } from "../../types/hotel";
+import { useBooking, HotelBookingAPI } from "../../contexts/BookingContext";
+
+// API Response interface for hotel booking
+interface HotelBookingResponse {
+  status: string;
+  message: string;
+  data: HotelBookingAPI[];
+}
 
 const RoomDetails = () => {
   const { hotelId, roomId } = useParams<{ hotelId: string; roomId: string }>();
   const navigate = useNavigate();
+  const { addHotelBooking } = useBooking();
 
   // State management
   const [room, setRoom] = useState<Room | null>(null);
@@ -158,7 +166,7 @@ const RoomDetails = () => {
           check_out_date: checkOutDate,
         };
 
-        const response = await axios.post<RoomBookingResponse>(
+        const response = await axios.post<HotelBookingResponse>(
           "http://127.0.0.1:8000/api/hotel-bookings",
           bookingData,
           {
@@ -169,26 +177,35 @@ const RoomDetails = () => {
           }
         );
 
-        if (response.data.status === "success") {
-          console.log(response.data.data)
+        if (
+          response.data.status === "success" &&
+          response.data.data.length > 0
+        ) {
+          const newBooking = response.data.data[0];
+
+          // Add booking to context
+          addHotelBooking(newBooking);
+
           toast.success(
-            `Booking confirmed!`
+            `Booking created successfully! Reference: ${newBooking.id}`
           );
-          // Navigate to booking confirmation or hotel page
-          navigate(`/hotel/${hotelId}`);
+          toast.info("Your booking is pending. Complete payment to confirm.");
+
+          // Navigate to profile bookings section
+          navigate("/profile?section=bookings");
         } else {
           toast.error(response.data.message || "Booking failed");
         }
       } catch (err: any) {
         console.error("Error creating booking:", err);
         const errorMessage =
-          err.response?.data?.errors.room_id[0] || "Failed to create booking";
+          err.response?.data?.message || "Failed to create booking";
         toast.error(errorMessage);
       } finally {
         setBookingLoading(false);
       }
     },
-    [room, checkInDate, checkOutDate, token, navigate, hotelId]
+    [room, checkInDate, checkOutDate, token, navigate, addHotelBooking]
   );
 
   // Get today's date for min date validation
@@ -297,7 +314,7 @@ const RoomDetails = () => {
                   <div className="flex items-center justify-between">
                     <span className="text-gray-600">Price per night:</span>
                     <div className="flex items-center">
-                      <FaMoneyBill className="mr-2 text-green-500" />
+                      <FaDollarSign className="mr-2 text-green-500" />
                       <span className="font-bold text-green-600 text-lg">
                         {formatPrice(room.price_per_night)}
                       </span>
@@ -442,7 +459,7 @@ const RoomDetails = () => {
                   {bookingLoading ? (
                     <>
                       <FaSpinner className="animate-spin mr-2" />
-                      Processing...
+                      Creating Booking...
                     </>
                   ) : (
                     <>
@@ -456,7 +473,9 @@ const RoomDetails = () => {
                 <div className="text-center">
                   <div className="flex items-center justify-center text-sm text-gray-600">
                     <FaCheckCircle className="mr-2 text-green-500" />
-                    <span>Secure booking with instant confirmation</span>
+                    <span>
+                      Booking will be pending until payment is completed
+                    </span>
                   </div>
                 </div>
               </form>

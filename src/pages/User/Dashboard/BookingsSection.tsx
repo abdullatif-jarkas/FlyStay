@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { toast } from "sonner";
 import {
   FaPlane,
   FaHotel,
@@ -11,7 +13,9 @@ import {
   FaSpinner,
   FaExclamationTriangle,
   FaInbox,
+  FaCreditCard,
 } from "react-icons/fa";
+import { useBooking, HotelBookingAPI } from "../../../contexts/BookingContext";
 
 // Booking interfaces
 interface FlightBooking {
@@ -61,118 +65,13 @@ const BookingsSection: React.FC<BookingsSectionProps> = ({ user }) => {
   );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>("");
+  const [paymentLoading, setPaymentLoading] = useState<number | null>(null);
+
+  const { hotelBookings, updateBookingStatus } = useBooking();
+  const token = localStorage.getItem("token");
 
   // Mock data - replace with actual API calls
-  const [flightBookings] = useState<FlightBooking[]>([
-    // {
-    //   id: 1,
-    //   booking_reference: "FL123456",
-    //   flight_details: {
-    //     airline: "Emirates",
-    //     flight_number: "EK123",
-    //     departure_airport: "DXB",
-    //     arrival_airport: "JFK",
-    //     departure_time: "2024-12-15T10:30:00Z",
-    //     arrival_time: "2024-12-15T18:45:00Z",
-    //   },
-    //   passenger_details: {
-    //     name: user?.name || "John Doe",
-    //     email: user?.email || "john@example.com",
-    //   },
-    //   status: "confirmed",
-    //   total_amount: 1250.0,
-    //   booking_date: "2024-11-20T09:15:00Z",
-    // },
-    // {
-    //   id: 2,
-    //   booking_reference: "FL789012",
-    //   flight_details: {
-    //     airline: "Qatar Airways",
-    //     flight_number: "QR456",
-    //     departure_airport: "DOH",
-    //     arrival_airport: "LHR",
-    //     departure_time: "2024-12-20T14:20:00Z",
-    //     arrival_time: "2024-12-20T19:30:00Z",
-    //   },
-    //   passenger_details: {
-    //     name: user?.name || "John Doe",
-    //     email: user?.email || "john@example.com",
-    //   },
-    //   status: "pending",
-    //   total_amount: 890.0,
-    //   booking_date: "2024-11-22T16:30:00Z",
-    // },
-    // {
-    //   id: 3,
-    //   booking_reference: "FL345678",
-    //   flight_details: {
-    //     airline: "Turkish Airlines",
-    //     flight_number: "TK789",
-    //     departure_airport: "IST",
-    //     arrival_airport: "CDG",
-    //     departure_time: "2024-11-10T08:15:00Z",
-    //     arrival_time: "2024-11-10T11:30:00Z",
-    //   },
-    //   passenger_details: {
-    //     name: user?.name || "John Doe",
-    //     email: user?.email || "john@example.com",
-    //   },
-    //   status: "confirmed",
-    //   total_amount: 650.0,
-    //   booking_date: "2024-10-15T13:20:00Z",
-    // },
-  ]);
-
-  const [hotelBookings] = useState<HotelBooking[]>([
-    // {
-    //   id: 1,
-    //   booking_reference: "HT345678",
-    //   hotel_name: "Grand Plaza Hotel",
-    //   room_type: "Deluxe Suite",
-    //   check_in_date: "2024-12-15",
-    //   check_out_date: "2024-12-18",
-    //   guest_details: {
-    //     name: user?.name || "John Doe",
-    //     email: user?.email || "john@example.com",
-    //   },
-    //   status: "confirmed",
-    //   total_amount: 450.0,
-    //   booking_date: "2024-11-18T11:45:00Z",
-    //   nights: 3,
-    // },
-    // {
-    //   id: 2,
-    //   booking_reference: "HT901234",
-    //   hotel_name: "Ocean View Resort",
-    //   room_type: "Standard Room",
-    //   check_in_date: "2024-12-22",
-    //   check_out_date: "2024-12-25",
-    //   guest_details: {
-    //     name: user?.name || "John Doe",
-    //     email: user?.email || "john@example.com",
-    //   },
-    //   status: "cancelled",
-    //   total_amount: 320.0,
-    //   booking_date: "2024-11-25T14:20:00Z",
-    //   nights: 3,
-    // },
-    // {
-    //   id: 3,
-    //   booking_reference: "HT567890",
-    //   hotel_name: "City Center Inn",
-    //   room_type: "Business Room",
-    //   check_in_date: "2024-11-05",
-    //   check_out_date: "2024-11-07",
-    //   guest_details: {
-    //     name: user?.name || "John Doe",
-    //     email: user?.email || "john@example.com",
-    //   },
-    //   status: "confirmed",
-    //   total_amount: 280.0,
-    //   booking_date: "2024-10-20T10:30:00Z",
-    //   nights: 2,
-    // },
-  ]);
+  const [flightBookings] = useState<FlightBooking[]>([]);
 
   // Format date
   const formatDate = (dateString: string): string => {
@@ -232,17 +131,76 @@ const BookingsSection: React.FC<BookingsSectionProps> = ({ user }) => {
     );
   };
 
+  // Handle payment for hotel booking
+  const handlePayment = async (bookingId: number) => {
+    if (!token) {
+      toast.error("Please login to complete payment");
+      return;
+    }
+
+    setPaymentLoading(bookingId);
+
+    try {
+      const response = await axios.post(
+        `http://127.0.0.1:8000/api/payments/hotel-booking/${bookingId}`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: "application/json",
+          },
+        }
+      );
+
+      if (response.data.status === "success") {
+        // Update booking status to confirmed
+        updateBookingStatus(bookingId, "confirmed");
+        toast.success(
+          "Payment completed successfully! Your booking is now confirmed."
+        );
+      } else {
+        toast.error(response.data.message || "Payment failed");
+      }
+    } catch (err: unknown) {
+      console.error("Error processing payment:", err);
+      const errorMessage =
+        (err as any)?.response?.data?.message || "Payment failed";
+      toast.error(errorMessage);
+    } finally {
+      setPaymentLoading(null);
+    }
+  };
+
+  // Convert API hotel bookings to display format
+  const convertApiHotelBookings = (apiBookings: HotelBookingAPI[]) => {
+    return apiBookings.map((booking) => ({
+      id: booking.id,
+      booking_reference: `HT${booking.id.toString().padStart(6, "0")}`,
+      hotel_name: `Hotel (Room ${booking.Room.room_type})`,
+      room_type: booking.Room.room_type,
+      check_in_date: booking.check_in_date.split("T")[0],
+      check_out_date: booking.check_out_date.split("T")[0],
+      guest_details: {
+        name: booking.user_Info.name,
+        email: booking.user_Info.email,
+      },
+      status: booking.status,
+      total_amount: booking.amount,
+      booking_date: booking.booking_date,
+      nights: parseInt(booking.duration.split(" ")[0]),
+      type: "hotel" as const,
+    }));
+  };
+
   // Filter bookings based on active tab
   const getFilteredBookings = () => {
+    const convertedHotelBookings = convertApiHotelBookings(hotelBookings);
     const allBookings = [
       ...flightBookings.map((booking) => ({
         ...booking,
         type: "flight" as const,
       })),
-      ...hotelBookings.map((booking) => ({
-        ...booking,
-        type: "hotel" as const,
-      })),
+      ...convertedHotelBookings,
     ].sort(
       (a, b) =>
         new Date(b.booking_date).getTime() - new Date(a.booking_date).getTime()
@@ -261,14 +219,18 @@ const BookingsSection: React.FC<BookingsSectionProps> = ({ user }) => {
   const filteredBookings = getFilteredBookings();
 
   // Calculate booking statistics
-  const totalBookings = flightBookings.length + hotelBookings.length;
-  const confirmedBookings = [...flightBookings, ...hotelBookings].filter(
-    (b) => b.status === "confirmed"
-  ).length;
-  const pendingBookings = [...flightBookings, ...hotelBookings].filter(
-    (b) => b.status === "pending"
-  ).length;
-  const totalSpent = [...flightBookings, ...hotelBookings]
+  const convertedHotelBookingsForStats = convertApiHotelBookings(hotelBookings);
+  const totalBookings =
+    flightBookings.length + convertedHotelBookingsForStats.length;
+  const confirmedBookings = [
+    ...flightBookings,
+    ...convertedHotelBookingsForStats,
+  ].filter((b) => b.status === "confirmed").length;
+  const pendingBookings = [
+    ...flightBookings,
+    ...convertedHotelBookingsForStats,
+  ].filter((b) => b.status === "pending").length;
+  const totalSpent = [...flightBookings, ...convertedHotelBookingsForStats]
     .filter((b) => b.status === "confirmed")
     .reduce((sum, booking) => sum + booking.total_amount, 0);
 
@@ -384,7 +346,9 @@ const BookingsSection: React.FC<BookingsSectionProps> = ({ user }) => {
             return (
               <button
                 key={tab.id}
-                onClick={() => setActiveTab(tab.id as any)}
+                onClick={() =>
+                  setActiveTab(tab.id as "all" | "flights" | "hotels")
+                }
                 className={`flex items-center py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
                   activeTab === tab.id
                     ? "border-primary-500 text-primary-600"
@@ -539,10 +503,32 @@ const BookingsSection: React.FC<BookingsSectionProps> = ({ user }) => {
           <div className="text-lg font-bold text-gray-900 mb-2">
             {formatCurrency(booking.total_amount)}
           </div>
-          <button className="inline-flex items-center px-3 py-1 border border-gray-300 rounded-md text-sm text-gray-700 hover:bg-gray-50 transition-colors">
-            <FaEye className="mr-1" />
-            View Details
-          </button>
+          <div className="space-y-2">
+            {booking.status === "pending" ? (
+              <button
+                onClick={() => handlePayment(booking.id)}
+                disabled={paymentLoading === booking.id}
+                className="inline-flex items-center px-3 py-1 bg-green-600 text-white rounded-md text-sm hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {paymentLoading === booking.id ? (
+                  <>
+                    <FaSpinner className="animate-spin mr-1" />
+                    Processing...
+                  </>
+                ) : (
+                  <>
+                    <FaCreditCard className="mr-1" />
+                    Pay Now
+                  </>
+                )}
+              </button>
+            ) : (
+              <button className="inline-flex items-center px-3 py-1 border border-gray-300 rounded-md text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+                <FaEye className="mr-1" />
+                View Details
+              </button>
+            )}
+          </div>
         </div>
       </div>
     );

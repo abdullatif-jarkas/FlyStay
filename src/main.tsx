@@ -6,12 +6,15 @@ import { routes } from "./routes";
 import { Toaster } from "sonner";
 import { Provider } from "react-redux";
 import { store } from "./store";
+import { BookingProvider } from "./contexts/BookingContext";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <Provider store={store}>
-      <Toaster position="bottom-right" richColors />
-      <RouterProvider router={routes} />
+      <BookingProvider>
+        <Toaster position="bottom-right" richColors expand={true} />
+        <RouterProvider router={routes} />
+      </BookingProvider>
     </Provider>
   </StrictMode>
 );
