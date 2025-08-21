@@ -4,25 +4,17 @@ import {
   FaStar,
   FaMapMarkerAlt,
   FaInfoCircle,
-  FaHeart,
-  FaRegHeart,
   FaImage,
 } from "react-icons/fa";
 import { Hotel } from "../../types/hotel";
+import FavoriteButton from "../Favorites/FavoriteButton";
 
 export interface HotelCardProps {
   hotel: Hotel;
   onViewDetails: (hotel: Hotel) => void;
-  onAddToFavorites?: (hotel: Hotel) => void;
-  isFavorite?: boolean;
 }
 
-const HotelCard: React.FC<HotelCardProps> = ({
-  hotel,
-  onViewDetails,
-  onAddToFavorites,
-  isFavorite = false,
-}) => {
+const HotelCard: React.FC<HotelCardProps> = ({ hotel, onViewDetails }) => {
   // Get primary image or first image
   const primaryImage =
     hotel.images?.find((img) => img.is_primary) || hotel.images?.[0];
@@ -82,18 +74,14 @@ const HotelCard: React.FC<HotelCardProps> = ({
         </div>
 
         {/* Favorite Button */}
-        {onAddToFavorites && (
-          <button
-            onClick={() => onAddToFavorites(hotel)}
-            className="absolute top-3 right-3 p-2 bg-white bg-opacity-90 rounded-full hover:bg-opacity-100 transition-all duration-200"
-          >
-            {isFavorite ? (
-              <FaHeart className="text-red-500" />
-            ) : (
-              <FaRegHeart className="text-gray-600" />
-            )}
-          </button>
-        )}
+        <div className="absolute top-3 right-3">
+          <FavoriteButton
+            type="hotel"
+            id={hotel.id}
+            size="md"
+            className="bg-white bg-opacity-90 hover:bg-opacity-100"
+          />
+        </div>
 
         {/* Rating Badge */}
         <div className="absolute top-3 left-3 bg-white bg-opacity-90 rounded-lg px-2 py-1">

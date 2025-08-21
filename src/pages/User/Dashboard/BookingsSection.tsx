@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import axios from "axios";
 import { toast } from "sonner";
 import {
@@ -11,11 +11,11 @@ import {
   FaTimes,
   FaEye,
   FaSpinner,
-  FaExclamationTriangle,
   FaInbox,
   FaCreditCard,
 } from "react-icons/fa";
 import { useBooking, HotelBookingAPI } from "../../../contexts/BookingContext";
+import PaymentModal from "../../../components/Payment/PaymentModal";
 
 // Booking interfaces
 interface FlightBooking {
@@ -56,16 +56,26 @@ interface HotelBooking {
 }
 
 interface BookingsSectionProps {
-  user: any;
+  user?: {
+    id: number;
+    name: string;
+    email: string;
+  };
 }
 
-const BookingsSection: React.FC<BookingsSectionProps> = ({ user }) => {
+const BookingsSection: React.FC<BookingsSectionProps> = () => {
   const [activeTab, setActiveTab] = useState<"all" | "flights" | "hotels">(
     "all"
   );
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string>("");
   const [paymentLoading, setPaymentLoading] = useState<number | null>(null);
+
+  // Payment modal state
+  const [paymentModalOpen, setPaymentModalOpen] = useState(false);
+  const [currentPayment, setCurrentPayment] = useState<{
+    bookingId: number;
+    amount: number;
+    clientSecret: string;
+  } | null>(null);
 
   const { hotelBookings, updateBookingStatus } = useBooking();
   const token = localStorage.getItem("token");
@@ -132,7 +142,8 @@ const BookingsSection: React.FC<BookingsSectionProps> = ({ user }) => {
   };
 
   // Handle payment for hotel booking
-  const handlePayment = async (bookingId: number) => {
+  const handlePayment = async (bookingId: number, amount: number) => {
+    console.log("first")
     if (!token) {
       toast.error("Please login to complete payment");
       return;
@@ -152,23 +163,58 @@ const BookingsSection: React.FC<BookingsSectionProps> = ({ user }) => {
         }
       );
 
-      if (response.data.status === "success") {
-        // Update booking status to confirmed
-        updateBookingStatus(bookingId, "confirmed");
-        toast.success(
-          "Payment completed successfully! Your booking is now confirmed."
-        );
+      if (
+        response.data.status === "success" &&
+        response.data.data &&
+        response.data.data.length > 0
+      ) {
+        const clientSecret = response.data.data[0];
+        
+        // Set up payment modal with client secret
+        setCurrentPayment({
+          bookingId,
+          amount,
+          clientSecret,
+        });
+        setPaymentModalOpen(true);
+
+        toast.info("Redirecting to secure payment...");
       } else {
-        toast.error(response.data.message || "Payment failed");
+        toast.error(response.data.message || "Failed to initialize payment");
       }
     } catch (err: unknown) {
-      console.error("Error processing payment:", err);
+      console.error("Error initializing payment:", err);
       const errorMessage =
-        (err as any)?.response?.data?.message || "Payment failed";
-      toast.error(errorMessage);
+        err instanceof Error && "response" in err
+          ? (err as { response?: { data?: { message?: string } } }).response
+              ?.data?.message
+          : undefined;
+      toast.error(errorMessage || "Failed to initialize payment");
     } finally {
       setPaymentLoading(null);
     }
+  };
+
+  // Handle successful payment
+  const handlePaymentSuccess = () => {
+    if (currentPayment) {
+      updateBookingStatus(currentPayment.bookingId, "confirmed");
+      toast.success(
+        "Payment completed successfully! Your booking is now confirmed."
+      );
+      setCurrentPayment(null);
+    }
+  };
+
+  // Handle payment error
+  const handlePaymentError = (error: string) => {
+    toast.error(`Payment failed: ${error}`);
+  };
+
+  // Close payment modal
+  const closePaymentModal = () => {
+    setPaymentModalOpen(false);
+    setCurrentPayment(null);
   };
 
   // Convert API hotel bookings to display format
@@ -233,173 +279,6 @@ const BookingsSection: React.FC<BookingsSectionProps> = ({ user }) => {
   const totalSpent = [...flightBookings, ...convertedHotelBookingsForStats]
     .filter((b) => b.status === "confirmed")
     .reduce((sum, booking) => sum + booking.total_amount, 0);
-
-  // Loading state
-  if (loading) {
-    return (
-      <div className="bg-white rounded-lg shadow-sm p-8">
-        <div className="flex items-center justify-center">
-          <FaSpinner className="animate-spin text-2xl text-primary-500 mr-3" />
-          <span className="text-gray-600">Loading your bookings...</span>
-        </div>
-      </div>
-    );
-  }
-
-  // Error state
-  if (error) {
-    return (
-      <div className="bg-white rounded-lg shadow-sm p-8">
-        <div className="text-center">
-          <FaExclamationTriangle className="text-4xl text-red-500 mb-4 mx-auto" />
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">
-            Error Loading Bookings
-          </h3>
-          <p className="text-gray-600">{error}</p>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="bg-white rounded-lg shadow-sm">
-      {/* Header */}
-      <div className="p-6 border-b border-gray-200">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">My Bookings</h2>
-        <p className="text-gray-600">View and manage your travel bookings</p>
-      </div>
-
-      {/* Statistics Cards */}
-      <div className="p-6 border-b border-gray-200">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="bg-blue-50 rounded-lg p-4">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <FaTicketAlt className="h-6 w-6 text-blue-600" />
-              </div>
-              <div className="ml-3">
-                <p className="text-sm font-medium text-blue-900">
-                  Total Bookings
-                </p>
-                <p className="text-2xl font-bold text-blue-600">
-                  {totalBookings}
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-green-50 rounded-lg p-4">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <FaCheckCircle className="h-6 w-6 text-green-600" />
-              </div>
-              <div className="ml-3">
-                <p className="text-sm font-medium text-green-900">Confirmed</p>
-                <p className="text-2xl font-bold text-green-600">
-                  {confirmedBookings}
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-yellow-50 rounded-lg p-4">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <FaClock className="h-6 w-6 text-yellow-600" />
-              </div>
-              <div className="ml-3">
-                <p className="text-sm font-medium text-yellow-900">Pending</p>
-                <p className="text-2xl font-bold text-yellow-600">
-                  {pendingBookings}
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-purple-50 rounded-lg p-4">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <FaTicketAlt className="h-6 w-6 text-purple-600" />
-              </div>
-              <div className="ml-3">
-                <p className="text-sm font-medium text-purple-900">
-                  Total Spent
-                </p>
-                <p className="text-2xl font-bold text-purple-600">
-                  {formatCurrency(totalSpent)}
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Tabs */}
-      <div className="border-b border-gray-200">
-        <nav className="flex space-x-8 px-6">
-          {[
-            { id: "all", label: "All Bookings", icon: FaTicketAlt },
-            { id: "flights", label: "Flights", icon: FaPlane },
-            { id: "hotels", label: "Hotels", icon: FaHotel },
-          ].map((tab) => {
-            const Icon = tab.icon;
-            return (
-              <button
-                key={tab.id}
-                onClick={() =>
-                  setActiveTab(tab.id as "all" | "flights" | "hotels")
-                }
-                className={`flex items-center py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
-                  activeTab === tab.id
-                    ? "border-primary-500 text-primary-600"
-                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                }`}
-              >
-                <Icon className="mr-2" />
-                {tab.label}
-              </button>
-            );
-          })}
-        </nav>
-      </div>
-
-      {/* Bookings List */}
-      <div className="p-6">
-        {filteredBookings.length === 0 ? (
-          <div className="text-center py-12">
-            <FaInbox className="text-4xl text-gray-400 mb-4 mx-auto" />
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">
-              No Bookings Found
-            </h3>
-            <p className="text-gray-600">
-              {activeTab === "all"
-                ? "You haven't made any bookings yet."
-                : `You haven't made any ${activeTab} bookings yet.`}
-            </p>
-          </div>
-        ) : (
-          <div className="space-y-4">
-            {filteredBookings.map((booking) => (
-              <div
-                key={`${booking.type}-${booking.id}`}
-                className="border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow"
-              >
-                {booking.type === "flight" ? (
-                  <FlightBookingCard
-                    booking={booking as FlightBooking & { type: "flight" }}
-                  />
-                ) : (
-                  <HotelBookingCard
-                    booking={booking as HotelBooking & { type: "hotel" }}
-                  />
-                )}
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-    </div>
-  );
 
   // Flight Booking Card Component
   function FlightBookingCard({
@@ -506,7 +385,7 @@ const BookingsSection: React.FC<BookingsSectionProps> = ({ user }) => {
           <div className="space-y-2">
             {booking.status === "pending" ? (
               <button
-                onClick={() => handlePayment(booking.id)}
+                onClick={() => handlePayment(booking.id, booking.total_amount)}
                 disabled={paymentLoading === booking.id}
                 className="inline-flex items-center px-3 py-1 bg-green-600 text-white rounded-md text-sm hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
@@ -533,6 +412,164 @@ const BookingsSection: React.FC<BookingsSectionProps> = ({ user }) => {
       </div>
     );
   }
+
+  return (
+    <>
+      {/* Main Content */}
+      <div className="bg-white rounded-lg shadow-sm">
+        {/* Header */}
+        <div className="p-6 border-b border-gray-200">
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">My Bookings</h2>
+          <p className="text-gray-600">View and manage your travel bookings</p>
+        </div>
+
+        {/* Statistics Cards */}
+        <div className="p-6 border-b border-gray-200">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="bg-blue-50 rounded-lg p-4">
+              <div className="flex items-center">
+                <div className="flex-shrink-0">
+                  <FaTicketAlt className="h-6 w-6 text-blue-600" />
+                </div>
+                <div className="ml-3">
+                  <p className="text-sm font-medium text-blue-900">
+                    Total Bookings
+                  </p>
+                  <p className="text-2xl font-bold text-blue-600">
+                    {totalBookings}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-green-50 rounded-lg p-4">
+              <div className="flex items-center">
+                <div className="flex-shrink-0">
+                  <FaCheckCircle className="h-6 w-6 text-green-600" />
+                </div>
+                <div className="ml-3">
+                  <p className="text-sm font-medium text-green-900">
+                    Confirmed
+                  </p>
+                  <p className="text-2xl font-bold text-green-600">
+                    {confirmedBookings}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-yellow-50 rounded-lg p-4">
+              <div className="flex items-center">
+                <div className="flex-shrink-0">
+                  <FaClock className="h-6 w-6 text-yellow-600" />
+                </div>
+                <div className="ml-3">
+                  <p className="text-sm font-medium text-yellow-900">Pending</p>
+                  <p className="text-2xl font-bold text-yellow-600">
+                    {pendingBookings}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-purple-50 rounded-lg p-4">
+              <div className="flex items-center">
+                <div className="flex-shrink-0">
+                  <FaTicketAlt className="h-6 w-6 text-purple-600" />
+                </div>
+                <div className="ml-3">
+                  <p className="text-sm font-medium text-purple-900">
+                    Total Spent
+                  </p>
+                  <p className="text-2xl font-bold text-purple-600">
+                    {formatCurrency(totalSpent)}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Tabs */}
+        <div className="border-b border-gray-200">
+          <nav className="flex space-x-8 px-6">
+            {[
+              { id: "all", label: "All Bookings", icon: FaTicketAlt },
+              { id: "flights", label: "Flights", icon: FaPlane },
+              { id: "hotels", label: "Hotels", icon: FaHotel },
+            ].map((tab) => {
+              const Icon = tab.icon;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() =>
+                    setActiveTab(tab.id as "all" | "flights" | "hotels")
+                  }
+                  className={`flex items-center py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
+                    activeTab === tab.id
+                      ? "border-primary-500 text-primary-600"
+                      : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                  }`}
+                >
+                  <Icon className="mr-2" />
+                  {tab.label}
+                </button>
+              );
+            })}
+          </nav>
+        </div>
+
+        {/* Bookings List */}
+        <div className="p-6">
+          {filteredBookings.length === 0 ? (
+            <div className="text-center py-12">
+              <FaInbox className="text-4xl text-gray-400 mb-4 mx-auto" />
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                No Bookings Found
+              </h3>
+              <p className="text-gray-600">
+                {activeTab === "all"
+                  ? "You haven't made any bookings yet."
+                  : `You haven't made any ${activeTab} bookings yet.`}
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {filteredBookings.map((booking) => (
+                <div
+                  key={`${booking.type}-${booking.id}`}
+                  className="border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow"
+                >
+                  {booking.type === "flight" ? (
+                    <FlightBookingCard
+                      booking={booking as FlightBooking & { type: "flight" }}
+                    />
+                  ) : (
+                    <HotelBookingCard
+                      booking={booking as HotelBooking & { type: "hotel" }}
+                    />
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Payment Modal */}
+      {currentPayment && (
+        <PaymentModal
+          isOpen={paymentModalOpen}
+          onClose={closePaymentModal}
+          clientSecret={currentPayment.clientSecret}
+          bookingId={currentPayment.bookingId}
+          amount={currentPayment.amount}
+          onSuccess={handlePaymentSuccess}
+          onError={handlePaymentError}
+        />
+      )}
+    </>
+  );
 };
 
 export default BookingsSection;

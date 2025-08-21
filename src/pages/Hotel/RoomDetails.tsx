@@ -21,6 +21,7 @@ import {
   RoomBookingRequest,
 } from "../../types/hotel";
 import { useBooking, HotelBookingAPI } from "../../contexts/BookingContext";
+import FavoriteButton from "../../components/Favorites/FavoriteButton";
 
 // API Response interface for hotel booking
 interface HotelBookingResponse {
@@ -192,14 +193,14 @@ const RoomDetails = () => {
           toast.info("Your booking is pending. Complete payment to confirm.");
 
           // Navigate to profile bookings section
-          navigate("/profile?section=bookings");
+          // navigate("/profile?section=bookings");
         } else {
           toast.error(response.data.message || "Booking failed");
         }
       } catch (err: any) {
         console.error("Error creating booking:", err);
         const errorMessage =
-          err.response?.data?.message || "Failed to create booking";
+          err.response?.data?.errors.room_id[0] || "Failed to create booking";
         toast.error(errorMessage);
       } finally {
         setBookingLoading(false);
@@ -289,14 +290,24 @@ const RoomDetails = () => {
           <div className="lg:col-span-2 space-y-6">
             {/* Room Basic Info */}
             <div className="bg-white rounded-lg shadow-lg p-6">
-              <div className="flex items-center mb-6">
-                <FaBed className="text-primary-500 text-2xl mr-3" />
-                <div>
-                  <h2 className="text-2xl font-bold text-gray-900">
-                    {room.room_type}
-                  </h2>
-                  <p className="text-gray-600">Room Information</p>
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center">
+                  <FaBed className="text-primary-500 text-2xl mr-3" />
+                  <div>
+                    <h2 className="text-2xl font-bold text-gray-900">
+                      {room.room_type}
+                    </h2>
+                    <p className="text-gray-600">Room Information</p>
+                  </div>
                 </div>
+
+                {/* Favorite Button */}
+                <FavoriteButton
+                  type="room"
+                  id={room.id}
+                  size="lg"
+                  showText={true}
+                />
               </div>
 
               <div className="grid md:grid-cols-2 gap-6">
