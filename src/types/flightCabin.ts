@@ -94,6 +94,15 @@ export interface FlightsResponse {
   status: string;
   message?: string;
   data: Flight[];
+  pagination?: {
+    total: number;
+    count: number;
+    per_page: number;
+    current_page: number;
+    total_pages: number;
+    next_page_url: string | null;
+    prev_page_url: string | null;
+  };
 }
 
 // Modal props interfaces
@@ -132,54 +141,54 @@ export type FlightCabinFormErrors = {
 
 // Constants
 export const FLIGHT_CLASSES = [
-  { value: 'Economy', label: 'Economy' },
-  { value: 'Business', label: 'Business' },
-  { value: 'First', label: 'First Class' },
+  { value: "Economy", label: "Economy" },
+  { value: "Business", label: "Business" },
+  { value: "First", label: "First Class" },
 ] as const;
 
 export const FLIGHT_CABIN_ENDPOINTS = {
-  LIST: '/api/flight-cabin',
-  CREATE: '/api/flight-cabin',
+  LIST: "/api/flight-cabin",
+  CREATE: "/api/flight-cabin",
   SHOW: (id: number) => `/api/flight-cabin/${id}`,
   UPDATE: (id: number) => `/api/flight-cabin/${id}`,
   DELETE: (id: number) => `/api/flight-cabin/${id}`,
-  FLIGHTS: '/api/flight',
+  FLIGHTS: "/api/flight",
 } as const;
 
 // Utility functions
 export const formatPrice = (price: string | number): string => {
-  const numPrice = typeof price === 'string' ? parseFloat(price) : price;
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
+  const numPrice = typeof price === "string" ? parseFloat(price) : price;
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
   }).format(numPrice);
 };
 
 export const getClassBadgeColor = (className: string): string => {
   switch (className.toLowerCase()) {
-    case 'economy':
-      return 'bg-blue-100 text-blue-800';
-    case 'business':
-      return 'bg-purple-100 text-purple-800';
-    case 'first':
-      return 'bg-yellow-100 text-yellow-800';
+    case "economy":
+      return "bg-blue-100 text-blue-800";
+    case "business":
+      return "bg-purple-100 text-purple-800";
+    case "first":
+      return "bg-yellow-100 text-yellow-800";
     default:
-      return 'bg-gray-100 text-gray-800';
+      return "bg-gray-100 text-gray-800";
   }
 };
 
 export const formatFlightRoute = (flight: Flight): string => {
-  const departure = flight.departure_airport?.IATA_code || 'N/A';
-  const arrival = flight.arrival_airport?.IATA_code || 'N/A';
+  const departure = flight.departure_airport?.IATA_code || "N/A";
+  const arrival = flight.arrival_airport?.IATA_code || "N/A";
   return `${departure} → ${arrival}`;
 };
 
 export const formatDateTime = (dateString: string): string => {
-  return new Date(dateString).toLocaleString('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
+  return new Date(dateString).toLocaleString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
   });
 };
