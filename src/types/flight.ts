@@ -85,6 +85,14 @@ export interface FlightFilters {
   aircraft_types: string[];
   departure_airports: string[];
   arrival_airports: string[];
+
+  // Advanced filters matching backend scope
+  old_flights?: boolean;
+  later_flight?: boolean;
+  airline?: string;
+  from_date?: string;
+  to_date?: string;
+  arrival_country?: string;
 }
 
 // Sort options

@@ -39,6 +39,13 @@ const Flight = () => {
     aircraft_types: [],
     departure_airports: [],
     arrival_airports: [],
+    // Advanced filters
+    old_flights: false,
+    later_flight: false,
+    airline: "",
+    from_date: "",
+    to_date: "",
+    arrival_country: "",
   });
 
   const searchFlights = useCallback(
@@ -113,8 +120,25 @@ const Flight = () => {
 
       try {
         const token = localStorage.getItem("token");
+
+        // Build query parameters including filters
+        const queryParams = new URLSearchParams({
+          page: page.toString(),
+          sort_by: sortBy,
+        });
+
+        // Add advanced filters to query params
+        if (filters.old_flights) queryParams.append("old_flights", "1");
+        if (filters.later_flight) queryParams.append("later_flight", "1");
+        if (filters.airline) queryParams.append("airline", filters.airline);
+        if (filters.from_date)
+          queryParams.append("from_date", filters.from_date);
+        if (filters.to_date) queryParams.append("to_date", filters.to_date);
+        if (filters.arrival_country)
+          queryParams.append("arrival_country", filters.arrival_country);
+
         const response = await axios.get(
-          `http://127.0.0.1:8000/api/flight?page=${page}&sort_by=${sortBy}`,
+          `http://127.0.0.1:8000/api/flight?${queryParams.toString()}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -155,7 +179,7 @@ const Flight = () => {
         setLoading(false);
       }
     },
-    [sortBy]
+    [sortBy, filters]
   );
 
   useEffect(() => {
@@ -189,9 +213,12 @@ const Flight = () => {
 
   const handleFiltersChange = (newFilters: IFlightFilters) => {
     setFilters(newFilters);
+    setCurrentPage(1);
+
     if (searchParams && !showAllFlights) {
-      setCurrentPage(1);
       searchFlights(searchParams, 1);
+    } else if (showAllFlights) {
+      fetchAllFlights(1);
     }
   };
 
@@ -266,18 +293,16 @@ const Flight = () => {
       {(searchParams || showAllFlights) && (
         <div className="container mx-auto px-4 py-8">
           <div className="flex gap-8">
-            {/* Filters Sidebar - Only show for search results */}
-            {!showAllFlights && (
-              <div className="w-80 flex-shrink-0">
-                <FlightFilters
-                  filters={filters}
-                  onFiltersChange={handleFiltersChange}
-                  availableAirlines={availableAirlines}
-                  priceRange={priceRange}
-                  durationRange={durationRange}
-                />
-              </div>
-            )}
+            {/* Filters Sidebar - Show for both search results and all flights */}
+            <div className="w-80 flex-shrink-0">
+              <FlightFilters
+                filters={filters}
+                onFiltersChange={handleFiltersChange}
+                availableAirlines={availableAirlines}
+                priceRange={priceRange}
+                durationRange={durationRange}
+              />
+            </div>
 
             {/* Results */}
             <div className={showAllFlights ? "w-full" : "flex-1"}>

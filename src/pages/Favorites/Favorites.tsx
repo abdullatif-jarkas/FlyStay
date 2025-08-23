@@ -275,9 +275,11 @@ const Favorites = () => {
                     >
                       <div className="relative">
                         <div className="h-48 bg-gray-200 flex items-center justify-center">
-                          <FaBed className="text-4xl text-gray-400" />
+                          <img 
+                          src={room[0].images[0].url}
+                          />
                         </div>
-
+                        {console.log("ddd", room[0])}
                         {/* Favorite Button */}
                         <div className="absolute top-3 right-3">
                           <FavoriteButton

@@ -224,7 +224,7 @@ const UpdateHotelImagesModal: React.FC<UpdateHotelImagesModalProps> = ({
                       alt={image.alt || `Hotel image ${image.id}`}
                       className="w-full h-32 object-cover"
                     />
-                    <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-opacity flex items-center justify-center">
+                    <div className="absolute inset-0 bg-transparent bg-opacity-0 group-hover:bg-opacity-30 transition-opacity flex items-center justify-center">
                       <div className="opacity-0 group-hover:opacity-100 transition-opacity flex gap-2">
                         <button
                           type="button"

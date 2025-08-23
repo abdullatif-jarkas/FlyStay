@@ -6,6 +6,7 @@ import { useHotels } from "../../hooks/useHotels";
 import { Hotel as IHotel } from "../../types/hotel";
 import HotelFilters from "../../components/Hotel/HotelFilters";
 import HotelResults from "../../components/Hotel/HotelResults";
+import HotelPagination from "../../components/Hotel/HotelPagination";
 
 const Hotel = () => {
   const navigate = useNavigate();
@@ -24,6 +25,16 @@ const Hotel = () => {
     refreshHotels,
     hasFilters,
     hotelCount,
+    // Pagination properties
+    currentPage,
+    totalPages,
+    totalResults,
+    hasNextPage,
+    hasPrevPage,
+    // Pagination actions
+    goToNextPage,
+    goToPrevPage,
+    goToPage,
   } = useHotels();
 
   // Handle hotel details view
@@ -132,6 +143,19 @@ const Hotel = () => {
               onViewDetails={handleViewDetails}
               onAddToFavorites={handleAddToFavorites}
               hasFilters={hasFilters}
+            />
+
+            {/* Pagination */}
+            <HotelPagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              totalResults={totalResults}
+              hasNextPage={hasNextPage}
+              hasPrevPage={hasPrevPage}
+              onNextPage={goToNextPage}
+              onPrevPage={goToPrevPage}
+              onGoToPage={goToPage}
+              loading={loading}
             />
           </div>
         </div>

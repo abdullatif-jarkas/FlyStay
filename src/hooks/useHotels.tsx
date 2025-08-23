@@ -14,6 +14,12 @@ export interface HotelState {
   error: string | null;
   countries: string[];
   filters: HotelFilters;
+  // Pagination state
+  currentPage: number;
+  totalPages: number;
+  totalResults: number;
+  hasNextPage: boolean;
+  hasPrevPage: boolean;
 }
 
 export const useHotels = () => {
@@ -23,88 +29,133 @@ export const useHotels = () => {
     error: null,
     countries: [],
     filters: {},
+    // Pagination initial state
+    currentPage: 1,
+    totalPages: 1,
+    totalResults: 0,
+    hasNextPage: false,
+    hasPrevPage: false,
   });
 
   /**
-   * Fetch all hotels
+   * Fetch all hotels with pagination
    */
-  const fetchHotels = useCallback(async () => {
-    setState((prev) => ({
-      ...prev,
-      loading: true,
-      error: null,
-    }));
-
-    try {
-      const hotels = await getAllHotels();
-      
+  const fetchHotels = useCallback(
+    async (page: number = 1, filters?: HotelFilters) => {
       setState((prev) => ({
         ...prev,
-        loading: false,
-        hotels,
+        loading: true,
         error: null,
       }));
 
-      return hotels;
-    } catch (error: any) {
-      const errorMessage = error.message || "Failed to fetch hotels";
-      
-      setState((prev) => ({
-        ...prev,
-        loading: false,
-        error: errorMessage,
-        hotels: [],
-      }));
+      try {
+        const response = await getAllHotels(page, filters);
+        const hotels = Array.isArray(response.data)
+          ? response.data
+          : [response.data];
 
-      toast.error(errorMessage);
-      return [];
-    }
-  }, []);
+        setState((prev) => ({
+          ...prev,
+          loading: false,
+          hotels,
+          error: null,
+          // Update pagination state
+          currentPage: response.pagination?.current_page || 1,
+          totalPages: response.pagination?.total_pages || 1,
+          totalResults: hotels.length,
+          hasNextPage:
+            (response.pagination?.current_page || 1) <
+            (response.pagination?.total_pages || 1),
+          hasPrevPage: (response.pagination?.current_page || 1) > 1,
+        }));
+
+        return hotels;
+      } catch (error: any) {
+        const errorMessage = error.message || "Failed to fetch hotels";
+
+        setState((prev) => ({
+          ...prev,
+          loading: false,
+          error: errorMessage,
+          hotels: [],
+        }));
+
+        toast.error(errorMessage);
+        return [];
+      }
+    },
+    []
+  );
 
   /**
-   * Fetch hotels with filters
+   * Fetch hotels with filters and pagination
    */
-  const fetchFilteredHotels = useCallback(async (filters: HotelFilters) => {
-    setState((prev) => ({
-      ...prev,
-      loading: true,
-      error: null,
-      filters,
-    }));
-
-    try {
-      const hotels = await getFilteredHotels(filters);
-      
+  const fetchFilteredHotels = useCallback(
+    async (filters: HotelFilters, page: number = 1) => {
       setState((prev) => ({
         ...prev,
-        loading: false,
-        hotels,
+        loading: true,
         error: null,
+        filters,
       }));
 
-      // Show success message if filters are applied
-      if (filters.rating || filters.country) {
-        const filterMessages = [];
-        if (filters.rating) filterMessages.push(`${filters.rating} star rating`);
-        if (filters.country) filterMessages.push(`country: ${filters.country}`);
-        toast.success(`Found ${hotels.length} hotels with ${filterMessages.join(' and ')}`);
+      try {
+        // Use getAllHotels with filters and pagination
+        const response = await getAllHotels(page, filters);
+        const hotels = Array.isArray(response.data)
+          ? response.data
+          : [response.data];
+
+        setState((prev) => ({
+          ...prev,
+          loading: false,
+          hotels,
+          error: null,
+          // Update pagination state
+          currentPage: response.pagination?.current_page || 1,
+          totalPages: response.pagination?.total_pages || 1,
+          totalResults: hotels.length,
+          hasNextPage:
+            (response.pagination?.current_page || 1) <
+            (response.pagination?.total_pages || 1),
+          hasPrevPage: (response.pagination?.current_page || 1) > 1,
+        }));
+
+        // Show success message if filters are applied
+        if (filters.rating || filters.country) {
+          const filterMessages = [];
+          if (filters.rating)
+            filterMessages.push(`${filters.rating} star rating`);
+          if (filters.country)
+            filterMessages.push(`country: ${filters.country}`);
+          toast.success(
+            `Found ${hotels.length} hotels with ${filterMessages.join(" and ")}`
+          );
+        }
+
+        return hotels;
+      } catch (error: any) {
+        const errorMessage = error.message || "Failed to fetch filtered hotels";
+
+        setState((prev) => ({
+          ...prev,
+          loading: false,
+          error: errorMessage,
+          hotels: [],
+          // Reset pagination on error
+          currentPage: 1,
+          totalPages: 1,
+          totalResults: 0,
+          hasNextPage: false,
+          hasPrevPage: false,
+        }));
+
+        toast.error(errorMessage);
+        return [];
       }
-
-      return hotels;
-    } catch (error: any) {
-      const errorMessage = error.message || "Failed to fetch filtered hotels";
-      
-      setState((prev) => ({
-        ...prev,
-        loading: false,
-        error: errorMessage,
-        hotels: [],
-      }));
-
-      toast.error(errorMessage);
-      return [];
-    }
-  }, []);
+    },
+    []
+  );
 
   /**
    * Fetch available countries
@@ -112,7 +163,7 @@ export const useHotels = () => {
   const fetchCountries = useCallback(async () => {
     try {
       const countries = await getHotelCountries();
-      
+
       setState((prev) => ({
         ...prev,
         countries,
@@ -193,9 +244,65 @@ export const useHotels = () => {
     if (Object.keys(state.filters).length > 0) {
       await fetchFilteredHotels(state.filters);
     } else {
-      await fetchHotels();
+      await fetchHotels(state.currentPage);
     }
-  }, [state.filters, fetchFilteredHotels, fetchHotels]);
+  }, [state.filters, state.currentPage, fetchFilteredHotels, fetchHotels]);
+
+  /**
+   * Go to next page
+   */
+  const goToNextPage = useCallback(async () => {
+    if (state.hasNextPage) {
+      const nextPage = state.currentPage + 1;
+      if (Object.keys(state.filters).length > 0) {
+        await fetchFilteredHotels(state.filters, nextPage);
+      } else {
+        await fetchHotels(nextPage);
+      }
+    }
+  }, [
+    state.hasNextPage,
+    state.currentPage,
+    state.filters,
+    fetchFilteredHotels,
+    fetchHotels,
+  ]);
+
+  /**
+   * Go to previous page
+   */
+  const goToPrevPage = useCallback(async () => {
+    if (state.hasPrevPage) {
+      const prevPage = state.currentPage - 1;
+      if (Object.keys(state.filters).length > 0) {
+        await fetchFilteredHotels(state.filters, prevPage);
+      } else {
+        await fetchHotels(prevPage);
+      }
+    }
+  }, [
+    state.hasPrevPage,
+    state.currentPage,
+    state.filters,
+    fetchFilteredHotels,
+    fetchHotels,
+  ]);
+
+  /**
+   * Go to specific page
+   */
+  const goToPage = useCallback(
+    async (page: number) => {
+      if (page >= 1 && page <= state.totalPages) {
+        if (Object.keys(state.filters).length > 0) {
+          await fetchFilteredHotels(state.filters, page);
+        } else {
+          await fetchHotels(page);
+        }
+      }
+    },
+    [state.totalPages, state.filters, fetchFilteredHotels, fetchHotels]
+  );
 
   /**
    * Initialize hotels and countries on mount
@@ -212,7 +319,14 @@ export const useHotels = () => {
     error: state.error,
     countries: state.countries,
     filters: state.filters,
-    
+
+    // Pagination state
+    currentPage: state.currentPage,
+    totalPages: state.totalPages,
+    totalResults: state.totalResults,
+    hasNextPage: state.hasNextPage,
+    hasPrevPage: state.hasPrevPage,
+
     // Actions
     fetchHotels,
     fetchFilteredHotels,
@@ -224,7 +338,12 @@ export const useHotels = () => {
     removeRatingFilter,
     removeCountryFilter,
     refreshHotels,
-    
+
+    // Pagination actions
+    goToNextPage,
+    goToPrevPage,
+    goToPage,
+
     // Computed properties
     hasFilters: Object.keys(state.filters).length > 0,
     hotelCount: state.hotels.length,

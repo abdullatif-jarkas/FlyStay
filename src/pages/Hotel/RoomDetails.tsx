@@ -368,14 +368,13 @@ const RoomDetails = () => {
                   {room.images.map((image, index) => (
                     <div key={image.id} className="relative group">
                       <img
-                        src={image.image_path || image.url}
+                        src={image.url || image.url}
                         alt={`Room ${room.room_type} - Image ${index + 1}`}
-                        className="w-full h-48 object-cover rounded-lg"
+                        className="w-full h-48 object-cover rounded-lg shadow-2xl"
                         onError={(e) => {
                           e.currentTarget.style.display = "none";
                         }}
                       />
-                      <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-200 rounded-lg"></div>
                     </div>
                   ))}
                 </div>

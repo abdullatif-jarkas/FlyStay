@@ -13,7 +13,7 @@ const getAuthToken = (): string | null => {
 const hotelApi = axios.create({
   baseURL: BASE_URL,
   headers: {
-    "Accept": "application/json",
+    Accept: "application/json",
   },
 });
 
@@ -33,27 +33,45 @@ export interface HotelFilters {
 }
 
 /**
- * Get all hotels
- * @returns Promise with hotels array
+ * Get all hotels with pagination support
+ * @param page - Page number (default: 1)
+ * @param filters - Optional filters
+ * @returns Promise with hotels response including pagination
  */
-export const getAllHotels = async (): Promise<Hotel[]> => {
+export const getAllHotels = async (
+  page: number = 1,
+  filters?: HotelFilters
+): Promise<HotelApiResponse> => {
   try {
-    const response = await hotelApi.get<HotelApiResponse>("/api/hotel");
+    // Build query parameters
+    const queryParams = new URLSearchParams({
+      page: page.toString(),
+    });
+
+    // Add filters to query params
+    if (filters?.rating) {
+      queryParams.append("rating", filters.rating.toString());
+    }
+    if (filters?.country) {
+      queryParams.append("country", filters.country);
+    }
+
+    const response = await hotelApi.get<HotelApiResponse>(
+      `/api/hotel?${queryParams.toString()}`
+    );
 
     if (response.data.status === "success") {
-      // Handle both single hotel and array of hotels
-      const data = response.data.data;
-      return Array.isArray(data) ? data : [data];
+      return response.data;
     } else {
       throw new Error(response.data.message || "Failed to fetch hotels");
     }
   } catch (error: any) {
     console.error("Error fetching hotels:", error);
-    
+
     if (error.response?.data) {
       throw new Error(error.response.data.message || "Failed to fetch hotels");
     }
-    
+
     throw new Error("Network error occurred while fetching hotels");
   }
 };
@@ -65,21 +83,27 @@ export const getAllHotels = async (): Promise<Hotel[]> => {
  */
 export const getHotelsByRating = async (rating: number): Promise<Hotel[]> => {
   try {
-    const response = await hotelApi.get<HotelApiResponse>(`/api/hotel?rating=${rating}`);
+    const response = await hotelApi.get<HotelApiResponse>(
+      `/api/hotel?rating=${rating}`
+    );
 
     if (response.data.status === "success") {
       const data = response.data.data;
       return Array.isArray(data) ? data : [data];
     } else {
-      throw new Error(response.data.message || "Failed to fetch hotels by rating");
+      throw new Error(
+        response.data.message || "Failed to fetch hotels by rating"
+      );
     }
   } catch (error: any) {
     console.error("Error fetching hotels by rating:", error);
-    
+
     if (error.response?.data) {
-      throw new Error(error.response.data.message || "Failed to fetch hotels by rating");
+      throw new Error(
+        error.response.data.message || "Failed to fetch hotels by rating"
+      );
     }
-    
+
     throw new Error("Network error occurred while fetching hotels by rating");
   }
 };
@@ -91,21 +115,27 @@ export const getHotelsByRating = async (rating: number): Promise<Hotel[]> => {
  */
 export const getHotelsByCountry = async (country: string): Promise<Hotel[]> => {
   try {
-    const response = await hotelApi.get<HotelApiResponse>(`/api/hotel?country=${encodeURIComponent(country)}`);
+    const response = await hotelApi.get<HotelApiResponse>(
+      `/api/hotel?country=${encodeURIComponent(country)}`
+    );
 
     if (response.data.status === "success") {
       const data = response.data.data;
       return Array.isArray(data) ? data : [data];
     } else {
-      throw new Error(response.data.message || "Failed to fetch hotels by country");
+      throw new Error(
+        response.data.message || "Failed to fetch hotels by country"
+      );
     }
   } catch (error: any) {
     console.error("Error fetching hotels by country:", error);
-    
+
     if (error.response?.data) {
-      throw new Error(error.response.data.message || "Failed to fetch hotels by country");
+      throw new Error(
+        error.response.data.message || "Failed to fetch hotels by country"
+      );
     }
-    
+
     throw new Error("Network error occurred while fetching hotels by country");
   }
 };
@@ -115,36 +145,42 @@ export const getHotelsByCountry = async (country: string): Promise<Hotel[]> => {
  * @param filters - Object containing rating and/or country filters
  * @returns Promise with filtered hotels array
  */
-export const getFilteredHotels = async (filters: HotelFilters): Promise<Hotel[]> => {
+export const getFilteredHotels = async (
+  filters: HotelFilters
+): Promise<Hotel[]> => {
   try {
     const params = new URLSearchParams();
-    
+
     if (filters.rating) {
-      params.append('rating', filters.rating.toString());
+      params.append("rating", filters.rating.toString());
     }
-    
+
     if (filters.country) {
-      params.append('country', filters.country);
+      params.append("country", filters.country);
     }
 
     const queryString = params.toString();
-    const endpoint = queryString ? `/api/hotel?${queryString}` : '/api/hotel';
-    
+    const endpoint = queryString ? `/api/hotel?${queryString}` : "/api/hotel";
+
     const response = await hotelApi.get<HotelApiResponse>(endpoint);
 
     if (response.data.status === "success") {
       const data = response.data.data;
       return Array.isArray(data) ? data : [data];
     } else {
-      throw new Error(response.data.message || "Failed to fetch filtered hotels");
+      throw new Error(
+        response.data.message || "Failed to fetch filtered hotels"
+      );
     }
   } catch (error: any) {
     console.error("Error fetching filtered hotels:", error);
-    
+
     if (error.response?.data) {
-      throw new Error(error.response.data.message || "Failed to fetch filtered hotels");
+      throw new Error(
+        error.response.data.message || "Failed to fetch filtered hotels"
+      );
     }
-    
+
     throw new Error("Network error occurred while fetching filtered hotels");
   }
 };
@@ -156,7 +192,9 @@ export const getFilteredHotels = async (filters: HotelFilters): Promise<Hotel[]>
  */
 export const getHotelById = async (hotelId: number): Promise<Hotel> => {
   try {
-    const response = await hotelApi.get<HotelApiResponse>(`/api/hotel/${hotelId}`);
+    const response = await hotelApi.get<HotelApiResponse>(
+      `/api/hotel/${hotelId}`
+    );
 
     if (response.data.status === "success") {
       const data = response.data.data;
@@ -166,11 +204,13 @@ export const getHotelById = async (hotelId: number): Promise<Hotel> => {
     }
   } catch (error: any) {
     console.error("Error fetching hotel details:", error);
-    
+
     if (error.response?.data) {
-      throw new Error(error.response.data.message || "Failed to fetch hotel details");
+      throw new Error(
+        error.response.data.message || "Failed to fetch hotel details"
+      );
     }
-    
+
     throw new Error("Network error occurred while fetching hotel details");
   }
 };
@@ -182,7 +222,7 @@ export const getHotelById = async (hotelId: number): Promise<Hotel> => {
 export const getHotelCountries = async (): Promise<string[]> => {
   try {
     const hotels = await getAllHotels();
-    const countries = [...new Set(hotels.map(hotel => hotel.country.name))];
+    const countries = [...new Set(hotels.map((hotel) => hotel.country.name))];
     return countries.sort();
   } catch (error) {
     console.error("Error fetching hotel countries:", error);
