@@ -233,12 +233,11 @@ const Home = () => {
             </div>
           </div>
         </div>
-
+                
         {/* Search Bar */}
-        <div className="container mx-auto px-4 relative">
+        {/* <div className="container mx-auto px-4 relative">
           <div className="absolute left-0 right-0 bottom-0 transform translate-y-1/2">
             <div className="bg-white rounded-lg shadow-xl p-6">
-              {/* Search Tabs */}
               <div className="flex mb-6 bg-gray-100 rounded-lg p-1">
                 <button
                   onClick={() => setActiveSearchTab("hotels")}
@@ -264,13 +263,11 @@ const Home = () => {
                 </button>
               </div>
 
-              {/* Search Components */}
               {activeSearchTab === "hotels" ? (
                 <HotelSearchBar />
               ) : (
                 <FlightSearchBar
                   onSearch={(params) => {
-                    // Navigate to flight search with params
                     window.location.href = `/flight?${new URLSearchParams({
                       origin: params.origin,
                       destination: params.destination,
@@ -287,10 +284,9 @@ const Home = () => {
               )}
             </div>
           </div>
-        </div>
+        </div> */}
 
-        {/* Spacer */}
-        <div className="h-32"></div>
+        {/* <div className="h-32"></div> */}
       </section>
 
       {/* Services Section */}

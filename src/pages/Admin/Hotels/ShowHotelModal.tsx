@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { 
-  FaHotel, 
-  FaStar, 
-  FaMapMarkerAlt, 
-  FaCalendarAlt, 
-  FaImages, 
+import {
+  FaHotel,
+  FaStar,
+  FaMapMarkerAlt,
+  FaCalendarAlt,
+  FaImages,
   FaInfoCircle,
   FaChevronLeft,
   FaChevronRight,
-  FaExpand
+  FaExpand,
 } from "react-icons/fa";
 import { ShowHotelModalProps, Hotel } from "../../../types/hotel";
 
@@ -39,12 +39,15 @@ const ShowHotelModal: React.FC<ShowHotelModalProps> = ({
     setError("");
 
     try {
-      const response = await axios.get(`http://127.0.0.1:8000/api/hotel/${hotelId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          Accept: "application/json",
-        },
-      });
+      const response = await axios.get(
+        `http://127.0.0.1:8000/api/hotel/${hotelId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: "application/json",
+          },
+        }
+      );
 
       if (response.data.status === "success") {
         setHotel(response.data.data[0]);
@@ -53,9 +56,9 @@ const ShowHotelModal: React.FC<ShowHotelModalProps> = ({
       }
     } catch (err: any) {
       setError(
-        err.response?.data?.message || 
-        err.response?.data?.error || 
-        "Failed to load hotel details"
+        err.response?.data?.message ||
+          err.response?.data?.error ||
+          "Failed to load hotel details"
       );
     } finally {
       setLoading(false);
@@ -70,7 +73,7 @@ const ShowHotelModal: React.FC<ShowHotelModalProps> = ({
 
   const nextImage = () => {
     if (hotel?.images && hotel.images.length > 0) {
-      setCurrentImageIndex((prev) => 
+      setCurrentImageIndex((prev) =>
         prev === hotel.images!.length - 1 ? 0 : prev + 1
       );
     }
@@ -78,7 +81,7 @@ const ShowHotelModal: React.FC<ShowHotelModalProps> = ({
 
   const prevImage = () => {
     if (hotel?.images && hotel.images.length > 0) {
-      setCurrentImageIndex((prev) => 
+      setCurrentImageIndex((prev) =>
         prev === 0 ? hotel.images!.length - 1 : prev - 1
       );
     }
@@ -117,7 +120,9 @@ const ShowHotelModal: React.FC<ShowHotelModalProps> = ({
             {loading && (
               <div className="flex items-center justify-center py-8">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
-                <span className="ml-2 text-gray-600">Loading hotel details...</span>
+                <span className="ml-2 text-gray-600">
+                  Loading hotel details...
+                </span>
               </div>
             )}
 
@@ -133,7 +138,8 @@ const ShowHotelModal: React.FC<ShowHotelModalProps> = ({
                 <div className="bg-gray-50 rounded-lg p-6">
                   <div className="flex items-start justify-between mb-4">
                     <div>
-                      <h3 className="text-2xl font-bold text-gray-800 mb-2">{hotel.name}
+                      <h3 className="text-2xl font-bold text-gray-800 mb-2">
+                        {hotel.name}
                       </h3>
                       <div className="flex items-center gap-2 mb-2">
                         <FaMapMarkerAlt className="text-red-500" />
@@ -142,15 +148,19 @@ const ShowHotelModal: React.FC<ShowHotelModalProps> = ({
                         </span>
                       </div>
                       <div className="flex items-center gap-1">
-                        {[1, 2, 3, 4, 5].map(star => (
+                        {[1, 2, 3, 4, 5].map((star) => (
                           <FaStar
                             key={star}
                             className={`text-lg ${
-                              star <= hotel.rating ? 'text-yellow-400' : 'text-gray-300'
+                              star <= hotel.rating
+                                ? "text-yellow-400"
+                                : "text-gray-300"
                             }`}
                           />
                         ))}
-                        <span className="ml-2 text-gray-600">({hotel.rating}/5)</span>
+                        <span className="ml-2 text-gray-600">
+                          ({hotel.rating}/5)
+                        </span>
                       </div>
                     </div>
                     <div className="text-right">
@@ -169,12 +179,15 @@ const ShowHotelModal: React.FC<ShowHotelModalProps> = ({
                         Hotel Images ({hotel.images.length})
                       </h3>
                     </div>
-                    
+
                     <div className="relative">
                       <div className="aspect-video bg-gray-100 rounded-lg overflow-hidden">
                         <img
-                          src={hotel.images[currentImageIndex].image_path}
-                          alt={hotel.images[currentImageIndex].alt || `Hotel image ${currentImageIndex + 1}`}
+                          src={hotel.images[currentImageIndex].url}
+                          alt={
+                            hotel.images[currentImageIndex].alt ||
+                            `Hotel image ${currentImageIndex + 1}`
+                          }
                           className="w-full h-full object-cover cursor-pointer"
                           onClick={() => setShowImageModal(true)}
                         />
@@ -185,7 +198,7 @@ const ShowHotelModal: React.FC<ShowHotelModalProps> = ({
                           <FaExpand />
                         </button>
                       </div>
-                      
+
                       {hotel.images.length > 1 && (
                         <>
                           <button
@@ -207,21 +220,25 @@ const ShowHotelModal: React.FC<ShowHotelModalProps> = ({
                     {/* Image Thumbnails */}
                     {hotel.images.length > 1 && (
                       <div className="flex gap-2 mt-4 overflow-x-auto">
-                        {hotel.images.map((image, index) => (
-                          <button
+                        {hotel.images.map((image, index) => {
+                          return (
+                            <button
                             key={image.id}
                             onClick={() => setCurrentImageIndex(index)}
                             className={`flex-shrink-0 w-16 h-16 rounded border-2 overflow-hidden ${
-                              index === currentImageIndex ? 'border-primary-500' : 'border-gray-300'
-                            }`}
-                          >
-                            <img
-                              src={image.url}
-                              alt={`Thumbnail ${index + 1}`}
-                              className="w-full h-full object-cover"
-                            />
-                          </button>
-                        ))}
+                                index === currentImageIndex
+                                  ? "border-primary-500"
+                                  : "border-gray-300"
+                              }`}
+                              >
+                              <img
+                                src={image.url}
+                                alt={`Thumbnail ${index + 1}`}
+                                className="w-full h-full object-cover"
+                              />
+                            </button>
+                          );
+                        })}
                       </div>
                     )}
                   </div>
@@ -231,39 +248,61 @@ const ShowHotelModal: React.FC<ShowHotelModalProps> = ({
                 <div className="bg-blue-50 rounded-lg p-6">
                   <div className="flex items-center gap-2 mb-3">
                     <FaInfoCircle className="text-blue-600" />
-                    <h3 className="text-lg font-semibold text-gray-800">Description</h3>
+                    <h3 className="text-lg font-semibold text-gray-800">
+                      Description
+                    </h3>
                   </div>
-                  <p className="text-gray-700 leading-relaxed">{hotel.description}</p>
+                  <p className="text-gray-700 leading-relaxed">
+                    {hotel.description}
+                  </p>
                 </div>
 
                 {/* Hotel Metadata */}
                 <div className="bg-green-50 rounded-lg p-6">
                   <div className="flex items-center gap-2 mb-4">
                     <FaCalendarAlt className="text-green-600" />
-                    <h3 className="text-lg font-semibold text-gray-800">Hotel Information</h3>
+                    <h3 className="text-lg font-semibold text-gray-800">
+                      Hotel Information
+                    </h3>
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-600">Created At</label>
-                      <p className="text-gray-800">{formatDate(hotel.created_at)}</p>
+                      <label className="block text-sm font-medium text-gray-600">
+                        Created At
+                      </label>
+                      <p className="text-gray-800">
+                        {formatDate(hotel.created_at)}
+                      </p>
                     </div>
                     {hotel.updated_at && (
                       <div>
-                        <label className="block text-sm font-medium text-gray-600">Updated At</label>
-                        <p className="text-gray-800">{formatDate(hotel.updated_at)}</p>
+                        <label className="block text-sm font-medium text-gray-600">
+                          Updated At
+                        </label>
+                        <p className="text-gray-800">
+                          {formatDate(hotel.updated_at)}
+                        </p>
                       </div>
                     )}
                     <div>
-                      <label className="block text-sm font-medium text-gray-600">City ID</label>
+                      <label className="block text-sm font-medium text-gray-600">
+                        City ID
+                      </label>
                       <p className="text-gray-800 font-mono">{hotel.city_id}</p>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-600">Country</label>
-                      <p className="text-gray-800">{hotel.country.name} ({hotel.country.iso2})</p>
+                      <label className="block text-sm font-medium text-gray-600">
+                        Country
+                      </label>
+                      <p className="text-gray-800">
+                        {hotel.country.name} ({hotel.country.iso2})
+                      </p>
                     </div>
                     {hotel.address && (
                       <div className="md:col-span-2">
-                        <label className="block text-sm font-medium text-gray-600">Address</label>
+                        <label className="block text-sm font-medium text-gray-600">
+                          Address
+                        </label>
                         <p className="text-gray-800">{hotel.address}</p>
                       </div>
                     )}
@@ -272,23 +311,35 @@ const ShowHotelModal: React.FC<ShowHotelModalProps> = ({
 
                 {/* Statistics */}
                 <div className="bg-yellow-50 rounded-lg p-6">
-                  <h3 className="text-lg font-semibold text-gray-800 mb-4">Statistics</h3>
+                  <h3 className="text-lg font-semibold text-gray-800 mb-4">
+                    Statistics
+                  </h3>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
                     <div>
-                      <p className="text-2xl font-bold text-yellow-600">{hotel.rating}</p>
+                      <p className="text-2xl font-bold text-yellow-600">
+                        {hotel.rating}
+                      </p>
                       <p className="text-gray-600 text-sm">Star Rating</p>
                     </div>
                     <div>
-                      <p className="text-2xl font-bold text-yellow-600">{hotel.images?.length || 0}</p>
+                      <p className="text-2xl font-bold text-yellow-600">
+                        {hotel.images?.length || 0}
+                      </p>
                       <p className="text-gray-600 text-sm">Images</p>
                     </div>
                     <div>
-                      <p className="text-2xl font-bold text-yellow-600">{hotel.country.iso2}</p>
+                      <p className="text-2xl font-bold text-yellow-600">
+                        {hotel.country.iso2}
+                      </p>
                       <p className="text-gray-600 text-sm">Country Code</p>
                     </div>
                     <div>
-                      <p className="text-2xl font-bold text-yellow-600">{hotel.description.length}</p>
-                      <p className="text-gray-600 text-sm">Description Length</p>
+                      <p className="text-2xl font-bold text-yellow-600">
+                        {hotel.description.length}
+                      </p>
+                      <p className="text-gray-600 text-sm">
+                        Description Length
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -315,7 +366,10 @@ const ShowHotelModal: React.FC<ShowHotelModalProps> = ({
           <div className="relative max-w-full max-h-full">
             <img
               src={hotel.images[currentImageIndex].url}
-              alt={hotel.images[currentImageIndex].alt || `Hotel image ${currentImageIndex + 1}`}
+              alt={
+                hotel.images[currentImageIndex].alt ||
+                `Hotel image ${currentImageIndex + 1}`
+              }
               className="max-w-full max-h-full object-contain"
             />
             <button
