@@ -47,9 +47,11 @@ const EditFlightCabinModal: React.FC<EditFlightCabinModalProps> = ({
 
   const fetchFlights = async () => {
     setLoadingFlights(true);
+
     try {
-      const response = await axios.get(
-        `http://127.0.0.1:8000${FLIGHT_CABIN_ENDPOINTS.FLIGHTS}`,
+      // First, fetch the first page to get pagination info
+      const firstPageResponse = await axios.get(
+        `http://127.0.0.1:8000${FLIGHT_CABIN_ENDPOINTS.FLIGHTS}?page=1`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -58,19 +60,63 @@ const EditFlightCabinModal: React.FC<EditFlightCabinModalProps> = ({
         }
       );
 
-      if (response.data.status === "success") {
-        const responseData: FlightsResponse = response.data;
-        setFlights(responseData.data);
+      if (firstPageResponse.data.status === "success") {
+        const firstPageData: FlightsResponse = firstPageResponse.data;
+        let allFlights: Flight[] = [...firstPageData.data];
+
+        // Check if there are more pages to fetch
+        const totalPages = firstPageData.pagination?.total_pages || 1;
+
+        if (totalPages > 1) {
+          // Fetch remaining pages in parallel
+          const pagePromises: Promise<
+            import("axios").AxiosResponse<FlightsResponse>
+          >[] = [];
+
+          for (let page = 2; page <= totalPages; page++) {
+            const pagePromise = axios.get<FlightsResponse>(
+              `http://127.0.0.1:8000${FLIGHT_CABIN_ENDPOINTS.FLIGHTS}?page=${page}`,
+              {
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                  Accept: "application/json",
+                },
+              }
+            );
+            pagePromises.push(pagePromise);
+          }
+
+          // Wait for all pages to complete
+          const pageResponses = await Promise.all(pagePromises);
+
+          // Combine all flight data
+          pageResponses.forEach((response) => {
+            if (response.data.status === "success") {
+              const pageData: FlightsResponse = response.data;
+              allFlights = [...allFlights, ...pageData.data];
+            }
+          });
+        }
+
+        // Set all flights to state
+        setFlights(allFlights);
+        console.log(
+          `Fetched ${allFlights.length} flights from ${totalPages} page(s)`
+        );
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Error fetching flights:", err);
+      // Set empty array on error to prevent UI issues
+      setFlights([]);
     } finally {
       setLoadingFlights(false);
     }
   };
 
   const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -99,14 +145,21 @@ const EditFlightCabinModal: React.FC<EditFlightCabinModalProps> = ({
 
     if (!formData.price.trim()) {
       newErrors.price = "Price is required";
-    } else if (isNaN(parseFloat(formData.price)) || parseFloat(formData.price) <= 0) {
+    } else if (
+      isNaN(parseFloat(formData.price)) ||
+      parseFloat(formData.price) <= 0
+    ) {
       newErrors.price = "Price must be a valid positive number";
     }
 
     if (!formData.available_seats.trim()) {
       newErrors.available_seats = "Available seats is required";
-    } else if (isNaN(parseInt(formData.available_seats)) || parseInt(formData.available_seats) <= 0) {
-      newErrors.available_seats = "Available seats must be a valid positive number";
+    } else if (
+      isNaN(parseInt(formData.available_seats)) ||
+      parseInt(formData.available_seats) <= 0
+    ) {
+      newErrors.available_seats =
+        "Available seats must be a valid positive number";
     }
 
     setErrors(newErrors);
@@ -144,7 +197,9 @@ const EditFlightCabinModal: React.FC<EditFlightCabinModalProps> = ({
         onSuccess();
         handleClose();
       } else {
-        setErrors({ general: response.data.message || "Failed to update flight cabin" });
+        setErrors({
+          general: response.data.message || "Failed to update flight cabin",
+        });
       }
     } catch (err: any) {
       console.error("Error updating flight cabin:", err);
@@ -152,7 +207,8 @@ const EditFlightCabinModal: React.FC<EditFlightCabinModalProps> = ({
         setErrors(err.response.data.errors);
       } else {
         setErrors({
-          general: err.response?.data?.message || "Failed to update flight cabin",
+          general:
+            err.response?.data?.message || "Failed to update flight cabin",
         });
       }
     } finally {
@@ -181,7 +237,9 @@ const EditFlightCabinModal: React.FC<EditFlightCabinModalProps> = ({
         <div className="flex items-center justify-between p-6 border-b">
           <div className="flex items-center">
             <FaPlane className="text-primary-500 mr-3" />
-            <h2 className="text-xl font-semibold text-gray-900">Edit Flight Cabin</h2>
+            <h2 className="text-xl font-semibold text-gray-900">
+              Edit Flight Cabin
+            </h2>
           </div>
           <button
             onClick={handleClose}
@@ -201,7 +259,10 @@ const EditFlightCabinModal: React.FC<EditFlightCabinModalProps> = ({
 
           {/* Flight Selection */}
           <div className="mb-4">
-            <label htmlFor="flight_id" className="block text-sm font-medium text-gray-700 mb-2">
+            <label
+              htmlFor="flight_id"
+              className="block text-sm font-medium text-gray-700 mb-2"
+            >
               Flight *
             </label>
             <select
@@ -215,11 +276,13 @@ const EditFlightCabinModal: React.FC<EditFlightCabinModalProps> = ({
               disabled={loadingFlights}
             >
               <option value="">
-                {loadingFlights ? "Loading flights..." : "Select a flight"}
+                {loadingFlights ? "Loading all flights..." : "Select a flight"}
               </option>
               {flights.map((flight) => (
                 <option key={flight.id} value={flight.id}>
-                  {flight.airline} {flight.flight_number} - {flight.departure_airport?.IATA_code || 'N/A'} → {flight.arrival_airport?.IATA_code || 'N/A'}
+                  {flight.airline} {flight.flight_number} -{" "}
+                  {flight.departure_airport?.IATA_code || "N/A"} →{" "}
+                  {flight.arrival_airport?.IATA_code || "N/A"}
                 </option>
               ))}
             </select>
@@ -230,7 +293,10 @@ const EditFlightCabinModal: React.FC<EditFlightCabinModalProps> = ({
 
           {/* Class Name */}
           <div className="mb-4">
-            <label htmlFor="class_name" className="block text-sm font-medium text-gray-700 mb-2">
+            <label
+              htmlFor="class_name"
+              className="block text-sm font-medium text-gray-700 mb-2"
+            >
               Class *
             </label>
             <select
@@ -256,7 +322,10 @@ const EditFlightCabinModal: React.FC<EditFlightCabinModalProps> = ({
 
           {/* Price */}
           <div className="mb-4">
-            <label htmlFor="price" className="block text-sm font-medium text-gray-700 mb-2">
+            <label
+              htmlFor="price"
+              className="block text-sm font-medium text-gray-700 mb-2"
+            >
               Price (USD) *
             </label>
             <input
@@ -278,7 +347,10 @@ const EditFlightCabinModal: React.FC<EditFlightCabinModalProps> = ({
 
           {/* Available Seats */}
           <div className="mb-4">
-            <label htmlFor="available_seats" className="block text-sm font-medium text-gray-700 mb-2">
+            <label
+              htmlFor="available_seats"
+              className="block text-sm font-medium text-gray-700 mb-2"
+            >
               Available Seats *
             </label>
             <input
@@ -293,13 +365,18 @@ const EditFlightCabinModal: React.FC<EditFlightCabinModalProps> = ({
               placeholder="Enter number of available seats"
             />
             {errors.available_seats && (
-              <p className="mt-1 text-sm text-red-600">{errors.available_seats}</p>
+              <p className="mt-1 text-sm text-red-600">
+                {errors.available_seats}
+              </p>
             )}
           </div>
 
           {/* Note */}
           <div className="mb-6">
-            <label htmlFor="note" className="block text-sm font-medium text-gray-700 mb-2">
+            <label
+              htmlFor="note"
+              className="block text-sm font-medium text-gray-700 mb-2"
+            >
               Note (Optional)
             </label>
             <textarea
