@@ -123,7 +123,14 @@ export const routes = createBrowserRouter([
   {
     path: "/admin",
     element: withSuspense(
-      <ProtectedRoute allowedRoles={["admin", "finance_officer", "hotel_agent", "flight_agent"]}>
+      <ProtectedRoute
+        allowedRoles={[
+          "admin",
+          "finance_officer",
+          "hotel_agent",
+          "flight_agent",
+        ]}
+      >
         <AdminLayout />
       </ProtectedRoute>
     ),

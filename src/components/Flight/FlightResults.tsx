@@ -156,15 +156,6 @@ const FlightResults: React.FC<FlightResultsProps> = ({
           </button>
         </div>
       )}
-
-      {/* Results Summary */}
-      {pagination && (
-        <div className="text-center text-sm text-gray-500 py-4">
-          Showing {(pagination.current_page - 1) * 10 + 1} to{" "}
-          {Math.min(pagination.current_page * 10, pagination.total_results)} of{" "}
-          {pagination.total_results} results
-        </div>
-      )}
     </div>
   );
 };

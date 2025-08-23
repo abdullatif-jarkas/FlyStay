@@ -77,14 +77,14 @@ const AdminLayout = () => {
               }}
             >
               {/* 1. General */}
-              <MenuItem
+              {/* <MenuItem
                 icon={<FaTachometerAlt />}
                 onClick={() => navigate("/admin")}
                 active={currentPath === "/admin"}
                 title="Dashboard"
               >
                 Dashboard
-              </MenuItem>
+              </MenuItem> */}
 
               {/* 2. User Management */}
               {role === "admin" && (

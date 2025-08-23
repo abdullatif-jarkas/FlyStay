@@ -26,39 +26,6 @@ const ProfileSection = ({ user }: ProfileSectionProps) => {
             </label>
             <p className="text-gray-900">{user.name}</p>
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Date Of Birth
-            </label>
-            <p className="text-gray-500">Not Provided</p>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Bio
-            </label>
-            <p className="text-gray-500">Not Provided</p>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Disability
-            </label>
-            <p className="text-gray-500">None</p>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Accessibility Needs
-            </label>
-            <p className="text-gray-500">Not Provided</p>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Gender
-            </label>
-            <p className="text-gray-500">Not Provided</p>
-          </div>
         </div>
       </div>
 
@@ -86,21 +53,6 @@ const ProfileSection = ({ user }: ProfileSectionProps) => {
               Email
             </label>
             <p className="text-gray-900">{user.email}</p>
-          </div>
-        </div>
-
-        <div className="mt-6">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Emergency Contact
-            </label>
-            <p className="text-gray-500">Not Provided</p>
-          </div>
-          <div className="mt-4">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Address
-            </label>
-            <p className="text-gray-500">Not Provided</p>
           </div>
         </div>
       </div>

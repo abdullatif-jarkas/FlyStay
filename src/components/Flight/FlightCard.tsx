@@ -135,13 +135,6 @@ const FlightCard: React.FC<FlightCardProps> = ({
 
           <div className="flex space-x-2">
             <button
-              onClick={() => onViewDetails(flight)}
-              className="px-3 py-2 border border-primary-500 text-primary-500 rounded-lg hover:bg-primary-50 transition-colors flex items-center"
-            >
-              <FaInfoCircle className="mr-1" />
-              Details
-            </button>
-            <button
               onClick={() => onSelect(flight)}
               className="px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors flex items-center"
             >

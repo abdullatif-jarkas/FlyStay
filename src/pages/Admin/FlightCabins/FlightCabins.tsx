@@ -145,9 +145,9 @@ const FlightCabins = () => {
               <div className="font-medium text-gray-900">
                 {flight.airline} {flight.flight_number}
               </div>
-              <div className="text-sm text-gray-600">
+              {/* <div className="text-sm text-gray-600">
                 {formatFlightRoute(flight)}
-              </div>
+              </div> */}
               <div className="text-xs text-gray-500">
                 {formatDateTime(flight.departure_time)}
               </div>

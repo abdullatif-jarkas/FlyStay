@@ -108,23 +108,23 @@ const Cities = () => {
       <div className="flex flex-col sm:flex-row gap-2 mb-4">
         <input
           type="text"
-          placeholder="ابحث باسم المدينة"
+          placeholder="Search by city name"
           value={searchCity}
           onChange={(e) => setSearchCity(e.target.value)}
           className="border p-2 rounded w-full sm:w-auto"
         />
         <input
           type="text"
-          placeholder="ابحث باسم الدولة"
+          placeholder="Search by country name"
           value={searchCountry}
           onChange={(e) => setSearchCountry(e.target.value)}
           className="border p-2 rounded w-full sm:w-auto"
         />
         <button
           onClick={handleSearch}
-          className="bg-blue-500 text-white px-4 py-2 rounded"
+          className="bg-primary-500 text-white px-4 py-2 rounded"
         >
-          بحث
+          Search
         </button>
       </div>
 
