@@ -87,7 +87,7 @@ const HotelResults: React.FC<HotelResultsProps> = ({
       {resultsHeader}
 
       {/* Hotel Cards Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 pb-6 gap-6">
         {hotels.map((hotel) => (
           <HotelCard
             key={hotel.id}
@@ -98,18 +98,6 @@ const HotelResults: React.FC<HotelResultsProps> = ({
           />
         ))}
       </div>
-
-      {/* Results footer */}
-      {hotels.length > 0 && (
-        <div className="mt-8 pt-6 border-t border-gray-200">
-          <div className="text-center text-gray-600">
-            <p className="text-sm">
-              Showing {hotels.length} hotel{hotels.length !== 1 ? "s" : ""}
-              {hasFilters && " matching your filters"}
-            </p>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

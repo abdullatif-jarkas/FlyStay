@@ -222,7 +222,8 @@ export const getHotelById = async (hotelId: number): Promise<Hotel> => {
 export const getHotelCountries = async (): Promise<string[]> => {
   try {
     const hotels = await getAllHotels();
-    const countries = [...new Set(hotels.map((hotel) => hotel.country.name))];
+    console.log("hotels: ", hotels.data)
+    const countries = [...new Set(hotels.data.map((hotel) => hotel.country.name))];
     return countries.sort();
   } catch (error) {
     console.error("Error fetching hotel countries:", error);

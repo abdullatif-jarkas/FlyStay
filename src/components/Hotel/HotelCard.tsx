@@ -51,7 +51,6 @@ const HotelCard: React.FC<HotelCardProps> = ({ hotel, onViewDetails }) => {
     <div className="flex flex-col bg-white rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden">
       {/* Hotel Image */}
       <div className="relative h-48 bg-gray-200">
-        {console.log(primaryImage)}
         {primaryImage ? (
           <img
             src={primaryImage.url || primaryImage.url}

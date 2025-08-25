@@ -122,7 +122,7 @@ const HotelFilters: React.FC<HotelFiltersProps> = ({
                       ? 'border-primary-500 bg-primary-50 text-primary-700'
                       : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
                   }`}
-                >
+                >{console.log("count: ", countries)}
                   <span className="text-sm font-medium text-left">
                     {country}
                   </span>

@@ -77,25 +77,10 @@ const HotelPagination: React.FC<HotelPaginationProps> = ({
 
   // Calculate results range
   const resultsPerPage = Math.ceil(totalResults / totalPages);
-  const startResult = (currentPage - 1) * resultsPerPage + 1;
-  const endResult = Math.min(currentPage * resultsPerPage, totalResults);
 
   return (
     <div className="bg-white border-t border-gray-200 px-4 py-3 sm:px-6">
-      <div className="flex flex-col sm:flex-row items-center justify-between">
-        {/* Results info */}
-        <div className="mb-4 sm:mb-0">
-          <p className="text-sm text-gray-700">
-            Showing{' '}
-            <span className="font-medium">{startResult}</span>
-            {' '}to{' '}
-            <span className="font-medium">{endResult}</span>
-            {' '}of{' '}
-            <span className="font-medium">{totalResults}</span>
-            {' '}hotels
-          </p>
-        </div>
-
+      <div className="flex flex-col justify-center sm:flex-row items-center justify-between">
         {/* Pagination controls */}
         <div className="flex items-center space-x-1">
           {/* First page button */}
