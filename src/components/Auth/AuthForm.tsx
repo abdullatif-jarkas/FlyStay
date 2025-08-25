@@ -76,7 +76,7 @@ const AuthForm = ({ type }: AuthFormProps) => {
 
           {type === "login" && (
             <p className="text-gray-600 mb-6">
-              Login to access your Easyset24 account
+              Login to access your FlyStay account
             </p>
           )}
 
@@ -94,7 +94,7 @@ const AuthForm = ({ type }: AuthFormProps) => {
                     onChange={(e) =>
                       setFormData({ ...formData, name: e.target.value })
                     }
-                    placeholder="Easyset24"
+                    placeholder="FlyStay"
                     className="w-full p-3 border rounded-md"
                   />
                 </div>
@@ -131,7 +131,7 @@ const AuthForm = ({ type }: AuthFormProps) => {
                 onChange={(e) =>
                   setFormData({ ...formData, email: e.target.value })
                 }
-                placeholder="Easyset24@Gmail.Com"
+                placeholder="flystay@gmail.Com"
                 className="w-full p-3 border rounded-md"
               />
             </div>
@@ -276,7 +276,7 @@ const AuthForm = ({ type }: AuthFormProps) => {
           <div className="mt-6 text-center text-sm">
             {type === "login" ? (
               <p>
-                Don't have an account in Easyset24 yet?{" "}
+                Don't have an account in FlyStay yet?{" "}
                 <Link
                   to="/auth/register"
                   className="text-primary-500 font-medium"

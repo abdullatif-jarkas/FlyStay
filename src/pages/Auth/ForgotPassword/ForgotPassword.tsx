@@ -58,7 +58,7 @@ const ForgotPassword = () => {
                   id="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Easyset24@Gmail.Com"
+                  placeholder="flystay@gmail.Com"
                   className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
                   required
                 />
