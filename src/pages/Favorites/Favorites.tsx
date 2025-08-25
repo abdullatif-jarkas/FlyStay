@@ -261,7 +261,6 @@ const Favorites = () => {
             {/* Rooms Section */}
             {filteredItems.rooms.length > 0 && (
               <div>
-                {console.log(filteredItems.rooms)}
                 <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
                   <FaBed className="mr-2 text-primary-500" />
                   Favorite Rooms ({filteredItems.rooms.length})

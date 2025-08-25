@@ -1,14 +1,19 @@
-import React, { useState, useEffect } from 'react';
-import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js';
-import { stripePromise, stripeConfig } from '../../config/stripe';
-import { toast } from 'sonner';
+import React, { useState, useEffect } from "react";
+import {
+  Elements,
+  PaymentElement,
+  useStripe,
+  useElements,
+} from "@stripe/react-stripe-js";
+import { stripePromise, stripeConfig } from "../../config/stripe";
+import { toast } from "sonner";
 import {
   FaSpinner,
   FaCreditCard,
   FaCheckCircle,
   FaExclamationTriangle,
   FaArrowLeft,
-} from 'react-icons/fa';
+} from "react-icons/fa";
 
 interface StripePaymentProps {
   clientSecret: string;
@@ -37,12 +42,12 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
   const stripe = useStripe();
   const elements = useElements();
   const [isLoading, setIsLoading] = useState(false);
-  const [message, setMessage] = useState<string>('');
+  const [message, setMessage] = useState<string>("");
 
   const formatCurrency = (amount: number): string => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
     }).format(amount);
   };
 
@@ -54,27 +59,28 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
     }
 
     setIsLoading(true);
-    setMessage('');
+    setMessage("");
 
     const { error } = await stripe.confirmPayment({
       elements,
-      confirmParams: {
-        return_url: `${window.location.origin}/profile?section=bookings&payment=success&booking=${bookingId}`,
-      },
+      // confirmParams: {
+      //   return_url: `${window.location.origin}/profile?section=bookings&payment=success&booking=${bookingId}`,
+      // },
+      redirect: "if_required",
     });
 
     if (error) {
-      if (error.type === 'card_error' || error.type === 'validation_error') {
-        setMessage(error.message || 'An error occurred during payment');
-        onError(error.message || 'Payment failed');
+      if (error.type === "card_error" || error.type === "validation_error") {
+        setMessage(error.message || "An error occurred during payment");
+        onError(error.message || "Payment failed");
       } else {
-        setMessage('An unexpected error occurred');
-        onError('An unexpected error occurred');
+        setMessage("An unexpected error occurred");
+        onError("An unexpected error occurred");
       }
-      toast.error(error.message || 'Payment failed');
+      toast.error(error.message || "Payment failed");
     } else {
       // Payment succeeded
-      toast.success('Payment completed successfully!');
+      toast.success("Payment completed successfully!");
       onSuccess();
     }
 
@@ -98,8 +104,10 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
             <span className="font-medium">Secure Payment</span>
           </div>
         </div>
-        
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">Complete Payment</h2>
+
+        <h2 className="text-2xl font-bold text-gray-900 mb-2">
+          Complete Payment
+        </h2>
         <p className="text-gray-600">
           Complete your hotel booking payment securely with Stripe
         </p>
@@ -121,7 +129,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
         <div className="p-4 border border-gray-200 rounded-lg">
           <PaymentElement
             options={{
-              layout: 'tabs',
+              layout: "tabs",
             }}
           />
         </div>
@@ -184,6 +192,7 @@ const StripePayment: React.FC<StripePaymentProps> = ({
   useEffect(() => {
     if (clientSecret) {
       setStripeLoading(false);
+      console.log("client secret: ", clientSecret);
     }
   }, [clientSecret]);
 

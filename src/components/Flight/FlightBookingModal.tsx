@@ -57,7 +57,10 @@ const FlightBookingModal: React.FC<FlightBookingModalProps> = ({
     clientSecret,
     resetPaymentState,
   } = usePayment();
-  const stripePromise = loadStripe("pk_test_...");
+
+  const STRIPE_PUBLISHABLE_KEY = import.meta.env.REACT_APP_STRIPE_PUBLISHABLE_KEY || 'pk_test_your_publishable_key_here';
+  console.log("publish key", STRIPE_PUBLISHABLE_KEY)
+  const stripePromise = loadStripe(STRIPE_PUBLISHABLE_KEY);
 
   // Reset state when modal opens/closes
   useEffect(() => {
