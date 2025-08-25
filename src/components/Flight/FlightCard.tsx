@@ -1,21 +1,18 @@
 import {
   FaPlane,
-  FaHeart,
-  FaRegHeart,
   FaInfoCircle,
   FaArrowRight,
   FaCreditCard,
 } from "react-icons/fa";
 import { FlightCardProps } from "../../types/flight";
+import FavoriteButton from "../Favorites/FavoriteButton";
 
 const FlightCard: React.FC<FlightCardProps> = ({
   flight,
   onSelect,
   onViewDetails,
-  onAddToFavorites,
   onBookNow,
   isSelected = false,
-  isFavorite = false,
 }) => {
   const formatTime = (dateString: string) => {
     return new Date(dateString).toLocaleTimeString("en-US", {
@@ -57,16 +54,12 @@ const FlightCard: React.FC<FlightCardProps> = ({
             </div>
           </div>
           <div className="flex items-center space-x-2">
-            <button
-              onClick={() => onAddToFavorites(flight)}
+            <FavoriteButton
+              type="flight"
+              id={flight.id}
+              size="md"
               className="p-2 rounded-full hover:bg-gray-100 transition-colors"
-            >
-              {isFavorite ? (
-                <FaHeart className="text-red-500" />
-              ) : (
-                <FaRegHeart className="text-gray-400 hover:text-red-500" />
-              )}
-            </button>
+            />
           </div>
         </div>
 
@@ -122,10 +115,15 @@ const FlightCard: React.FC<FlightCardProps> = ({
                 <>${minPrice.toFixed(2)}</>
               ) : (
                 <>
-                  <span className="text-sm font-normal text-gray-500">from </span>$
-                  {minPrice.toFixed(2)}
-                  <span className="text-sm font-normal text-gray-500"> to </span>$
-                  {maxPrice.toFixed(2)}
+                  <span className="text-sm font-normal text-gray-500">
+                    from{" "}
+                  </span>
+                  ${minPrice.toFixed(2)}
+                  <span className="text-sm font-normal text-gray-500">
+                    {" "}
+                    to{" "}
+                  </span>
+                  ${maxPrice.toFixed(2)}
                 </>
               )}
             </div>

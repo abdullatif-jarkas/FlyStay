@@ -239,34 +239,6 @@ const Flight = () => {
     toast.info(`Viewing details for flight ${flight.flight_number}`);
   };
 
-  const handleAddToFavorites = async (flight: IFlight) => {
-    try {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        toast.error("Please login to add flights to favorites");
-        return;
-      }
-
-      await axios.post(
-        `http://127.0.0.1:8000/api/flight/${flight.id}/favorite`,
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            Accept: "application/json",
-          },
-        }
-      );
-
-      toast.success("Flight added to favorites!");
-    } catch (err: any) {
-      console.error("Add to favorites error:", err);
-      toast.error(
-        err.response?.data?.message || "Failed to add flight to favorites"
-      );
-    }
-  };
-
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Search Bar Section */}
@@ -321,7 +293,6 @@ const Flight = () => {
                 onSortChange={handleSortChange}
                 onFlightSelect={handleFlightSelect}
                 onViewDetails={handleViewDetails}
-                onAddToFavorites={handleAddToFavorites}
                 // onBookNow={handleBookNow}
                 pagination={{
                   current_page: currentPage,

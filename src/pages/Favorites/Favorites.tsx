@@ -3,20 +3,24 @@ import {
   FaHeart,
   FaHotel,
   FaBed,
+  FaPlane,
   FaSpinner,
   FaExclamationTriangle,
   FaInbox,
   FaUsers,
   FaDollarSign,
+  FaClock,
+  FaMapMarkerAlt,
 } from "react-icons/fa";
 import { useFavorites } from "../../contexts/FavoritesContext";
 import { Hotel } from "../../types/hotel";
+import { Flight } from "../../types/flight";
 import HotelCard from "../../components/Hotel/HotelCard";
 import FavoriteButton from "../../components/Favorites/FavoriteButton";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
-type FilterType = "all" | "hotels" | "rooms";
+type FilterType = "all" | "hotels" | "rooms" | "flights";
 
 type FavoriteHotel = Hotel;
 
@@ -34,6 +38,8 @@ interface FavoriteRoom {
   };
 }
 
+type FavoriteFlight = Flight;
+
 const Favorites = () => {
   const navigate = useNavigate();
   const { favorites, isLoading, error } = useFavorites();
@@ -41,12 +47,13 @@ const Favorites = () => {
   const [filter, setFilter] = useState<FilterType>("all");
   const [favoriteHotels, setFavoriteHotels] = useState<FavoriteHotel[]>([]);
   const [favoriteRooms, setFavoriteRooms] = useState<FavoriteRoom[]>([]);
+  const [favoriteFlights, setFavoriteFlights] = useState<FavoriteFlight[]>([]);
   const [dataLoading, setDataLoading] = useState(false);
   const [dataError, setDataError] = useState<string>("");
 
   const token = localStorage.getItem("token");
 
-  // Fetch detailed data for favorite hotels and rooms
+  // Fetch detailed data for favorite hotels, rooms, and flights
   useEffect(() => {
     const fetchFavoriteDetails = async () => {
       if (!token || isLoading) return;
@@ -97,13 +104,36 @@ const Favorites = () => {
           }
         });
 
-        const [hotelResults, roomResults] = await Promise.all([
+        // Fetch flight details
+        const flightPromises = favorites.flights.map(async (flightId) => {
+          try {
+            const response = await axios.get(
+              `http://127.0.0.1:8000/api/flight/${flightId}`,
+              {
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                  Accept: "application/json",
+                },
+              }
+            );
+            return response.data.status === "success"
+              ? response.data.data
+              : null;
+          } catch (error) {
+            console.error(`Error fetching flight ${flightId}:`, error);
+            return null;
+          }
+        });
+
+        const [hotelResults, roomResults, flightResults] = await Promise.all([
           Promise.all(hotelPromises),
           Promise.all(roomPromises),
+          Promise.all(flightPromises),
         ]);
 
         setFavoriteHotels(hotelResults.filter(Boolean));
         setFavoriteRooms(roomResults.filter(Boolean));
+        setFavoriteFlights(flightResults.filter(Boolean));
       } catch (err) {
         console.error("Error fetching favorite details:", err);
         setDataError("Failed to load favorite details");
@@ -119,16 +149,23 @@ const Favorites = () => {
   const getFilteredItems = () => {
     switch (filter) {
       case "hotels":
-        return { hotels: favoriteHotels, rooms: [] };
+        return { hotels: favoriteHotels, rooms: [], flights: [] };
       case "rooms":
-        return { hotels: [], rooms: favoriteRooms };
+        return { hotels: [], rooms: favoriteRooms, flights: [] };
+      case "flights":
+        return { hotels: [], rooms: [], flights: favoriteFlights };
       default:
-        return { hotels: favoriteHotels, rooms: favoriteRooms };
+        return {
+          hotels: favoriteHotels,
+          rooms: favoriteRooms,
+          flights: favoriteFlights,
+        };
     }
   };
 
   const filteredItems = getFilteredItems();
-  const totalCount = favoriteHotels.length + favoriteRooms.length;
+  const totalCount =
+    favoriteHotels.length + favoriteRooms.length + favoriteFlights.length;
 
   // Handle hotel card click
   const handleHotelClick = (hotel: Hotel) => {
@@ -138,6 +175,11 @@ const Favorites = () => {
   // Handle room card click
   const handleRoomClick = (room: FavoriteRoom) => {
     navigate(`/hotel/${room.hotel_id}/room/${room.id}`);
+  };
+
+  // Handle flight card click
+  const handleFlightClick = (flight: FavoriteFlight) => {
+    navigate(`/flight/purchase/${flight.id}`);
   };
 
   // Format price
@@ -205,6 +247,7 @@ const Favorites = () => {
             { id: "all", label: "All", count: totalCount },
             { id: "hotels", label: "Hotels", count: favoriteHotels.length },
             { id: "rooms", label: "Rooms", count: favoriteRooms.length },
+            { id: "flights", label: "Flights", count: favoriteFlights.length },
           ].map((tab) => (
             <button
               key={tab.id}
@@ -266,24 +309,100 @@ const Favorites = () => {
                   Favorite Rooms ({filteredItems.rooms.length})
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {filteredItems.rooms.map((room) => (
-                    <div
-                      key={room[0].id}
-                      className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow cursor-pointer"
-                      onClick={() => handleRoomClick(room)}
-                    >
-                      <div className="relative">
-                        <div className="h-48 bg-gray-200 flex items-center justify-center">
-                          <img 
-                          src={room[0].images[0].url}
-                          />
+                  {filteredItems.rooms.map((roomData) => {
+                    const room = Array.isArray(roomData)
+                      ? roomData[0]
+                      : roomData;
+                    return (
+                      <div
+                        key={room.id}
+                        className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow cursor-pointer"
+                        onClick={() => handleRoomClick(room)}
+                      >
+                        <div className="relative">
+                          <div className="h-48 bg-gray-200 flex items-center justify-center">
+                            <img src={room.images[0].url} />
+                          </div>
+
+                          {/* Favorite Button */}
+                          <div className="absolute top-3 right-3">
+                            <FavoriteButton
+                              type="room"
+                              id={room.id}
+                              size="md"
+                              className="bg-white bg-opacity-90 hover:bg-opacity-100"
+                            />
+                          </div>
                         </div>
-                        {console.log("ddd", room[0])}
+
+                        <div className="p-4">
+                          <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                            {room.room_type}
+                          </h3>
+
+                          <div className="space-y-2 mb-4">
+                            <div className="flex items-center text-sm text-gray-600">
+                              <FaUsers className="mr-2" />
+                              <span>Capacity: {room.capacity} guests</span>
+                            </div>
+                            <div className="flex items-center text-sm text-gray-600">
+                              <FaDollarSign className="mr-2" />
+                              <span className="font-semibold text-green-600">
+                                {formatPrice(room.price_per_night)} / night
+                              </span>
+                            </div>
+                          </div>
+
+                          {room.description && (
+                            <p className="text-sm text-gray-600 line-clamp-2 mb-4">
+                              {room.description}
+                            </p>
+                          )}
+
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleRoomClick(room);
+                            }}
+                            className="w-full py-2 px-4 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+                          >
+                            View Details
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* Flights Section */}
+            {filteredItems.flights.length > 0 && (
+              <div className="mb-8">
+                <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                  <FaPlane className="mr-2 text-primary-500" />
+                  Favorite Flights ({filteredItems.flights.length})
+                </h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {filteredItems.flights[0].map((flight) => (
+                    <div
+                    key={flight.id}
+                    className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow cursor-pointer"
+                    onClick={() => handleFlightClick(flight)}
+                    >
+                      {
+                        console.log("filtered:, ",flight)
+                      }
+                      <div className="relative">
+                        <div className="h-48 bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
+                          <FaPlane className="text-4xl text-white" />
+                        </div>
+
                         {/* Favorite Button */}
                         <div className="absolute top-3 right-3">
                           <FavoriteButton
-                            type="room"
-                            id={room[0].id}
+                            type="flight"
+                            id={flight.id}
                             size="md"
                             className="bg-white bg-opacity-90 hover:bg-opacity-100"
                           />
@@ -292,32 +411,38 @@ const Favorites = () => {
 
                       <div className="p-4">
                         <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                          {room[0].room_type}
+                          {flight.airline} {flight.flight_number}
                         </h3>
 
                         <div className="space-y-2 mb-4">
                           <div className="flex items-center text-sm text-gray-600">
-                            <FaUsers className="mr-2" />
-                            <span>Capacity: {room[0].capacity} guests</span>
+                            <FaMapMarkerAlt className="mr-2" />
+                            <span>
+                              {flight.departure_airport?.IATA_code || "N/A"} →{" "}
+                              {flight.arrival_airport?.IATA_code || "N/A"}
+                            </span>
                           </div>
                           <div className="flex items-center text-sm text-gray-600">
-                            <FaDollarSign className="mr-2" />
-                            <span className="font-semibold text-green-600">
-                              {formatPrice(room[0].price_per_night)} / night
+                            <FaClock className="mr-2" />
+                            <span>
+                              {new Date(
+                                flight.departure_time
+                              ).toLocaleDateString()}{" "}
+                              at{" "}
+                              {new Date(
+                                flight.departure_time
+                              ).toLocaleTimeString([], {
+                                hour: "2-digit",
+                                minute: "2-digit",
+                              })}
                             </span>
                           </div>
                         </div>
 
-                        {room[0].description && (
-                          <p className="text-sm text-gray-600 line-clamp-2 mb-4">
-                            {room[0].description}
-                          </p>
-                        )}
-
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
-                            handleRoomClick(room[0]);
+                            handleFlightClick(flight);
                           }}
                           className="w-full py-2 px-4 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
                         >

@@ -2,7 +2,10 @@
 export interface Favorite {
   id: number;
   user_id: number;
-  favoritable_type: 'App\\Models\\Hotel' | 'App\\Models\\Room';
+  favoritable_type:
+    | "App\\Models\\Hotel"
+    | "App\\Models\\Room"
+    | "App\\Models\\Flight";
   favoritable_id: number;
 }
 
@@ -34,7 +37,8 @@ export interface FavoriteActionResponse {
 // Parsed favorites for easier use
 export interface ParsedFavorites {
   hotels: number[]; // Array of hotel IDs
-  rooms: number[];  // Array of room IDs
+  rooms: number[]; // Array of room IDs
+  flights: number[]; // Array of flight IDs
 }
 
 // Favorite context types
@@ -44,7 +48,9 @@ export interface FavoritesContextType {
   error: string | null;
   toggleHotelFavorite: (hotelId: number) => Promise<void>;
   toggleRoomFavorite: (roomId: number) => Promise<void>;
+  toggleFlightFavorite: (flightId: number) => Promise<void>;
   isHotelFavorite: (hotelId: number) => boolean;
   isRoomFavorite: (roomId: number) => boolean;
+  isFlightFavorite: (flightId: number) => boolean;
   refreshFavorites: () => Promise<void>;
 }

@@ -171,9 +171,6 @@ const HotelCard: React.FC<HotelCardProps> = ({ hotel, onViewDetails }) => {
           {/* Additional Info */}
           <div className="mt-4 pt-4 border-t border-gray-200">
             <div className="flex items-center justify-between text-sm text-gray-500">
-              <span>
-                Added: {new Date(hotel.created_at).toLocaleDateString()}
-              </span>
               {hotel.images && hotel.images.length > 0 && (
                 <span>
                   {hotel.images.length} photo

@@ -11,7 +11,6 @@ const FlightResults: React.FC<FlightResultsProps> = ({
   onSortChange,
   onFlightSelect,
   onViewDetails,
-  onAddToFavorites,
   onBookNow,
   pagination,
 }) => {
@@ -103,10 +102,8 @@ const FlightResults: React.FC<FlightResultsProps> = ({
             flight={flight}
             onSelect={handleFlightSelect}
             onViewDetails={onViewDetails}
-            onAddToFavorites={onAddToFavorites}
             onBookNow={onBookNow}
             isSelected={selectedFlightId === flight.id}
-            isFavorite={false} // This would come from a favorites context/state
           />
         ))}
       </div>

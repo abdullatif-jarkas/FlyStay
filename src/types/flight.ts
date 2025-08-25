@@ -151,10 +151,8 @@ export interface FlightCardProps {
   flight: Flight;
   onSelect: (flight: Flight) => void;
   onViewDetails: (flight: Flight) => void;
-  onAddToFavorites: (flight: Flight) => void;
   onBookNow?: (flight: Flight) => void;
   isSelected?: boolean;
-  isFavorite?: boolean;
 }
 
 export interface FlightResultsProps {
@@ -165,7 +163,6 @@ export interface FlightResultsProps {
   onSortChange: (sort: FlightSortOption) => void;
   onFlightSelect: (flight: Flight) => void;
   onViewDetails: (flight: Flight) => void;
-  onAddToFavorites: (flight: Flight) => void;
   onBookNow?: (flight: Flight) => void;
   pagination?: {
     current_page: number;
