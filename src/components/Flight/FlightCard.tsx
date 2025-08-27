@@ -22,6 +22,18 @@ const FlightCard: React.FC<FlightCardProps> = ({
     });
   };
 
+  const calculateFlightDuration = (
+    departure: string,
+    arrival: string
+  ): string => {
+    const departureTime = new Date(departure);
+    const arrivalTime = new Date(arrival);
+    const durationMs = arrivalTime.getTime() - departureTime.getTime();
+    const hours = Math.floor(durationMs / (1000 * 60 * 60));
+    const minutes = Math.floor((durationMs % (1000 * 60 * 60)) / (1000 * 60));
+    return `${hours}h ${minutes}m`;
+  };
+
   const prices =
     flight.flight_details && flight.flight_details.length > 0
       ? flight.flight_details.map((detail) => parseFloat(detail.price))
@@ -82,8 +94,12 @@ const FlightCard: React.FC<FlightCardProps> = ({
           <div className="flex-1 mx-6">
             <div className="flex items-center justify-center relative">
               <div className="flex-1 h-px bg-gray-300"></div>
-              <div className="mx-2 bg-white px-2">
+              <div className="flex flex-col items-center justify-center gap-2 mx-2 bg-white px-2">
                 <FaPlane className="text-primary-500 transform rotate-90" />
+                {calculateFlightDuration(
+                  flight.departure_time,
+                  flight.arrival_time
+                )}
               </div>
               <div className="flex-1 h-px bg-gray-300"></div>
             </div>

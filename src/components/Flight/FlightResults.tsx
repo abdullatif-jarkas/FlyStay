@@ -78,7 +78,7 @@ const FlightResults: React.FC<FlightResultsProps> = ({
         </div>
 
         {/* Sort Dropdown */}
-        <div className="flex items-center space-x-2">
+        {/* <div className="flex items-center space-x-2">
           <label className="text-sm font-medium text-gray-700">Sort by:</label>
           <select
             value={sortBy}
@@ -91,7 +91,7 @@ const FlightResults: React.FC<FlightResultsProps> = ({
               </option>
             ))}
           </select>
-        </div>
+        </div> */}
       </div>
 
       {/* Flight Cards */}

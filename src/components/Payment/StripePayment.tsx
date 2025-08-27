@@ -88,7 +88,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
   };
 
   return (
-    <div className="max-w-md mx-auto bg-white rounded-lg shadow-lg p-6">
+    <div className="max-w-md mx-auto bg-white rounded-lg p-6">
       {/* Header */}
       <div className="mb-6">
         <div className="flex items-center justify-between mb-4">
@@ -192,7 +192,6 @@ const StripePayment: React.FC<StripePaymentProps> = ({
   useEffect(() => {
     if (clientSecret) {
       setStripeLoading(false);
-      console.log("client secret: ", clientSecret);
     }
   }, [clientSecret]);
 

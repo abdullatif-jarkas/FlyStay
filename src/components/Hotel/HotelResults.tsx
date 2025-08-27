@@ -87,7 +87,7 @@ const HotelResults: React.FC<HotelResultsProps> = ({
       {resultsHeader}
 
       {/* Hotel Cards Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 pb-6 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 pb-6 gap-6 min-h-dvh">
         {hotels.map((hotel) => (
           <HotelCard
             key={hotel.id}

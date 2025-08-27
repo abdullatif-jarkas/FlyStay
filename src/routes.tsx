@@ -23,6 +23,7 @@ const Login = lazyImport("./pages/Auth/Login/Login");
 const Register = lazyImport("./pages/Auth/Register/Register");
 const ForgotPassword = lazyImport("./pages/Auth/ForgotPassword/ForgotPassword");
 const ResetPassword = lazyImport("./pages/Auth/ResetPassword/ResetPassword");
+const AuthCallback = lazyImport("./pages/Auth/AuthCallback/AuthCallback");
 
 // Hotel Pages
 const Hotel = lazyImport("./pages/Hotel/Hotel");
@@ -118,6 +119,7 @@ export const routes = createBrowserRouter([
       { path: "register", element: withSuspense(<Register />) },
       { path: "forgot-password", element: withSuspense(<ForgotPassword />) },
       { path: "reset-password", element: withSuspense(<ResetPassword />) },
+      { path: "callback", element: withSuspense(<AuthCallback />) },
     ],
   },
   {
