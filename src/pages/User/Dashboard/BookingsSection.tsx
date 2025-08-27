@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { toast } from "sonner";
 import {
@@ -13,11 +13,42 @@ import {
   FaSpinner,
   FaInbox,
   FaCreditCard,
+  FaExclamationTriangle,
+  FaSync,
 } from "react-icons/fa";
-import { useBooking, HotelBookingAPI } from "../../../contexts/BookingContext";
+import { useBooking } from "../../../contexts/BookingContext";
 import PaymentModal from "../../../components/Payment/PaymentModal";
 
-// Booking interfaces
+// API Response interfaces
+interface ApiHotelBooking {
+  id: number;
+  user_id: number;
+  room_id: number;
+  check_in_date: string;
+  check_out_date: string;
+  booking_date: string;
+  status: "confirmed" | "pending" | "failed" | "cancelled";
+}
+
+interface ApiFlightBooking {
+  id: number;
+  user_id: number;
+  flight_cabins_id: number;
+  booking_date: string;
+  seat_number: number;
+  status: "confirmed" | "pending" | "failed" | "cancelled";
+}
+
+interface ApiBookingsResponse {
+  status: string;
+  message: string;
+  data: {
+    "hotel-bookings": ApiHotelBooking[];
+    "flight-bookings": ApiFlightBooking[];
+  };
+}
+
+// Display interfaces (converted from API data)
 interface FlightBooking {
   id: number;
   booking_reference: string;
@@ -33,9 +64,10 @@ interface FlightBooking {
     name: string;
     email: string;
   };
-  status: "confirmed" | "pending" | "cancelled";
+  status: "confirmed" | "pending" | "cancelled" | "failed";
   total_amount: number;
   booking_date: string;
+  seat_number: number;
 }
 
 interface HotelBooking {
@@ -49,7 +81,7 @@ interface HotelBooking {
     name: string;
     email: string;
   };
-  status: "confirmed" | "pending" | "cancelled";
+  status: "confirmed" | "pending" | "cancelled" | "failed";
   total_amount: number;
   booking_date: string;
   nights: number;
@@ -77,11 +109,69 @@ const BookingsSection: React.FC<BookingsSectionProps> = () => {
     clientSecret: string;
   } | null>(null);
 
-  const { hotelBookings, updateBookingStatus } = useBooking();
+  // API data state
+  const [apiHotelBookings, setApiHotelBookings] = useState<ApiHotelBooking[]>(
+    []
+  );
+  const [apiFlightBookings, setApiFlightBookings] = useState<
+    ApiFlightBooking[]
+  >([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const { updateBookingStatus } = useBooking();
   const token = localStorage.getItem("token");
 
-  // Mock data - replace with actual API calls
-  const [flightBookings] = useState<FlightBooking[]>([]);
+  // Fetch bookings from API
+  const fetchBookings = async () => {
+    if (!token) {
+      setError("Please login to view your bookings");
+      setLoading(false);
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setError(null);
+
+      const response = await axios.get<ApiBookingsResponse>(
+        "http://127.0.0.1:8000/api/my-bookings",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: "application/json",
+          },
+        }
+      );
+
+      if (response.data.status === "success") {
+        setApiHotelBookings(response.data.data["hotel-bookings"] || []);
+        setApiFlightBookings(response.data.data["flight-bookings"] || []);
+      } else {
+        setError(response.data.message || "Failed to fetch bookings");
+      }
+    } catch (err: unknown) {
+      console.error("Error fetching bookings:", err);
+      const errorMessage =
+        err instanceof Error && "response" in err
+          ? (err as { response?: { data?: { message?: string } } }).response
+              ?.data?.message
+          : undefined;
+      setError(errorMessage || "Failed to fetch bookings");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Load bookings on component mount
+  useEffect(() => {
+    fetchBookings();
+  }, [token]);
+
+  // Refresh bookings
+  const refreshBookings = () => {
+    fetchBookings();
+  };
 
   // Format date
   const formatDate = (dateString: string): string => {
@@ -126,9 +216,23 @@ const BookingsSection: React.FC<BookingsSectionProps> = () => {
         color: "text-red-600 bg-red-100",
         text: "Cancelled",
       },
+      failed: {
+        icon: FaExclamationTriangle,
+        color: "text-red-600 bg-red-100",
+        text: "Failed",
+      },
     };
 
     const config = statusConfig[status as keyof typeof statusConfig];
+    if (!config) {
+      return (
+        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium text-gray-600 bg-gray-100">
+          <FaClock className="mr-1" />
+          {status}
+        </span>
+      );
+    }
+
     const Icon = config.icon;
 
     return (
@@ -143,7 +247,7 @@ const BookingsSection: React.FC<BookingsSectionProps> = () => {
 
   // Handle payment for hotel booking
   const handlePayment = async (bookingId: number, amount: number) => {
-    console.log("first")
+    console.log("first");
     if (!token) {
       toast.error("Please login to complete payment");
       return;
@@ -169,7 +273,7 @@ const BookingsSection: React.FC<BookingsSectionProps> = () => {
         response.data.data.length > 0
       ) {
         const clientSecret = response.data.data[0];
-        
+
         // Set up payment modal with client secret
         setCurrentPayment({
           bookingId,
@@ -218,34 +322,66 @@ const BookingsSection: React.FC<BookingsSectionProps> = () => {
   };
 
   // Convert API hotel bookings to display format
-  const convertApiHotelBookings = (apiBookings: HotelBookingAPI[]) => {
+  const convertApiHotelBookings = (apiBookings: ApiHotelBooking[]) => {
+    return apiBookings.map((booking) => {
+      // Calculate nights between check-in and check-out
+      const checkIn = new Date(booking.check_in_date);
+      const checkOut = new Date(booking.check_out_date);
+      const nights = Math.ceil(
+        (checkOut.getTime() - checkIn.getTime()) / (1000 * 60 * 60 * 24)
+      );
+
+      return {
+        id: booking.id,
+        booking_reference: `HT${booking.id.toString().padStart(6, "0")}`,
+        hotel_name: `Hotel Booking (Room ID: ${booking.room_id})`,
+        room_type: `Room ${booking.room_id}`, // This would ideally be fetched from room details
+        check_in_date: booking.check_in_date.split("T")[0],
+        check_out_date: booking.check_out_date.split("T")[0],
+        guest_details: {
+          name: "Guest", // This would be fetched from user data
+          email: "guest@example.com",
+        },
+        status: booking.status,
+        total_amount: 0, // This would be fetched from room pricing
+        booking_date: booking.booking_date,
+        nights: nights > 0 ? nights : 1,
+        type: "hotel" as const,
+      };
+    });
+  };
+
+  // Convert API flight bookings to display format
+  const convertApiFlightBookings = (apiBookings: ApiFlightBooking[]) => {
     return apiBookings.map((booking) => ({
       id: booking.id,
-      booking_reference: `HT${booking.id.toString().padStart(6, "0")}`,
-      hotel_name: `Hotel (Room ${booking.Room.room_type})`,
-      room_type: booking.Room.room_type,
-      check_in_date: booking.check_in_date.split("T")[0],
-      check_out_date: booking.check_out_date.split("T")[0],
-      guest_details: {
-        name: booking.user_Info.name,
-        email: booking.user_Info.email,
+      booking_reference: `FL${booking.id.toString().padStart(6, "0")}`,
+      flight_details: {
+        airline: "Airline", // This would need to be fetched from flight cabin data
+        flight_number: `FL${booking.flight_cabins_id}`,
+        departure_airport: "DEP",
+        arrival_airport: "ARR",
+        departure_time: booking.booking_date,
+        arrival_time: booking.booking_date,
+      },
+      passenger_details: {
+        name: "Passenger", // This would need to be fetched from user data
+        email: "passenger@example.com",
       },
       status: booking.status,
-      total_amount: booking.amount,
+      total_amount: 0, // This would need to be fetched from flight cabin pricing
       booking_date: booking.booking_date,
-      nights: parseInt(booking.duration.split(" ")[0]),
-      type: "hotel" as const,
+      seat_number: booking.seat_number,
+      type: "flight" as const,
     }));
   };
 
   // Filter bookings based on active tab
   const getFilteredBookings = () => {
-    const convertedHotelBookings = convertApiHotelBookings(hotelBookings);
+    const convertedHotelBookings = convertApiHotelBookings(apiHotelBookings);
+    const convertedFlightBookings = convertApiFlightBookings(apiFlightBookings);
     const allBookings = [
-      ...flightBookings.map((booking) => ({
-        ...booking,
-        type: "flight" as const,
-      })),
+      ...convertedFlightBookings,
       ...convertedHotelBookings,
     ].sort(
       (a, b) =>
@@ -265,18 +401,29 @@ const BookingsSection: React.FC<BookingsSectionProps> = () => {
   const filteredBookings = getFilteredBookings();
 
   // Calculate booking statistics
-  const convertedHotelBookingsForStats = convertApiHotelBookings(hotelBookings);
+  const convertedHotelBookingsForStats =
+    convertApiHotelBookings(apiHotelBookings);
+
+  const convertedFlightBookingsForStats =
+    convertApiFlightBookings(apiFlightBookings);
   const totalBookings =
-    flightBookings.length + convertedHotelBookingsForStats.length;
+    convertedFlightBookingsForStats.length +
+    convertedHotelBookingsForStats.length;
+
   const confirmedBookings = [
-    ...flightBookings,
+    ...convertedFlightBookingsForStats,
     ...convertedHotelBookingsForStats,
   ].filter((b) => b.status === "confirmed").length;
+
   const pendingBookings = [
-    ...flightBookings,
+    ...convertedFlightBookingsForStats,
     ...convertedHotelBookingsForStats,
   ].filter((b) => b.status === "pending").length;
-  const totalSpent = [...flightBookings, ...convertedHotelBookingsForStats]
+
+  const totalSpent = [
+    ...convertedFlightBookingsForStats,
+    ...convertedHotelBookingsForStats,
+  ]
     .filter((b) => b.status === "confirmed")
     .reduce((sum, booking) => sum + booking.total_amount, 0);
 
@@ -413,14 +560,92 @@ const BookingsSection: React.FC<BookingsSectionProps> = () => {
     );
   }
 
+  // Loading state
+  if (loading) {
+    return (
+      <div className="bg-white rounded-lg shadow-sm">
+        <div className="p-6 border-b border-gray-200">
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">My Bookings</h2>
+          <p className="text-gray-600">View and manage your travel bookings</p>
+        </div>
+        <div className="p-12 text-center">
+          <FaSpinner className="animate-spin text-4xl text-primary-600 mb-4 mx-auto" />
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">
+            Loading Your Bookings
+          </h3>
+          <p className="text-gray-600">
+            Please wait while we fetch your booking history...
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div className="bg-white rounded-lg shadow-sm">
+        <div className="p-6 border-b border-gray-200">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                My Bookings
+              </h2>
+              <p className="text-gray-600">
+                View and manage your travel bookings
+              </p>
+            </div>
+            <button
+              onClick={refreshBookings}
+              className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors"
+            >
+              <FaSync className="mr-2" />
+              Refresh
+            </button>
+          </div>
+        </div>
+        <div className="p-12 text-center">
+          <FaExclamationTriangle className="text-4xl text-red-500 mb-4 mx-auto" />
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">
+            Failed to Load Bookings
+          </h3>
+          <p className="text-gray-600 mb-4">{error}</p>
+          <button
+            onClick={refreshBookings}
+            className="inline-flex items-center px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+          >
+            <FaSync className="mr-2" />
+            Try Again
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <>
       {/* Main Content */}
       <div className="bg-white rounded-lg shadow-sm">
         {/* Header */}
         <div className="p-6 border-b border-gray-200">
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">My Bookings</h2>
-          <p className="text-gray-600">View and manage your travel bookings</p>
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                My Bookings
+              </h2>
+              <p className="text-gray-600">
+                View and manage your travel bookings
+              </p>
+            </div>
+            <button
+              onClick={refreshBookings}
+              disabled={loading}
+              className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <FaSync className={`mr-2 ${loading ? "animate-spin" : ""}`} />
+              Refresh
+            </button>
+          </div>
         </div>
 
         {/* Statistics Cards */}
