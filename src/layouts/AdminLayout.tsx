@@ -12,6 +12,7 @@ import {
   FaCity,
   FaSignOutAlt,
   FaChair,
+  FaCreditCard,
 } from "react-icons/fa";
 import { useState } from "react";
 import Logo from "../components/ui/Logo";
@@ -164,6 +165,17 @@ const AdminLayout = () => {
                     Rooms
                   </MenuItem>
                 </SubMenu>
+              )}
+
+              {/* 5. Finance Management */}
+              {(role === "finance_officer") && (
+                <MenuItem
+                  icon={<FaCreditCard />}
+                  onClick={() => navigate("/admin/payments")}
+                  active={currentPath === "/admin/payments"}
+                >
+                  Payments
+                </MenuItem>
               )}
             </Menu>
           </div>
