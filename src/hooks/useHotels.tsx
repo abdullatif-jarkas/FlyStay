@@ -4,6 +4,7 @@ import {
   getAllHotels,
   getFilteredHotels,
   getHotelCountries,
+  getHotelCities,
   HotelFilters,
 } from "../services/hotelService";
 import { Hotel } from "../types/hotel";
@@ -13,6 +14,7 @@ export interface HotelState {
   loading: boolean;
   error: string | null;
   countries: string[];
+  cities: string[];
   filters: HotelFilters;
   // Pagination state
   currentPage: number;
@@ -28,6 +30,7 @@ export const useHotels = () => {
     loading: false,
     error: null,
     countries: [],
+    cities: [],
     filters: {},
     // Pagination initial state
     currentPage: 1,
@@ -177,6 +180,25 @@ export const useHotels = () => {
   }, []);
 
   /**
+   * Fetch available cities
+   */
+  const fetchCities = useCallback(async () => {
+    try {
+      const cities = await getHotelCities();
+
+      setState((prev) => ({
+        ...prev,
+        cities,
+      }));
+
+      return cities;
+    } catch (error: any) {
+      console.error("Error fetching cities:", error);
+      return [];
+    }
+  }, []);
+
+  /**
    * Apply filters
    */
   const applyFilters = useCallback(
@@ -200,11 +222,40 @@ export const useHotels = () => {
   }, [fetchHotels]);
 
   /**
+   * Filter by name
+   */
+  const filterByName = useCallback(
+    async (name: string) => {
+      const newFilters = name.trim()
+        ? { ...state.filters, name }
+        : { ...state.filters };
+      if (!name.trim()) {
+        const { name: _, ...filtersWithoutName } = newFilters;
+        await applyFilters(filtersWithoutName);
+      } else {
+        await applyFilters(newFilters);
+      }
+    },
+    [state.filters, applyFilters]
+  );
+
+  /**
    * Filter by rating
    */
   const filterByRating = useCallback(
     async (rating: number) => {
       const newFilters = { ...state.filters, rating };
+      await applyFilters(newFilters);
+    },
+    [state.filters, applyFilters]
+  );
+
+  /**
+   * Filter by city
+   */
+  const filterByCity = useCallback(
+    async (city: string) => {
+      const newFilters = { ...state.filters, city };
       await applyFilters(newFilters);
     },
     [state.filters, applyFilters]
@@ -222,10 +273,26 @@ export const useHotels = () => {
   );
 
   /**
+   * Remove name filter
+   */
+  const removeNameFilter = useCallback(async () => {
+    const { name, ...newFilters } = state.filters;
+    await applyFilters(newFilters);
+  }, [state.filters, applyFilters]);
+
+  /**
    * Remove rating filter
    */
   const removeRatingFilter = useCallback(async () => {
     const { rating, ...newFilters } = state.filters;
+    await applyFilters(newFilters);
+  }, [state.filters, applyFilters]);
+
+  /**
+   * Remove city filter
+   */
+  const removeCityFilter = useCallback(async () => {
+    const { city, ...newFilters } = state.filters;
     await applyFilters(newFilters);
   }, [state.filters, applyFilters]);
 
@@ -305,12 +372,13 @@ export const useHotels = () => {
   );
 
   /**
-   * Initialize hotels and countries on mount
+   * Initialize hotels, countries, and cities on mount
    */
   useEffect(() => {
     fetchHotels();
     fetchCountries();
-  }, [fetchHotels, fetchCountries]);
+    fetchCities();
+  }, [fetchHotels, fetchCountries, fetchCities]);
 
   return {
     // State
@@ -318,6 +386,7 @@ export const useHotels = () => {
     loading: state.loading,
     error: state.error,
     countries: state.countries,
+    cities: state.cities,
     filters: state.filters,
 
     // Pagination state
@@ -331,11 +400,16 @@ export const useHotels = () => {
     fetchHotels,
     fetchFilteredHotels,
     fetchCountries,
+    fetchCities,
     applyFilters,
     clearFilters,
+    filterByName,
     filterByRating,
+    filterByCity,
     filterByCountry,
+    removeNameFilter,
     removeRatingFilter,
+    removeCityFilter,
     removeCountryFilter,
     refreshHotels,
 

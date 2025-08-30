@@ -16,7 +16,9 @@ const Hotel = () => {
     loading,
     error,
     countries,
+    cities,
     filters,
+    filterByName,
     filterByRating,
     filterByCountry,
     removeRatingFilter,
@@ -125,6 +127,8 @@ const Hotel = () => {
             <HotelFilters
               filters={filters}
               countries={countries}
+              cities={cities}
+              onFilterByName={filterByName}
               onFilterByRating={filterByRating}
               onFilterByCountry={filterByCountry}
               onRemoveRatingFilter={removeRatingFilter}
