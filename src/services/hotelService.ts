@@ -26,10 +26,12 @@ hotelApi.interceptors.request.use((config) => {
   return config;
 });
 
-// Hotel filter parameters
+// Hotel filter parameters - aligned with API scope filter method
 export interface HotelFilters {
-  rating?: number;
-  country?: string;
+  name?: string; // Hotel name search (LIKE operator)
+  rating?: number; // Hotel rating filter (exact match)
+  city?: string; // City name filter (LIKE operator through relationship)
+  country?: string; // Country name filter (LIKE operator through nested relationship)
 }
 
 /**
@@ -49,8 +51,14 @@ export const getAllHotels = async (
     });
 
     // Add filters to query params
+    if (filters?.name) {
+      queryParams.append("name", filters.name);
+    }
     if (filters?.rating) {
       queryParams.append("rating", filters.rating.toString());
+    }
+    if (filters?.city) {
+      queryParams.append("city", filters.city);
     }
     if (filters?.country) {
       queryParams.append("country", filters.country);
@@ -142,7 +150,7 @@ export const getHotelsByCountry = async (country: string): Promise<Hotel[]> => {
 
 /**
  * Get hotels with combined filters
- * @param filters - Object containing rating and/or country filters
+ * @param filters - Object containing name, rating, city, and/or country filters
  * @returns Promise with filtered hotels array
  */
 export const getFilteredHotels = async (
@@ -151,8 +159,16 @@ export const getFilteredHotels = async (
   try {
     const params = new URLSearchParams();
 
+    if (filters.name) {
+      params.append("name", filters.name);
+    }
+
     if (filters.rating) {
       params.append("rating", filters.rating.toString());
+    }
+
+    if (filters.city) {
+      params.append("city", filters.city);
     }
 
     if (filters.country) {
@@ -222,11 +238,28 @@ export const getHotelById = async (hotelId: number): Promise<Hotel> => {
 export const getHotelCountries = async (): Promise<string[]> => {
   try {
     const hotels = await getAllHotels();
-    console.log("hotels: ", hotels.data)
-    const countries = [...new Set(hotels.data.map((hotel) => hotel.country.name))];
+    console.log("hotels: ", hotels.data);
+    const countries = [
+      ...new Set(hotels.data.map((hotel) => hotel.country.name)),
+    ];
     return countries.sort();
   } catch (error) {
     console.error("Error fetching hotel countries:", error);
+    return [];
+  }
+};
+
+/**
+ * Get unique cities from hotels
+ * @returns Promise with cities array
+ */
+export const getHotelCities = async (): Promise<string[]> => {
+  try {
+    const hotels = await getAllHotels();
+    const cities = [...new Set(hotels.data.map((hotel) => hotel.city.name))];
+    return cities.sort();
+  } catch (error) {
+    console.error("Error fetching hotel cities:", error);
     return [];
   }
 };
@@ -239,4 +272,5 @@ export default {
   getFilteredHotels,
   getHotelById,
   getHotelCountries,
+  getHotelCities,
 };
