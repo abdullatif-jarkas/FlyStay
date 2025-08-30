@@ -115,9 +115,9 @@ const FavoriteButton: React.FC<FavoriteButtonProps> = ({
             isFavorite ? "text-red-600" : "text-current"
           }`}
           style={{
-            fill: isFavorite ? "currentColor" : "none",
+            fill: isFavorite ? "red: " : "none",
             stroke: isFavorite ? "currentColor" : "currentColor",
-            strokeWidth: isFavorite ? 0 : 2,
+            strokeWidth: isFavorite ? 0 : 25,
           }}
         />
       )}

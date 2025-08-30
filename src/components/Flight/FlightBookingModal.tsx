@@ -74,7 +74,7 @@ const FlightBookingModal: React.FC<FlightBookingModalProps> = ({
         setTimeout(() => {
           onClose();
           // Navigate to profile page with bookings section
-          navigate("/profile");
+          navigate("/user/profile");
         }, 2000);
         
         // Call success callback if provided

@@ -193,7 +193,7 @@ const RoomDetails = () => {
           toast.info("Your booking is pending. Complete payment to confirm.");
 
           // Navigate to profile bookings section
-          navigate("/profile");
+          navigate("/user/profile");
         } else {
           toast.error(response.data.message || "Booking failed");
         }

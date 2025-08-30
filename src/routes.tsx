@@ -59,6 +59,8 @@ const Cities = lazyImport("./pages/Admin/Cities/Cities");
 const FlightCabins = lazyImport("./pages/Admin/FlightCabins/FlightCabins");
 const FlightAdmin = lazyImport("./pages/Admin/FlightAdmin/FlightAdmin");
 const AdminPayments = lazyImport("./pages/Admin/Payments/Payments");
+const FlightBookings = lazyImport("./pages/Admin/FlightBookings");
+const HotelBookings = lazyImport("./pages/Admin/HotelBookings");
 
 // Wrapper Component
 const withSuspense = (element: React.ReactNode) => (
@@ -174,6 +176,22 @@ export const routes = createBrowserRouter([
         element: withSuspense(
           <ProtectedRoute allowedRoles={["admin", "finance_officer"]}>
             <AdminPayments />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "flight-bookings",
+        element: withSuspense(
+          <ProtectedRoute allowedRoles={["admin", "flight_agent"]}>
+            <FlightBookings />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "hotel-bookings",
+        element: withSuspense(
+          <ProtectedRoute allowedRoles={["admin", "hotel_agent"]}>
+            <HotelBookings />
           </ProtectedRoute>
         ),
       },

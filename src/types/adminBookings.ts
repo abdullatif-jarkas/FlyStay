@@ -1,0 +1,166 @@
+// Flight Booking Types
+export interface FlightBookingAdmin {
+  id: number;
+  user_id: number;
+  flight_cabins_id: number;
+  booking_date: string;
+  seat_number: number;
+  status: "confirmed" | "pending" | "failed" | "cancelled";
+  created_at: string;
+  updated_at: string;
+  user?: {
+    id: number;
+    name: string;
+    email: string;
+  };
+  flight_cabin?: {
+    id: number;
+    class_name: string;
+    price: number;
+    flight?: {
+      id: number;
+      flight_number: string;
+      airline: string;
+      departure_time: string;
+      arrival_time: string;
+      departure_airport?: {
+        id: number;
+        name: string;
+        IATA_code: string;
+        city?: {
+          id: number;
+          name: string;
+          country: string;
+        };
+      };
+      arrival_airport?: {
+        id: number;
+        name: string;
+        IATA_code: string;
+        city?: {
+          id: number;
+          name: string;
+          country: string;
+        };
+      };
+    };
+  };
+}
+
+// Hotel Booking Types
+export interface HotelBookingAdmin {
+  id: number;
+  user_id: number;
+  room_id: number;
+  check_in_date: string;
+  check_out_date: string;
+  booking_date: string;
+  status: "confirmed" | "pending" | "failed" | "cancelled";
+  created_at: string;
+  updated_at: string;
+  user?: {
+    id: number;
+    name: string;
+    email: string;
+  };
+  room?: {
+    id: number;
+    room_number: string;
+    type: string;
+    price_per_night: number;
+    hotel?: {
+      id: number;
+      name: string;
+      address: string;
+      rating: number;
+      city?: {
+        id: number;
+        name: string;
+        country: string;
+      };
+    };
+  };
+}
+
+// API Response Types
+export interface FlightBookingsResponse {
+  status: string;
+  message: string;
+  data: FlightBookingAdmin[];
+  meta?: {
+    current_page: number;
+    last_page: number;
+    per_page: number;
+    total: number;
+  };
+}
+
+export interface HotelBookingsResponse {
+  status: string;
+  message: string;
+  data: HotelBookingAdmin[];
+  meta?: {
+    current_page: number;
+    last_page: number;
+    per_page: number;
+    total: number;
+  };
+}
+
+export interface FlightBookingDetailsResponse {
+  status: string;
+  message: string;
+  data: FlightBookingAdmin;
+}
+
+export interface HotelBookingDetailsResponse {
+  status: string;
+  message: string;
+  data: HotelBookingAdmin;
+}
+
+// Action Response Types
+export interface BookingActionResponse {
+  status: string;
+  message: string;
+  data?: any;
+}
+
+// Filter and Search Types
+export interface BookingFilters {
+  status?: string;
+  user_id?: number;
+  date_from?: string;
+  date_to?: string;
+  search?: string;
+}
+
+export interface BookingTableProps {
+  bookings: FlightBookingAdmin[] | HotelBookingAdmin[];
+  loading: boolean;
+  onView: (id: number) => void;
+  onCancel: (id: number) => void;
+  onDelete: (id: number) => void;
+  currentPage: number;
+  totalPages: number;
+  onPageChange: (page: number) => void;
+}
+
+// Modal Props
+export interface BookingDetailsModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  booking: FlightBookingAdmin | HotelBookingAdmin | null;
+  type: "flight" | "hotel";
+}
+
+export interface ConfirmationModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onConfirm: () => void;
+  title: string;
+  message: string;
+  confirmText?: string;
+  cancelText?: string;
+  type?: "danger" | "warning" | "info";
+}

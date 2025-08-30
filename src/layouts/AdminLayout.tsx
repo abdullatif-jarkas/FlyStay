@@ -13,6 +13,8 @@ import {
   FaSignOutAlt,
   FaChair,
   FaCreditCard,
+  FaCalendarCheck,
+  FaTicketAlt,
 } from "react-icons/fa";
 import { useState } from "react";
 import Logo from "../components/ui/Logo";
@@ -167,8 +169,30 @@ const AdminLayout = () => {
                 </SubMenu>
               )}
 
-              {/* 5. Finance Management */}
-              {(role === "finance_officer") && (
+              {/* 5. Booking Management */}
+              <SubMenu icon={<FaCalendarCheck />} label="Bookings">
+                {(role === "flight_agent" || role === "admin") && (
+                  <MenuItem
+                    icon={<FaTicketAlt />}
+                    onClick={() => navigate("/admin/flight-bookings")}
+                    active={currentPath === "/admin/flight-bookings"}
+                  >
+                    Flight Bookings
+                  </MenuItem>
+                )}
+                {(role === "hotel_agent" || role === "admin") && (
+                  <MenuItem
+                    icon={<FaHotel />}
+                    onClick={() => navigate("/admin/hotel-bookings")}
+                    active={currentPath === "/admin/hotel-bookings"}
+                  >
+                    Hotel Bookings
+                  </MenuItem>
+                )}
+              </SubMenu>
+
+              {/* 6. Finance Management */}
+              {role === "finance_officer" && (
                 <MenuItem
                   icon={<FaCreditCard />}
                   onClick={() => navigate("/admin/payments")}
