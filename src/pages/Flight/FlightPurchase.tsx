@@ -245,8 +245,8 @@ const FlightPurchase = () => {
                       {flight.departure_airport?.name}
                     </div>
                     <div className="text-xs text-gray-500">
-                      {flight.departure_airport?.city?.name},{" "}
-                      {flight.departure_airport?.city?.country}
+                      {flight.departure_airport?.city_name},{" "}
+                      {flight.departure_airport?.country_name}
                     </div>
                   </div>
 
@@ -264,8 +264,8 @@ const FlightPurchase = () => {
                       {flight.arrival_airport?.name}
                     </div>
                     <div className="text-xs text-gray-500">
-                      {flight.arrival_airport?.city?.name},{" "}
-                      {flight.arrival_airport?.city?.country}
+                      {flight.arrival_airport?.city_name},{" "}
+                      {flight.arrival_airport?.country_name}
                     </div>
                   </div>
                 </div>

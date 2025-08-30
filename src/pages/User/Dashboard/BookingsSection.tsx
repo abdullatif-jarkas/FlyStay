@@ -108,6 +108,9 @@ const BookingsSection: React.FC<BookingsSectionProps> = () => {
     amount: number;
     clientSecret: string;
   } | null>(null);
+  const [selectedBooking, setSelectedBooking] = useState<
+    (FlightBooking & { type: "flight" }) | null
+  >(null);
 
   // API data state
   const [apiHotelBookings, setApiHotelBookings] = useState<ApiHotelBooking[]>(
@@ -299,6 +302,60 @@ const BookingsSection: React.FC<BookingsSectionProps> = () => {
     }
   };
 
+  // Handle payment for flight booking
+  const handleFlightPayment = async (bookingId: number, amount: number) => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      toast.error("Please login to complete payment");
+      return;
+    }
+
+    setPaymentLoading(bookingId);
+
+    try {
+      const response = await axios.post(
+        `http://127.0.0.1:8000/api/payments/flight-booking/${bookingId}`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: "application/json",
+          },
+        }
+      );
+
+      if (
+        response.data.status === "success" &&
+        response.data.data &&
+        response.data.data.length > 0
+      ) {
+        const clientSecret = response.data.data[0];
+
+        // Set up payment modal with client secret
+        setCurrentPayment({
+          bookingId,
+          amount,
+          clientSecret,
+        });
+        setPaymentModalOpen(true);
+
+        toast.info("Redirecting to secure payment...");
+      } else {
+        toast.error(response.data.message || "Failed to initialize payment");
+      }
+    } catch (err: unknown) {
+      console.error("Error initializing flight payment:", err);
+      const errorMessage =
+        err instanceof Error && "response" in err
+          ? (err as { response?: { data?: { message?: string } } }).response
+              ?.data?.message
+          : undefined;
+      toast.error(errorMessage || "Failed to initialize payment");
+    } finally {
+      setPaymentLoading(null);
+    }
+  };
+
   // Handle successful payment
   const handlePaymentSuccess = () => {
     if (currentPayment) {
@@ -433,6 +490,15 @@ const BookingsSection: React.FC<BookingsSectionProps> = () => {
   }: {
     booking: FlightBooking & { type: "flight" };
   }) {
+    const handlePayNow = () => {
+      setSelectedBooking(booking);
+      // Extract booking ID from booking reference (remove FL prefix and convert to number)
+      const bookingId = parseInt(
+        booking.booking_reference.replace("FL", "").replace(/^0+/, "")
+      );
+      handleFlightPayment(bookingId, booking.total_amount);
+    };
+
     return (
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
@@ -475,10 +541,21 @@ const BookingsSection: React.FC<BookingsSectionProps> = () => {
           <div className="text-lg font-bold text-gray-900 mb-2">
             {formatCurrency(booking.total_amount)}
           </div>
-          <button className="inline-flex items-center px-3 py-1 border border-gray-300 rounded-md text-sm text-gray-700 hover:bg-gray-50 transition-colors">
-            <FaEye className="mr-1" />
-            View Details
-          </button>
+          <div className="space-y-2">
+            {booking.status === "pending" && (
+              <button
+                onClick={handlePayNow}
+                className="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-md text-sm hover:bg-green-700 transition-colors w-full justify-center"
+              >
+                <FaCreditCard className="mr-2" />
+                Pay Now
+              </button>
+            )}
+            <button className="inline-flex items-center px-3 py-1 border border-gray-300 rounded-md text-sm text-gray-700 hover:bg-gray-50 transition-colors w-full justify-center">
+              <FaEye className="mr-1" />
+              View Details
+            </button>
+          </div>
         </div>
       </div>
     );

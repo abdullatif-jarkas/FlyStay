@@ -1,45 +1,24 @@
 import React, { useState, useEffect } from "react";
-import {
-  FaPlane,
-  FaTimes,
-  FaSpinner,
-  FaCreditCard,
-  FaUser,
-  FaEnvelope,
-  FaPhone,
-} from "react-icons/fa";
-import {
-  Elements,
-  PaymentElement,
-  useStripe,
-  useElements,
-} from "@stripe/react-stripe-js";
-import { loadStripe } from "@stripe/stripe-js";
+import { FaPlane, FaTimes, FaSpinner, FaCheckCircle } from "react-icons/fa";
 import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { usePayment } from "../../hooks/usePayment";
-import {
-  FlightBookingModalProps,
-  FlightBookingConfirmation,
-} from "../../types/payment";
+import { FlightBookingModalProps } from "../../types/payment";
 import { formatPrice } from "../../types/flightCabin";
-
-interface PassengerDetails {
-  name: string;
-  email: string;
-  phone: string;
-}
 
 interface FlightBookingResponse {
   status: string;
   message: string;
-  data: {
+  data: Array<{
     id: number;
     user_id: number;
     flight_cabins_id: number;
     booking_date: string;
     seat_number: number;
     status: string;
+  }>;
+  errors?: {
+    flight_cabins_id?: string[];
   };
 }
 
@@ -50,94 +29,24 @@ const FlightBookingModal: React.FC<FlightBookingModalProps> = ({
   flightCabin,
   onBookingSuccess,
 }) => {
-  const [passengerDetails, setPassengerDetails] = useState<PassengerDetails>({
-    name: "",
-    email: "",
-    phone: "",
-  });
-  const [errors, setErrors] = useState<Partial<PassengerDetails>>({});
-  const [step, setStep] = useState<"details" | "payment" | "confirmation">(
-    "details"
-  );
-  const [bookingConfirmation, setBookingConfirmation] =
-    useState<FlightBookingConfirmation | null>(null);
-  const [createdBookingId, setCreatedBookingId] = useState<number | null>(null);
   const [bookingLoading, setBookingLoading] = useState(false);
-
-  const {
-    createPaymentIntent,
-    handleStripePaymentSuccess,
-    handleStripePaymentError,
-    isLoading,
-    hasError,
-    error,
-    clientSecret,
-    resetPaymentState,
-  } = usePayment();
-
-  const STRIPE_PUBLISHABLE_KEY =
-    import.meta.env.REACT_APP_STRIPE_PUBLISHABLE_KEY ||
-    "pk_test_your_publishable_key_here";
-  console.log("publish key", STRIPE_PUBLISHABLE_KEY);
-  const stripePromise = loadStripe(STRIPE_PUBLISHABLE_KEY);
+  const [bookingSuccess, setBookingSuccess] = useState(false);
+  const navigate = useNavigate();
 
   // Reset state when modal opens/closes
   useEffect(() => {
     if (isOpen) {
-      setStep("details");
-      setPassengerDetails({ name: "", email: "", phone: "" });
-      setErrors({});
-      setBookingConfirmation(null);
-      setCreatedBookingId(null);
       setBookingLoading(false);
-      resetPaymentState();
+      setBookingSuccess(false);
     }
-  }, [isOpen, resetPaymentState]);
+  }, [isOpen]);
 
-  const validatePassengerDetails = (): boolean => {
-    const newErrors: Partial<PassengerDetails> = {};
-
-    if (!passengerDetails.name.trim()) {
-      newErrors.name = "Full name is required";
-    }
-
-    if (!passengerDetails.email.trim()) {
-      newErrors.email = "Email is required";
-    } else if (!/\S+@\S+\.\S+/.test(passengerDetails.email)) {
-      newErrors.email = "Please enter a valid email address";
-    }
-
-    if (!passengerDetails.phone.trim()) {
-      newErrors.phone = "Phone number is required";
-    } else if (!/^\+?[\d\s-()]+$/.test(passengerDetails.phone)) {
-      newErrors.phone = "Please enter a valid phone number";
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleInputChange = (field: keyof PassengerDetails, value: string) => {
-    setPassengerDetails((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
-
-    // Clear error when user starts typing
-    if (errors[field]) {
-      setErrors((prev) => ({
-        ...prev,
-        [field]: undefined,
-      }));
-    }
-  };
-
-  // Create flight booking (Step 1)
-  const createFlightBooking = async (): Promise<number | null> => {
+  // Create flight booking directly
+  const handleBookFlight = async () => {
     const token = localStorage.getItem("token");
     if (!token) {
       toast.error("Please login to make a booking");
-      return null;
+      return;
     }
 
     try {
@@ -158,79 +67,62 @@ const FlightBookingModal: React.FC<FlightBookingModalProps> = ({
       );
 
       if (response.data.status === "success") {
-        const bookingId = response.data.data.id;
-        setCreatedBookingId(bookingId);
+        setBookingSuccess(true);
         toast.success("Booking created successfully!");
-        return bookingId;
+        
+        // Close modal after a short delay
+        setTimeout(() => {
+          onClose();
+          // Navigate to profile page with bookings section
+          navigate("/profile");
+        }, 2000);
+        
+        // Call success callback if provided
+        if (onBookingSuccess) {
+          onBookingSuccess({
+            booking_reference: `FL${response.data.data[0].id.toString().padStart(6, "0")}`,
+            flight_details: {
+              airline: flight.airline,
+              flight_number: flight.flight_number,
+              departure_airport: flight.departure_airport?.IATA_code || "",
+              arrival_airport: flight.arrival_airport?.IATA_code || "",
+              departure_time: flight.departure_time,
+              arrival_time: flight.arrival_time,
+              class: flightCabin.class_name,
+              seat_number: response.data.data[0].seat_number?.toString(),
+            },
+            passenger_details: {
+              name: "Passenger", // This would come from user data
+              email: "passenger@example.com",
+              phone: "+1234567890",
+            },
+            total_amount: flightCabin.price,
+            booking_date: new Date().toISOString(),
+          });
+        }
       } else {
-        toast.error(response.data.errors.flight_cabins_id[0] || "Failed to create booking");
-        return null;
+        const errorMessage = response.data.errors?.flight_cabins_id?.[0] || 
+                           response.data.message || 
+                           "Failed to create booking";
+        toast.error(errorMessage);
       }
     } catch (error: unknown) {
       console.error("Error creating flight booking:", error);
       const errorMessage =
         error instanceof Error && "response" in error
-          ? (error as { response?: { data?: { message?: string } } }).response
-              ?.data?.message
+          ? (error as { response?: { data?: { errors?: { flight_cabins_id?: string[] }; message?: string } } }).response
+              ?.data?.errors[0] ||
+            (error as { response?: { data?: { message?: string } } }).response?.data?.message
           : undefined;
       toast.error(errorMessage || "Failed to create booking");
-      return null;
     } finally {
       setBookingLoading(false);
     }
   };
 
-  const handleProceedToPayment = async () => {
-    if (!validatePassengerDetails()) {
-      return;
-    }
-
-    try {
-      // Step 1: Create the flight booking
-      const bookingId = await createFlightBooking();
-
-      if (!bookingId) {
-        return; // Error already handled in createFlightBooking
-      }
-
-      // Step 2: Create payment intent using the booking ID
-      const secret = await createPaymentIntent(bookingId, flight.airline);
-
-      if (secret) {
-        setStep("payment");
-      }
-    } catch (error) {
-      console.error("Error in booking process:", error);
-    }
-  };
-
-  const handlePaymentSuccess = async (paymentIntent: any) => {
-    try {
-      // Use the created booking ID instead of flight cabin ID
-      const bookingIdToUse = createdBookingId || flightCabin.id;
-
-      const confirmation = await handleStripePaymentSuccess(
-        paymentIntent,
-        bookingIdToUse
-      );
-      if (confirmation) {
-        setBookingConfirmation(confirmation);
-        setStep("confirmation");
-        onBookingSuccess?.(confirmation);
-      }
-    } catch (error) {
-      console.error("Error handling payment success:", error);
-    }
-  };
-
   const handleClose = () => {
-    setStep("details");
-    setPassengerDetails({ name: "", email: "", phone: "" });
-    setErrors({});
-    setBookingConfirmation(null);
-    setCreatedBookingId(null);
     setBookingLoading(false);
-    resetPaymentState();
+    setBookingSuccess(false);
     onClose();
   };
 
@@ -244,15 +136,13 @@ const FlightBookingModal: React.FC<FlightBookingModalProps> = ({
           <div className="flex items-center">
             <FaPlane className="text-primary-500 mr-3" />
             <h2 className="text-xl font-semibold text-gray-900">
-              {step === "details" && "Passenger Details"}
-              {step === "payment" && "Payment"}
-              {step === "confirmation" && "Booking Confirmed"}
+              {bookingSuccess ? "Booking Confirmed!" : "Confirm Flight Booking"}
             </h2>
           </div>
           <button
             onClick={handleClose}
             className="text-gray-400 hover:text-gray-600 transition-colors"
-            disabled={isLoading}
+            disabled={bookingLoading}
           >
             <FaTimes />
           </button>
@@ -292,139 +182,60 @@ const FlightBookingModal: React.FC<FlightBookingModalProps> = ({
             </div>
           </div>
 
-          {/* Step Content */}
-          {step === "details" && (
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                Passenger Information
+          {/* Booking Status */}
+          {bookingSuccess ? (
+            <div className="text-center py-8">
+              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <FaCheckCircle className="text-2xl text-green-600" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                Booking Created Successfully!
               </h3>
-
-              {/* Full Name */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  <FaUser className="inline mr-2" />
-                  Full Name *
-                </label>
-                <input
-                  type="text"
-                  value={passengerDetails.name}
-                  onChange={(e) => handleInputChange("name", e.target.value)}
-                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 ${
-                    errors.name ? "border-red-500" : "border-gray-300"
-                  }`}
-                  placeholder="Enter your full name"
-                />
-                {errors.name && (
-                  <p className="mt-1 text-sm text-red-600">{errors.name}</p>
-                )}
+              <p className="text-gray-600 mb-4">
+                Your flight booking has been created. You can complete the payment from your profile.
+              </p>
+              <div className="bg-blue-50 rounded-lg p-4 text-left">
+                <h4 className="font-semibold mb-2 text-blue-900">Next Steps:</h4>
+                <ol className="text-sm text-blue-800 space-y-1">
+                  <li>1. Go to your Profile → My Bookings</li>
+                  <li>2. Find your flight booking</li>
+                  <li>3. Click "Pay Now" to complete payment</li>
+                </ol>
               </div>
-
-              {/* Email */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  <FaEnvelope className="inline mr-2" />
-                  Email Address *
-                </label>
-                <input
-                  type="email"
-                  value={passengerDetails.email}
-                  onChange={(e) => handleInputChange("email", e.target.value)}
-                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 ${
-                    errors.email ? "border-red-500" : "border-gray-300"
-                  }`}
-                  placeholder="Enter your email address"
-                />
-                {errors.email && (
-                  <p className="mt-1 text-sm text-red-600">{errors.email}</p>
-                )}
+              <p className="text-sm text-gray-500 mt-4">
+                Redirecting to your profile in a moment...
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-6">
+              <div className="bg-blue-50 rounded-lg p-4">
+                <h4 className="font-semibold text-blue-900 mb-2">Booking Process</h4>
+                <p className="text-sm text-blue-800">
+                  This will create your flight booking. You can complete the payment later from your profile page.
+                </p>
               </div>
-
-              {/* Phone */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  <FaPhone className="inline mr-2" />
-                  Phone Number *
-                </label>
-                <input
-                  type="tel"
-                  value={passengerDetails.phone}
-                  onChange={(e) => handleInputChange("phone", e.target.value)}
-                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 ${
-                    errors.phone ? "border-red-500" : "border-gray-300"
-                  }`}
-                  placeholder="Enter your phone number"
-                />
-                {errors.phone && (
-                  <p className="mt-1 text-sm text-red-600">{errors.phone}</p>
-                )}
-              </div>
-
-              {/* Error Display */}
-              {hasError && (
-                <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-                  {error}
-                </div>
-              )}
 
               {/* Action Buttons */}
               <div className="flex justify-end space-x-3 pt-4">
                 <button
                   onClick={handleClose}
                   className="px-4 py-2 text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300 transition-colors"
-                  disabled={isLoading}
+                  disabled={bookingLoading}
                 >
                   Cancel
                 </button>
                 <button
-                  onClick={handleProceedToPayment}
-                  disabled={isLoading || bookingLoading}
+                  onClick={handleBookFlight}
+                  disabled={bookingLoading}
                   className="px-6 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 transition-colors disabled:opacity-50 flex items-center"
                 >
-                  {(isLoading || bookingLoading) && (
+                  {bookingLoading && (
                     <FaSpinner className="animate-spin mr-2" />
                   )}
-                  <FaCreditCard className="mr-2" />
-                  {bookingLoading
-                    ? "Creating Booking..."
-                    : "Proceed to Payment"}
+                  <FaPlane className="mr-2" />
+                  {bookingLoading ? "Creating Booking..." : "Book Flight"}
                 </button>
               </div>
-            </div>
-          )}
-
-          {step === "payment" && clientSecret && (
-            <Elements options={{ clientSecret }} stripe={stripePromise}>
-              <StripeCheckoutForm onSuccess={handlePaymentSuccess} />
-            </Elements>
-          )}
-
-          {step === "confirmation" && bookingConfirmation && (
-            <div className="text-center py-8">
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <FaPlane className="text-2xl text-green-600" />
-              </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                Booking Confirmed!
-              </h3>
-              <p className="text-gray-600 mb-4">
-                Your flight has been successfully booked.
-              </p>
-              <div className="bg-gray-50 rounded-lg p-4 text-left">
-                <h4 className="font-semibold mb-2">Booking Reference</h4>
-                <p className="text-lg font-mono text-primary-600 mb-4">
-                  {bookingConfirmation.booking_reference}
-                </p>
-                <p className="text-sm text-gray-600">
-                  A confirmation email has been sent to {passengerDetails.email}
-                </p>
-              </div>
-
-              <button
-                onClick={handleClose}
-                className="mt-6 px-6 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 transition-colors"
-              >
-                Close
-              </button>
             </div>
           )}
         </div>
@@ -434,49 +245,3 @@ const FlightBookingModal: React.FC<FlightBookingModalProps> = ({
 };
 
 export default FlightBookingModal;
-
-const StripeCheckoutForm = ({
-  onSuccess,
-}: {
-  onSuccess: (paymentIntent: any) => void;
-}) => {
-  const stripe = useStripe();
-  const elements = useElements();
-  const [loading, setLoading] = useState(false);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!stripe || !elements) return;
-
-    setLoading(true);
-
-    const result = await stripe.confirmPayment({
-      elements,
-      confirmParams: {
-        return_url: window.location.href,
-      },
-      redirect: "if_required",
-    });
-
-    if (result.error) {
-      toast.error(result.error.message || "Payment failed");
-    } else if (result.paymentIntent?.status === "succeeded") {
-      onSuccess(result.paymentIntent);
-    }
-
-    setLoading(false);
-  };
-
-  return (
-    <form onSubmit={handleSubmit}>
-      <PaymentElement />
-      <button
-        type="submit"
-        disabled={!stripe || loading}
-        className="mt-4 bg-primary-600 text-white px-4 py-2 rounded-md hover:bg-primary-700"
-      >
-        {loading ? "Processing..." : "Pay now"}
-      </button>
-    </form>
-  );
-};

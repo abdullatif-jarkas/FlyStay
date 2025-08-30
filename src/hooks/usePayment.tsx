@@ -37,7 +37,7 @@ export const usePayment = () => {
           bookingId,
           airline
         );
-
+        console.log("clientSecret", clientSecret)
         setPaymentState((prev) => ({
           ...prev,
           loading: false,

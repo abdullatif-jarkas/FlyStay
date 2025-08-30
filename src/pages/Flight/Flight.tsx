@@ -241,25 +241,6 @@ const Flight = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Search Bar Section */}
-      {/* <div className="bg-white shadow-sm">
-        <div className="container mx-auto px-4 py-6">
-          <div className="flex items-center justify-between mb-6">
-            <h1 className="text-3xl font-bold text-gray-900">
-              {showAllFlights ? "All Available Flights" : "Search Flights"}
-            </h1>
-            {!showAllFlights && (
-              <button
-                onClick={handleShowAllFlights}
-                className="px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-400 cursor-pointer transition-colors"
-              >
-                View All Flights
-              </button>
-            )}
-          </div>
-          <FlightSearchBar onSearch={handleSearch} loading={loading} />
-        </div>
-      </div> */}
 
       {/* Results Section */}
       {(searchParams || showAllFlights) && (

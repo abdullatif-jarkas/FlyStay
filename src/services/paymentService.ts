@@ -86,7 +86,7 @@ export const confirmFlightPayment = async (
       status: string;
       message: string;
       data: FlightBookingConfirmation;
-    }>(PAYMENT_ENDPOINTS.CONFIRM_PAYMENT, {
+    }>(PAYMENT_ENDPOINTS.CONFIRM_PAYMENT(bookingId), {
       payment_intent_id: paymentIntentId,
       booking_id: bookingId,
     });
