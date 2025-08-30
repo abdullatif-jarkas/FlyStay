@@ -15,15 +15,21 @@ import { FaCalendarCheck } from "react-icons/fa";
 // Dashboard sections
 import ProfileSection from "./Dashboard/ProfileSection";
 import BookingsSection from "./Dashboard/BookingsSection";
-// import PreferencesSection from "./Dashboard/PreferencesSection";
-// import PaymentSection from "./Dashboard/PaymentSection";
-// import HelpSection from "./Dashboard/HelpSection";
 import SettingsSection from "./Dashboard/SettingsSection";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "../../store";
+import { setActiveSection } from "../../store/sectionSlice";
 
 const Profile = () => {
   const { user, loading } = useUser();
   const [searchParams] = useSearchParams();
-  const [activeSection, setActiveSection] = useState("profile");
+  // const [activeSection, setActiveSection] = useState("profile");
+  const dispatch = useDispatch<AppDispatch>();
+
+  const activeSection = useSelector(
+    (state: RootState) => state.section.activeSection
+  );
+
   const navigate = useNavigate();
 
   // Handle URL parameters for section navigation
@@ -81,6 +87,10 @@ const Profile = () => {
     menuItems.find((item) => item.id === activeSection)?.component ||
     ProfileSection;
 
+  const handleActiveSection = (item) => {
+    dispatch(setActiveSection(item))
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 py-8">
@@ -106,7 +116,7 @@ const Profile = () => {
                 return (
                   <button
                     key={item.id}
-                    onClick={() => setActiveSection(item.id)}
+                    onClick={() => handleActiveSection(item.id)}
                     className={`w-full flex items-center justify-between px-4 py-3 rounded-lg text-left transition-colors ${
                       activeSection === item.id
                         ? "bg-blue-50 text-blue-600 border-l-4 border-blue-600"

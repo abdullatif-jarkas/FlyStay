@@ -185,7 +185,7 @@ const NavBar = ({ isAuth }: { isAuth?: boolean }) => {
             <Button
               title="Sign In"
               to="/auth/login"
-              styles="border border-primary-500 text-primary-500 px-4 py-2 rounded-md"
+              styles="border border-primary-500 text-primary-500 px-4 py-2 rounded-md bg-primary-500 text-white"
             />
             <Button
               title="Register"

@@ -5,6 +5,9 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { FlightBookingModalProps } from "../../types/payment";
 import { formatPrice } from "../../types/flightCabin";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "../../store";
+import { setActiveSection } from "../../store/sectionSlice";
 
 interface FlightBookingResponse {
   status: string;
@@ -32,6 +35,7 @@ const FlightBookingModal: React.FC<FlightBookingModalProps> = ({
   const [bookingLoading, setBookingLoading] = useState(false);
   const [bookingSuccess, setBookingSuccess] = useState(false);
   const navigate = useNavigate();
+  const dispatch = useDispatch<AppDispatch>();
 
   // Reset state when modal opens/closes
   useEffect(() => {
@@ -75,6 +79,7 @@ const FlightBookingModal: React.FC<FlightBookingModalProps> = ({
           onClose();
           // Navigate to profile page with bookings section
           navigate("/user/profile");
+          dispatch(setActiveSection("bookings"))
         }, 2000);
         
         // Call success callback if provided
