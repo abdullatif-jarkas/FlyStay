@@ -47,24 +47,27 @@ const ShowPermissionModal: React.FC<ShowPermissionModalProps> = ({
     setError("");
 
     try {
-      const response = await axios.get(`http://127.0.0.1:8000/api/permission/${permissionId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          Accept: "application/json",
-        },
-      });
+      const response = await axios.get(
+        `http://127.0.0.1:8000/api/permission/${permissionId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: "application/json",
+          },
+        }
+      );
 
       if (response.data.status === "success") {
         setPermission(response.data.data[0]);
-        console.log(response.data.data[0])
+        console.log(response.data.data[0]);
       } else {
         setError("Failed to load permission details");
       }
     } catch (err: any) {
       setError(
-        err.response?.data?.message || 
-        err.response?.data?.error || 
-        "Failed to load permission details"
+        err.response?.data?.message ||
+          err.response?.data?.error ||
+          "Failed to load permission details"
       );
     } finally {
       setLoading(false);
@@ -86,7 +89,7 @@ const ShowPermissionModal: React.FC<ShowPermissionModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-black/30 backdrop-blur-sm bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white rounded-lg p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-bold text-gray-800 flex items-center gap-2">
@@ -104,7 +107,9 @@ const ShowPermissionModal: React.FC<ShowPermissionModalProps> = ({
         {loading && (
           <div className="flex items-center justify-center py-8">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
-            <span className="ml-2 text-gray-600">Loading permission details...</span>
+            <span className="ml-2 text-gray-600">
+              Loading permission details...
+            </span>
           </div>
         )}
 
@@ -120,19 +125,29 @@ const ShowPermissionModal: React.FC<ShowPermissionModalProps> = ({
             <div className="bg-gray-50 rounded-lg p-4">
               <div className="flex items-center gap-2 mb-2">
                 <FaKey className="text-primary-600" />
-                <h3 className="text-lg font-semibold text-gray-800">Permission Information</h3>
+                <h3 className="text-lg font-semibold text-gray-800">
+                  Permission Information
+                </h3>
               </div>
               <div className="grid grid-cols-1 gap-3">
                 <div>
-                  <label className="block text-sm font-medium text-gray-600">ID</label>
+                  <label className="block text-sm font-medium text-gray-600">
+                    ID
+                  </label>
                   <p className="text-gray-800 font-mono">{permission.id}</p>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-600">Name</label>
-                  <p className="text-gray-800 font-semibold">{permission.name}</p>
+                  <label className="block text-sm font-medium text-gray-600">
+                    Name
+                  </label>
+                  <p className="text-gray-800 font-semibold">
+                    {permission.name}
+                  </p>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-600">Guard</label>
+                  <label className="block text-sm font-medium text-gray-600">
+                    Guard
+                  </label>
                   <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
                     {permission.guard_name}
                   </span>
@@ -161,7 +176,9 @@ const ShowPermissionModal: React.FC<ShowPermissionModalProps> = ({
                   ))}
                 </div>
               ) : (
-                <p className="text-gray-600 italic">No roles are associated with this permission</p>
+                <p className="text-gray-600 italic">
+                  No roles are associated with this permission
+                </p>
               )}
             </div>
 
@@ -169,17 +186,27 @@ const ShowPermissionModal: React.FC<ShowPermissionModalProps> = ({
             <div className="bg-green-50 rounded-lg p-4">
               <div className="flex items-center gap-2 mb-3">
                 <FaCalendarAlt className="text-green-600" />
-                <h3 className="text-lg font-semibold text-gray-800">Timestamps</h3>
+                <h3 className="text-lg font-semibold text-gray-800">
+                  Timestamps
+                </h3>
               </div>
               <div className="grid grid-cols-1 gap-3">
                 <div>
-                  <label className="block text-sm font-medium text-gray-600">Created At</label>
-                  <p className="text-gray-800">{formatDate(permission.created_at)}</p>
+                  <label className="block text-sm font-medium text-gray-600">
+                    Created At
+                  </label>
+                  <p className="text-gray-800">
+                    {formatDate(permission.created_at)}
+                  </p>
                 </div>
                 {permission.updated_at && (
                   <div>
-                    <label className="block text-sm font-medium text-gray-600">Updated At</label>
-                    <p className="text-gray-800">{formatDate(permission.updated_at)}</p>
+                    <label className="block text-sm font-medium text-gray-600">
+                      Updated At
+                    </label>
+                    <p className="text-gray-800">
+                      {formatDate(permission.updated_at)}
+                    </p>
                   </div>
                 )}
               </div>
@@ -189,15 +216,21 @@ const ShowPermissionModal: React.FC<ShowPermissionModalProps> = ({
             <div className="bg-yellow-50 rounded-lg p-4">
               <div className="flex items-center gap-2 mb-3">
                 <FaShieldAlt className="text-yellow-600" />
-                <h3 className="text-lg font-semibold text-gray-800">Usage Statistics</h3>
+                <h3 className="text-lg font-semibold text-gray-800">
+                  Usage Statistics
+                </h3>
               </div>
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div className="text-center">
-                  <p className="text-2xl font-bold text-yellow-600">{permission.roles.length}</p>
+                  <p className="text-2xl font-bold text-yellow-600">
+                    {permission.roles.length}
+                  </p>
                   <p className="text-gray-600">Roles Using</p>
                 </div>
                 <div className="text-center">
-                  <p className="text-2xl font-bold text-yellow-600">{permission.guard_name}</p>
+                  <p className="text-2xl font-bold text-yellow-600">
+                    {permission.guard_name}
+                  </p>
                   <p className="text-gray-600">Guard Type</p>
                 </div>
               </div>

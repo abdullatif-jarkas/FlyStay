@@ -15,6 +15,8 @@ import {
   useElements,
 } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
+import { toast } from "sonner";
+import axios from "axios";
 import { usePayment } from "../../hooks/usePayment";
 import {
   FlightBookingModalProps,
@@ -26,6 +28,19 @@ interface PassengerDetails {
   name: string;
   email: string;
   phone: string;
+}
+
+interface FlightBookingResponse {
+  status: string;
+  message: string;
+  data: {
+    id: number;
+    user_id: number;
+    flight_cabins_id: number;
+    booking_date: string;
+    seat_number: number;
+    status: string;
+  };
 }
 
 const FlightBookingModal: React.FC<FlightBookingModalProps> = ({
@@ -46,6 +61,8 @@ const FlightBookingModal: React.FC<FlightBookingModalProps> = ({
   );
   const [bookingConfirmation, setBookingConfirmation] =
     useState<FlightBookingConfirmation | null>(null);
+  const [createdBookingId, setCreatedBookingId] = useState<number | null>(null);
+  const [bookingLoading, setBookingLoading] = useState(false);
 
   const {
     createPaymentIntent,
@@ -58,8 +75,10 @@ const FlightBookingModal: React.FC<FlightBookingModalProps> = ({
     resetPaymentState,
   } = usePayment();
 
-  const STRIPE_PUBLISHABLE_KEY = import.meta.env.REACT_APP_STRIPE_PUBLISHABLE_KEY || 'pk_test_your_publishable_key_here';
-  console.log("publish key", STRIPE_PUBLISHABLE_KEY)
+  const STRIPE_PUBLISHABLE_KEY =
+    import.meta.env.REACT_APP_STRIPE_PUBLISHABLE_KEY ||
+    "pk_test_your_publishable_key_here";
+  console.log("publish key", STRIPE_PUBLISHABLE_KEY);
   const stripePromise = loadStripe(STRIPE_PUBLISHABLE_KEY);
 
   // Reset state when modal opens/closes
@@ -69,6 +88,8 @@ const FlightBookingModal: React.FC<FlightBookingModalProps> = ({
       setPassengerDetails({ name: "", email: "", phone: "" });
       setErrors({});
       setBookingConfirmation(null);
+      setCreatedBookingId(null);
+      setBookingLoading(false);
       resetPaymentState();
     }
   }, [isOpen, resetPaymentState]);
@@ -111,27 +132,86 @@ const FlightBookingModal: React.FC<FlightBookingModalProps> = ({
     }
   };
 
+  // Create flight booking (Step 1)
+  const createFlightBooking = async (): Promise<number | null> => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      toast.error("Please login to make a booking");
+      return null;
+    }
+
+    try {
+      setBookingLoading(true);
+
+      const formData = new FormData();
+      formData.append("flight_cabins_id", flightCabin.id.toString());
+
+      const response = await axios.post<FlightBookingResponse>(
+        "http://127.0.0.1:8000/api/flight-bookings",
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: "application/json",
+          },
+        }
+      );
+
+      if (response.data.status === "success") {
+        const bookingId = response.data.data.id;
+        setCreatedBookingId(bookingId);
+        toast.success("Booking created successfully!");
+        return bookingId;
+      } else {
+        toast.error(response.data.errors.flight_cabins_id[0] || "Failed to create booking");
+        return null;
+      }
+    } catch (error: unknown) {
+      console.error("Error creating flight booking:", error);
+      const errorMessage =
+        error instanceof Error && "response" in error
+          ? (error as { response?: { data?: { message?: string } } }).response
+              ?.data?.message
+          : undefined;
+      toast.error(errorMessage || "Failed to create booking");
+      return null;
+    } finally {
+      setBookingLoading(false);
+    }
+  };
+
   const handleProceedToPayment = async () => {
     if (!validatePassengerDetails()) {
       return;
     }
 
     try {
-      const secret = await createPaymentIntent(flightCabin.id, flight.airline);
+      // Step 1: Create the flight booking
+      const bookingId = await createFlightBooking();
+
+      if (!bookingId) {
+        return; // Error already handled in createFlightBooking
+      }
+
+      // Step 2: Create payment intent using the booking ID
+      const secret = await createPaymentIntent(bookingId, flight.airline);
 
       if (secret) {
         setStep("payment");
       }
     } catch (error) {
-      console.error("Error creating payment intent:", error);
+      console.error("Error in booking process:", error);
     }
   };
 
   const handlePaymentSuccess = async (paymentIntent: any) => {
     try {
+      // Use the created booking ID instead of flight cabin ID
+      const bookingIdToUse = createdBookingId || flightCabin.id;
+
       const confirmation = await handleStripePaymentSuccess(
         paymentIntent,
-        flightCabin.id
+        bookingIdToUse
       );
       if (confirmation) {
         setBookingConfirmation(confirmation);
@@ -148,6 +228,8 @@ const FlightBookingModal: React.FC<FlightBookingModalProps> = ({
     setPassengerDetails({ name: "", email: "", phone: "" });
     setErrors({});
     setBookingConfirmation(null);
+    setCreatedBookingId(null);
+    setBookingLoading(false);
     resetPaymentState();
     onClose();
   };
@@ -155,7 +237,7 @@ const FlightBookingModal: React.FC<FlightBookingModalProps> = ({
   if (!isOpen || !flight || !flightCabin) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div className="fixed inset-0 backdrop-blur-sm bg-black/30 bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b">
@@ -295,12 +377,16 @@ const FlightBookingModal: React.FC<FlightBookingModalProps> = ({
                 </button>
                 <button
                   onClick={handleProceedToPayment}
-                  disabled={isLoading}
+                  disabled={isLoading || bookingLoading}
                   className="px-6 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 transition-colors disabled:opacity-50 flex items-center"
                 >
-                  {isLoading && <FaSpinner className="animate-spin mr-2" />}
+                  {(isLoading || bookingLoading) && (
+                    <FaSpinner className="animate-spin mr-2" />
+                  )}
                   <FaCreditCard className="mr-2" />
-                  Proceed to Payment
+                  {bookingLoading
+                    ? "Creating Booking..."
+                    : "Proceed to Payment"}
                 </button>
               </div>
             </div>
@@ -308,10 +394,7 @@ const FlightBookingModal: React.FC<FlightBookingModalProps> = ({
 
           {step === "payment" && clientSecret && (
             <Elements options={{ clientSecret }} stripe={stripePromise}>
-              <StripeCheckoutForm
-                clientSecret={clientSecret}
-                onSuccess={handlePaymentSuccess}
-              />
+              <StripeCheckoutForm onSuccess={handlePaymentSuccess} />
             </Elements>
           )}
 
@@ -353,10 +436,8 @@ const FlightBookingModal: React.FC<FlightBookingModalProps> = ({
 export default FlightBookingModal;
 
 const StripeCheckoutForm = ({
-  clientSecret,
   onSuccess,
 }: {
-  clientSecret: string;
   onSuccess: (paymentIntent: any) => void;
 }) => {
   const stripe = useStripe();
@@ -378,7 +459,7 @@ const StripeCheckoutForm = ({
     });
 
     if (result.error) {
-      toast.error(result.error.message);
+      toast.error(result.error.message || "Payment failed");
     } else if (result.paymentIntent?.status === "succeeded") {
       onSuccess(result.paymentIntent);
     }

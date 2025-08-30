@@ -19,7 +19,7 @@ const getAuthToken = (): string | null => {
 const paymentApi = axios.create({
   baseURL: BASE_URL,
   headers: {
-    "Accept": "application/json",
+    Accept: "application/json",
   },
 });
 
@@ -34,12 +34,12 @@ paymentApi.interceptors.request.use((config) => {
 
 /**
  * Create a payment intent for flight booking
- * @param flightCabinId - The ID of the flight cabin to book
+ * @param bookingId - The ID of the flight booking to process payment for
  * @param airline - The airline name (note: API expects "airline" not "ariline")
  * @returns Promise with payment intent client secret
  */
 export const createFlightPaymentIntent = async (
-  flightCabinId: number,
+  bookingId: number,
   airline: string
 ): Promise<string> => {
   try {
@@ -48,23 +48,25 @@ export const createFlightPaymentIntent = async (
     };
 
     const response = await paymentApi.post<PaymentIntentResponse>(
-      PAYMENT_ENDPOINTS.CREATE_FLIGHT_PAYMENT_INTENT(flightCabinId),
+      PAYMENT_ENDPOINTS.CREATE_FLIGHT_PAYMENT_INTENT(bookingId),
       requestData
     );
 
     if (response.data.status === "success" && response.data.data.length > 0) {
       return response.data.data[0]; // Return the client secret
     } else {
-      throw new Error(response.data.message || "Failed to create payment intent");
+      throw new Error(
+        response.data.message || "Failed to create payment intent"
+      );
     }
   } catch (error: any) {
     console.error("Error creating flight payment intent:", error);
-    
+
     if (error.response?.data) {
       const errorData: PaymentError = error.response.data;
       throw new Error(errorData.message || "Payment intent creation failed");
     }
-    
+
     throw new Error("Network error occurred while creating payment intent");
   }
 };
@@ -72,12 +74,12 @@ export const createFlightPaymentIntent = async (
 /**
  * Confirm payment after successful Stripe payment
  * @param paymentIntentId - The Stripe payment intent ID
- * @param flightCabinId - The flight cabin ID
+ * @param bookingId - The flight booking ID
  * @returns Promise with booking confirmation
  */
 export const confirmFlightPayment = async (
   paymentIntentId: string,
-  flightCabinId: number
+  bookingId: number
 ): Promise<FlightBookingConfirmation> => {
   try {
     const response = await paymentApi.post<{
@@ -86,7 +88,7 @@ export const confirmFlightPayment = async (
       data: FlightBookingConfirmation;
     }>(PAYMENT_ENDPOINTS.CONFIRM_PAYMENT, {
       payment_intent_id: paymentIntentId,
-      flight_cabin_id: flightCabinId,
+      booking_id: bookingId,
     });
 
     if (response.data.status === "success") {
@@ -96,12 +98,12 @@ export const confirmFlightPayment = async (
     }
   } catch (error: any) {
     console.error("Error confirming flight payment:", error);
-    
+
     if (error.response?.data) {
       const errorData: PaymentError = error.response.data;
       throw new Error(errorData.message || "Payment confirmation failed");
     }
-    
+
     throw new Error("Network error occurred while confirming payment");
   }
 };
@@ -111,7 +113,9 @@ export const confirmFlightPayment = async (
  * @param paymentIntentId - The Stripe payment intent ID
  * @returns Promise with payment status
  */
-export const getPaymentStatus = async (paymentIntentId: string): Promise<{
+export const getPaymentStatus = async (
+  paymentIntentId: string
+): Promise<{
   status: string;
   amount: number;
   currency: string;
@@ -134,12 +138,12 @@ export const getPaymentStatus = async (paymentIntentId: string): Promise<{
     }
   } catch (error: any) {
     console.error("Error getting payment status:", error);
-    
+
     if (error.response?.data) {
       const errorData: PaymentError = error.response.data;
       throw new Error(errorData.message || "Failed to get payment status");
     }
-    
+
     throw new Error("Network error occurred while getting payment status");
   }
 };
@@ -149,7 +153,9 @@ export const getPaymentStatus = async (paymentIntentId: string): Promise<{
  * @param paymentIntentId - The Stripe payment intent ID
  * @returns Promise with cancellation result
  */
-export const cancelPaymentIntent = async (paymentIntentId: string): Promise<boolean> => {
+export const cancelPaymentIntent = async (
+  paymentIntentId: string
+): Promise<boolean> => {
   try {
     const response = await paymentApi.post<{
       status: string;
@@ -167,7 +173,9 @@ export const cancelPaymentIntent = async (paymentIntentId: string): Promise<bool
  * Get user's flight bookings
  * @returns Promise with user's bookings
  */
-export const getUserFlightBookings = async (): Promise<FlightBookingConfirmation[]> => {
+export const getUserFlightBookings = async (): Promise<
+  FlightBookingConfirmation[]
+> => {
   try {
     const response = await paymentApi.get<{
       status: string;
@@ -182,12 +190,12 @@ export const getUserFlightBookings = async (): Promise<FlightBookingConfirmation
     }
   } catch (error: any) {
     console.error("Error getting user flight bookings:", error);
-    
+
     if (error.response?.data) {
       const errorData: PaymentError = error.response.data;
       throw new Error(errorData.message || "Failed to get bookings");
     }
-    
+
     throw new Error("Network error occurred while getting bookings");
   }
 };

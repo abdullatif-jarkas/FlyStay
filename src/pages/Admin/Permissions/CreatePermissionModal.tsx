@@ -47,9 +47,9 @@ const CreatePermissionModal: React.FC<CreatePermissionModalProps> = ({
       setFormData({ name: "" });
     } catch (err: any) {
       setError(
-        err.response?.data?.message || 
-        err.response?.data?.error || 
-        "Failed to create permission"
+        err.response?.data?.message ||
+          err.response?.data?.error ||
+          "Failed to create permission"
       );
     } finally {
       setLoading(false);
@@ -58,7 +58,7 @@ const CreatePermissionModal: React.FC<CreatePermissionModalProps> = ({
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       [name]: value,
     }));
@@ -73,10 +73,12 @@ const CreatePermissionModal: React.FC<CreatePermissionModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-black/30 backdrop-blur-sm bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white rounded-lg p-6 w-full max-w-md">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-bold text-gray-800">Create New Permission</h2>
+          <h2 className="text-xl font-bold text-gray-800">
+            Create New Permission
+          </h2>
           <button
             onClick={handleClose}
             className="text-gray-500 hover:text-gray-700 text-xl"

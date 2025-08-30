@@ -24,7 +24,7 @@ export const usePayment = () => {
    * Create payment intent for flight booking
    */
   const createPaymentIntent = useCallback(
-    async (flightCabinId: number, airline: string): Promise<string | null> => {
+    async (bookingId: number, airline: string): Promise<string | null> => {
       setPaymentState((prev) => ({
         ...prev,
         loading: true,
@@ -33,8 +33,11 @@ export const usePayment = () => {
       }));
 
       try {
-        const clientSecret = await createFlightPaymentIntent(flightCabinId, airline);
-        
+        const clientSecret = await createFlightPaymentIntent(
+          bookingId,
+          airline
+        );
+
         setPaymentState((prev) => ({
           ...prev,
           loading: false,
@@ -46,7 +49,7 @@ export const usePayment = () => {
         return clientSecret;
       } catch (error: any) {
         const errorMessage = error.message || "Failed to create payment intent";
-        
+
         setPaymentState((prev) => ({
           ...prev,
           loading: false,
@@ -67,7 +70,7 @@ export const usePayment = () => {
   const confirmPayment = useCallback(
     async (
       paymentIntentId: string,
-      flightCabinId: number
+      bookingId: number
     ): Promise<FlightBookingConfirmation | null> => {
       setPaymentState((prev) => ({
         ...prev,
@@ -76,8 +79,11 @@ export const usePayment = () => {
       }));
 
       try {
-        const confirmation = await confirmFlightPayment(paymentIntentId, flightCabinId);
-        
+        const confirmation = await confirmFlightPayment(
+          paymentIntentId,
+          bookingId
+        );
+
         setPaymentState((prev) => ({
           ...prev,
           loading: false,
@@ -89,7 +95,7 @@ export const usePayment = () => {
         return confirmation;
       } catch (error: any) {
         const errorMessage = error.message || "Failed to confirm payment";
-        
+
         setPaymentState((prev) => ({
           ...prev,
           loading: false,
@@ -107,7 +113,9 @@ export const usePayment = () => {
    * Check payment status
    */
   const checkPaymentStatus = useCallback(
-    async (paymentIntentId: string): Promise<{
+    async (
+      paymentIntentId: string
+    ): Promise<{
       status: string;
       amount: number;
       currency: string;
@@ -137,7 +145,7 @@ export const usePayment = () => {
 
       try {
         const success = await cancelPaymentIntent(paymentIntentId);
-        
+
         setPaymentState((prev) => ({
           ...prev,
           loading: false,
@@ -153,7 +161,7 @@ export const usePayment = () => {
         return success;
       } catch (error: any) {
         const errorMessage = error.message || "Failed to cancel payment";
-        
+
         setPaymentState((prev) => ({
           ...prev,
           loading: false,
@@ -185,10 +193,10 @@ export const usePayment = () => {
   const handleStripePaymentSuccess = useCallback(
     async (
       paymentIntent: any,
-      flightCabinId: number
+      bookingId: number
     ): Promise<FlightBookingConfirmation | null> => {
       if (paymentIntent.status === "succeeded") {
-        return await confirmPayment(paymentIntent.id, flightCabinId);
+        return await confirmPayment(paymentIntent.id, bookingId);
       } else {
         toast.error("Payment was not successful");
         return null;
@@ -202,7 +210,7 @@ export const usePayment = () => {
    */
   const handleStripePaymentError = useCallback((error: any) => {
     const errorMessage = error.message || "Payment failed";
-    
+
     setPaymentState((prev) => ({
       ...prev,
       loading: false,

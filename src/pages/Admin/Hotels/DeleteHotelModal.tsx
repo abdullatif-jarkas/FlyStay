@@ -1,6 +1,12 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { FaTrash, FaExclamationTriangle, FaHotel, FaMapMarkerAlt, FaStar } from "react-icons/fa";
+import {
+  FaTrash,
+  FaExclamationTriangle,
+  FaHotel,
+  FaMapMarkerAlt,
+  FaStar,
+} from "react-icons/fa";
 import { DeleteHotelModalProps } from "../../../types/hotel";
 import { toast } from "sonner";
 
@@ -18,12 +24,14 @@ const DeleteHotelModal: React.FC<DeleteHotelModalProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!hotel) return;
 
     // Validate confirmation name
     if (confirmationName.trim().toLowerCase() !== hotel.name.toLowerCase()) {
-      setError("Hotel name confirmation does not match. Please type the exact hotel name.");
+      setError(
+        "Hotel name confirmation does not match. Please type the exact hotel name."
+      );
       return;
     }
 
@@ -50,9 +58,9 @@ const DeleteHotelModal: React.FC<DeleteHotelModalProps> = ({
       handleClose();
     } catch (err: any) {
       setError(
-        err.response?.data?.message || 
-        err.response?.data?.error || 
-        "Failed to delete hotel"
+        err.response?.data?.message ||
+          err.response?.data?.error ||
+          "Failed to delete hotel"
       );
     } finally {
       setLoading(false);
@@ -65,13 +73,14 @@ const DeleteHotelModal: React.FC<DeleteHotelModalProps> = ({
     onClose();
   };
 
-  const isConfirmationValid = confirmationName.trim().toLowerCase() === hotel?.name.toLowerCase();
+  const isConfirmationValid =
+    confirmationName.trim().toLowerCase() === hotel?.name.toLowerCase();
 
   if (!isOpen || !hotel) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg w-full max-w-md">
+    <div className="fixed inset-0 bg-black/30 backdrop-blur-sm bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-lg w-full max-w-md h-[90vh] overflow-y-auto">
         <div className="border-b px-6 py-4">
           <div className="flex items-center gap-3">
             <div className="flex-shrink-0 w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
@@ -79,7 +88,9 @@ const DeleteHotelModal: React.FC<DeleteHotelModalProps> = ({
             </div>
             <div>
               <h2 className="text-lg font-bold text-gray-800">Delete Hotel</h2>
-              <p className="text-sm text-gray-600">This action cannot be undone</p>
+              <p className="text-sm text-gray-600">
+                This action cannot be undone
+              </p>
             </div>
           </div>
         </div>
@@ -96,19 +107,25 @@ const DeleteHotelModal: React.FC<DeleteHotelModalProps> = ({
             <div className="flex items-start gap-3">
               <FaHotel className="text-gray-600 mt-1" />
               <div className="flex-1">
-                <h3 className="font-semibold text-gray-800 mb-2">{hotel.name}</h3>
+                <h3 className="font-semibold text-gray-800 mb-2">
+                  {hotel.name}
+                </h3>
                 <div className="space-y-1 text-sm text-gray-600">
                   <div className="flex items-center gap-2">
                     <FaMapMarkerAlt className="text-red-500" />
-                    <span>{hotel.city.name}, {hotel.country.name}</span>
+                    <span>
+                      {hotel.city.name}, {hotel.country.name}
+                    </span>
                   </div>
                   <div className="flex items-center gap-2">
                     <div className="flex">
-                      {[1, 2, 3, 4, 5].map(star => (
+                      {[1, 2, 3, 4, 5].map((star) => (
                         <FaStar
                           key={star}
                           className={`text-xs ${
-                            star <= hotel.rating ? 'text-yellow-400' : 'text-gray-300'
+                            star <= hotel.rating
+                              ? "text-yellow-400"
+                              : "text-gray-300"
                           }`}
                         />
                       ))}
@@ -119,10 +136,12 @@ const DeleteHotelModal: React.FC<DeleteHotelModalProps> = ({
                     <span className="font-medium">ID:</span> {hotel.id}
                   </div>
                   <div>
-                    <span className="font-medium">Images:</span> {hotel.images?.length || 0}
+                    <span className="font-medium">Images:</span>{" "}
+                    {hotel.images?.length || 0}
                   </div>
                   <div>
-                    <span className="font-medium">Created:</span> {new Date(hotel.created_at).toLocaleDateString()}
+                    <span className="font-medium">Created:</span>{" "}
+                    {new Date(hotel.created_at).toLocaleDateString()}
                   </div>
                 </div>
               </div>
@@ -134,7 +153,9 @@ const DeleteHotelModal: React.FC<DeleteHotelModalProps> = ({
             <div className="flex gap-3">
               <FaExclamationTriangle className="text-red-500 mt-0.5 flex-shrink-0" />
               <div className="text-sm">
-                <p className="font-medium text-red-800 mb-1">Warning: This action is irreversible!</p>
+                <p className="font-medium text-red-800 mb-1">
+                  Warning: This action is irreversible!
+                </p>
                 <ul className="text-red-700 space-y-1">
                   <li>• The hotel record will be permanently deleted</li>
                   <li>• All associated images will be removed</li>
@@ -166,7 +187,7 @@ const DeleteHotelModal: React.FC<DeleteHotelModalProps> = ({
               }}
               placeholder="Type hotel name here..."
               className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 ${
-                error ? 'border-red-500' : 'border-gray-300'
+                error ? "border-red-500" : "border-gray-300"
               }`}
             />
             <p className="text-xs text-gray-500 mt-1">
@@ -206,10 +227,14 @@ const DeleteHotelModal: React.FC<DeleteHotelModalProps> = ({
           {/* Confirmation Status */}
           <div className="mt-3 text-center">
             {confirmationName && (
-              <p className={`text-xs ${
-                isConfirmationValid ? 'text-green-600' : 'text-red-600'
-              }`}>
-                {isConfirmationValid ? '✓ Name confirmed' : '✗ Name does not match'}
+              <p
+                className={`text-xs ${
+                  isConfirmationValid ? "text-green-600" : "text-red-600"
+                }`}
+              >
+                {isConfirmationValid
+                  ? "✓ Name confirmed"
+                  : "✗ Name does not match"}
               </p>
             )}
           </div>

@@ -105,8 +105,8 @@ export interface PaymentMethodOption {
 
 // Constants
 export const PAYMENT_ENDPOINTS = {
-  CREATE_FLIGHT_PAYMENT_INTENT: (flightCabinId: number) =>
-    `/api/payments/flight-booking/${flightCabinId}`,
+  CREATE_FLIGHT_PAYMENT_INTENT: (bookingId: number) =>
+    `/api/payments/flight-booking/${bookingId}`,
   CONFIRM_PAYMENT: "/api/payments/confirm",
   GET_PAYMENT_STATUS: (paymentIntentId: string) =>
     `/api/payments/status/${paymentIntentId}`,

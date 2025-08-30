@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { FaTimes, FaBed, FaHotel, FaDollarSign, FaUsers } from "react-icons/fa";
-import { 
-  EditRoomModalProps, 
-  EditRoomFormData, 
+import {
+  EditRoomModalProps,
+  EditRoomFormData,
   RoomFormErrors,
   Hotel,
-  ROOM_TYPES
+  ROOM_TYPES,
 } from "../../../types/room";
 
 const EditRoomModal: React.FC<EditRoomModalProps> = ({
@@ -65,11 +65,11 @@ const EditRoomModal: React.FC<EditRoomModalProps> = ({
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-    
+    setFormData((prev) => ({ ...prev, [name]: value }));
+
     // Clear error when user starts typing
     if (errors[name as keyof RoomFormErrors]) {
-      setErrors(prev => ({ ...prev, [name]: undefined }));
+      setErrors((prev) => ({ ...prev, [name]: undefined }));
     }
   };
 
@@ -86,13 +86,19 @@ const EditRoomModal: React.FC<EditRoomModalProps> = ({
 
     if (!formData.price_per_night.trim()) {
       newErrors.price_per_night = "Price per night is required";
-    } else if (isNaN(Number(formData.price_per_night)) || Number(formData.price_per_night) <= 0) {
+    } else if (
+      isNaN(Number(formData.price_per_night)) ||
+      Number(formData.price_per_night) <= 0
+    ) {
       newErrors.price_per_night = "Price must be a valid positive number";
     }
 
     if (!formData.capacity.trim()) {
       newErrors.capacity = "Capacity is required";
-    } else if (isNaN(Number(formData.capacity)) || Number(formData.capacity) <= 0) {
+    } else if (
+      isNaN(Number(formData.capacity)) ||
+      Number(formData.capacity) <= 0
+    ) {
       newErrors.capacity = "Capacity must be a valid positive number";
     }
 
@@ -113,7 +119,7 @@ const EditRoomModal: React.FC<EditRoomModalProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!room || !validateForm()) {
       return;
     }
@@ -129,21 +135,26 @@ const EditRoomModal: React.FC<EditRoomModalProps> = ({
       urlEncodedData.append("price_per_night", formData.price_per_night);
       urlEncodedData.append("capacity", formData.capacity);
 
-      await axios.put(`http://127.0.0.1:8000/api/room/${room.id}`, urlEncodedData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          Accept: "application/json",
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-      });
+      await axios.put(
+        `http://127.0.0.1:8000/api/room/${room.id}`,
+        urlEncodedData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: "application/json",
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+        }
+      );
 
       onSuccess();
       handleClose();
     } catch (err: any) {
       setErrors({
-        general: err.response?.data?.message || 
-                err.response?.data?.error || 
-                "Failed to update room"
+        general:
+          err.response?.data?.message ||
+          err.response?.data?.error ||
+          "Failed to update room",
       });
     } finally {
       setLoading(false);
@@ -153,7 +164,7 @@ const EditRoomModal: React.FC<EditRoomModalProps> = ({
   if (!isOpen || !room) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <div className="fixed inset-0 bg-black/30 backdrop-blur-sm bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
         <div className="flex justify-between items-center p-6 border-b border-gray-200">
           <h2 className="text-xl font-semibold text-gray-800">Edit Room</h2>
@@ -174,12 +185,22 @@ const EditRoomModal: React.FC<EditRoomModalProps> = ({
 
           {/* Current Room Info */}
           <div className="bg-gray-50 p-4 rounded-lg">
-            <h3 className="text-sm font-medium text-gray-700 mb-2">Current Room Information</h3>
+            <h3 className="text-sm font-medium text-gray-700 mb-2">
+              Current Room Information
+            </h3>
             <div className="text-sm text-gray-600">
-              <p><strong>Hotel:</strong> {room.hotel.name}</p>
-              <p><strong>Room Type:</strong> {room.room_type.replace('_', ' ')}</p>
-              <p><strong>Current Price:</strong> ${room.price_per_night}/night</p>
-              <p><strong>Current Capacity:</strong> {room.capacity} guests</p>
+              <p>
+                <strong>Hotel:</strong> {room.hotel.name}
+              </p>
+              <p>
+                <strong>Room Type:</strong> {room.room_type.replace("_", " ")}
+              </p>
+              <p>
+                <strong>Current Price:</strong> ${room.price_per_night}/night
+              </p>
+              <p>
+                <strong>Current Capacity:</strong> {room.capacity} guests
+              </p>
             </div>
           </div>
 
@@ -259,7 +280,9 @@ const EditRoomModal: React.FC<EditRoomModalProps> = ({
                 }`}
               />
               {errors.price_per_night && (
-                <p className="text-red-500 text-sm mt-1">{errors.price_per_night}</p>
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.price_per_night}
+                </p>
               )}
             </div>
 
@@ -289,8 +312,9 @@ const EditRoomModal: React.FC<EditRoomModalProps> = ({
           {/* Note about images */}
           <div className="bg-blue-50 p-4 rounded-lg">
             <p className="text-sm text-blue-700">
-              <strong>Note:</strong> To update room images, use the "Manage Images" button in the actions column.
-              This form only updates room details (hotel, type, price, capacity).
+              <strong>Note:</strong> To update room images, use the "Manage
+              Images" button in the actions column. This form only updates room
+              details (hotel, type, price, capacity).
             </p>
           </div>
 

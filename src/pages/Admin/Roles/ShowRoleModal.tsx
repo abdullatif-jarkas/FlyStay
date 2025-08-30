@@ -45,12 +45,15 @@ const ShowRoleModal: React.FC<ShowRoleModalProps> = ({
     setError("");
 
     try {
-      const response = await axios.get(`http://127.0.0.1:8000/api/role/${roleId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          Accept: "application/json",
-        },
-      });
+      const response = await axios.get(
+        `http://127.0.0.1:8000/api/role/${roleId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: "application/json",
+          },
+        }
+      );
 
       if (response.data.status === "success") {
         setRole(response.data.data[0]);
@@ -59,9 +62,9 @@ const ShowRoleModal: React.FC<ShowRoleModalProps> = ({
       }
     } catch (err: any) {
       setError(
-        err.response?.data?.message || 
-        err.response?.data?.error || 
-        "Failed to load role details"
+        err.response?.data?.message ||
+          err.response?.data?.error ||
+          "Failed to load role details"
       );
     } finally {
       setLoading(false);
@@ -83,7 +86,7 @@ const ShowRoleModal: React.FC<ShowRoleModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-black/30 backdrop-blur-sm bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white rounded-lg p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-bold text-gray-800 flex items-center gap-2">
@@ -117,16 +120,24 @@ const ShowRoleModal: React.FC<ShowRoleModalProps> = ({
             <div className="bg-gray-50 rounded-lg p-4">
               <div className="flex items-center gap-2 mb-2">
                 <FaUser className="text-primary-600" />
-                <h3 className="text-lg font-semibold text-gray-800">Role Information</h3>
+                <h3 className="text-lg font-semibold text-gray-800">
+                  Role Information
+                </h3>
               </div>
               <div className="grid grid-cols-1 gap-3">
                 <div>
-                  <label className="block text-sm font-medium text-gray-600">ID</label>
+                  <label className="block text-sm font-medium text-gray-600">
+                    ID
+                  </label>
                   <p className="text-gray-800 font-mono">{role.id}</p>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-600">Name</label>
-                  <p className="text-gray-800 font-semibold capitalize">{role.name}</p>
+                  <label className="block text-sm font-medium text-gray-600">
+                    Name
+                  </label>
+                  <p className="text-gray-800 font-semibold capitalize">
+                    {role.name}
+                  </p>
                 </div>
               </div>
             </div>
@@ -136,8 +147,7 @@ const ShowRoleModal: React.FC<ShowRoleModalProps> = ({
               <div className="flex items-center gap-2 mb-3">
                 <FaShieldAlt className="text-blue-600" />
                 <h3 className="text-lg font-semibold text-gray-800">
-                  Permissions ({role.permissions.length})
-                  {}
+                  Permissions ({role.permissions.length}){}
                 </h3>
               </div>
               {role.permissions.length > 0 ? (
@@ -152,7 +162,9 @@ const ShowRoleModal: React.FC<ShowRoleModalProps> = ({
                   ))}
                 </div>
               ) : (
-                <p className="text-gray-600 italic">No permissions assigned to this role</p>
+                <p className="text-gray-600 italic">
+                  No permissions assigned to this role
+                </p>
               )}
             </div>
 
@@ -161,19 +173,29 @@ const ShowRoleModal: React.FC<ShowRoleModalProps> = ({
               <div className="bg-green-50 rounded-lg p-4">
                 <div className="flex items-center gap-2 mb-3">
                   <FaCalendarAlt className="text-green-600" />
-                  <h3 className="text-lg font-semibold text-gray-800">Timestamps</h3>
+                  <h3 className="text-lg font-semibold text-gray-800">
+                    Timestamps
+                  </h3>
                 </div>
                 <div className="grid grid-cols-1 gap-3">
                   {role.created_at && (
                     <div>
-                      <label className="block text-sm font-medium text-gray-600">Created At</label>
-                      <p className="text-gray-800">{formatDate(role.created_at)}</p>
+                      <label className="block text-sm font-medium text-gray-600">
+                        Created At
+                      </label>
+                      <p className="text-gray-800">
+                        {formatDate(role.created_at)}
+                      </p>
                     </div>
                   )}
                   {role.updated_at && (
                     <div>
-                      <label className="block text-sm font-medium text-gray-600">Updated At</label>
-                      <p className="text-gray-800">{formatDate(role.updated_at)}</p>
+                      <label className="block text-sm font-medium text-gray-600">
+                        Updated At
+                      </label>
+                      <p className="text-gray-800">
+                        {formatDate(role.updated_at)}
+                      </p>
                     </div>
                   )}
                 </div>

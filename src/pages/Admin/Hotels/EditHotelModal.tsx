@@ -1,7 +1,12 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { FaStar, FaEdit } from "react-icons/fa";
-import { EditHotelModalProps, EditHotelFormData, City, HotelFormErrors } from "../../../types/hotel";
+import {
+  EditHotelModalProps,
+  EditHotelFormData,
+  City,
+  HotelFormErrors,
+} from "../../../types/hotel";
 
 const EditHotelModal: React.FC<EditHotelModalProps> = ({
   isOpen,
@@ -38,13 +43,16 @@ const EditHotelModal: React.FC<EditHotelModalProps> = ({
   const fetchCities = async () => {
     setLoadingCities(true);
     try {
-      const response = await axios.get("http://127.0.0.1:8000/api/get-all-cities", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          Accept: "application/json",
-        },
-        params: { per_page: 100 }, // Get more cities for dropdown
-      });
+      const response = await axios.get(
+        "http://127.0.0.1:8000/api/get-all-cities",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: "application/json",
+          },
+          params: { per_page: 100 }, // Get more cities for dropdown
+        }
+      );
 
       if (response.data.status === "success") {
         setCities(response.data.data);
@@ -56,15 +64,19 @@ const EditHotelModal: React.FC<EditHotelModalProps> = ({
     }
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+  const handleInputChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >
+  ) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       [name]: value,
     }));
     // Clear error when user starts typing
     if (errors[name as keyof HotelFormErrors]) {
-      setErrors(prev => ({
+      setErrors((prev) => ({
         ...prev,
         [name]: undefined,
       }));
@@ -82,7 +94,11 @@ const EditHotelModal: React.FC<EditHotelModalProps> = ({
       newErrors.city_id = "Please select a city";
     }
 
-    if (!formData.rating || parseInt(formData.rating) < 1 || parseInt(formData.rating) > 5) {
+    if (
+      !formData.rating ||
+      parseInt(formData.rating) < 1 ||
+      parseInt(formData.rating) > 5
+    ) {
       newErrors.rating = "Rating must be between 1 and 5";
     }
 
@@ -96,7 +112,7 @@ const EditHotelModal: React.FC<EditHotelModalProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!hotel || !validateForm()) {
       return;
     }
@@ -112,21 +128,26 @@ const EditHotelModal: React.FC<EditHotelModalProps> = ({
       urlEncodedData.append("rating", formData.rating);
       urlEncodedData.append("description", formData.description);
 
-      await axios.put(`http://127.0.0.1:8000/api/hotel/${hotel.id}`, urlEncodedData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          Accept: "application/json",
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-      });
+      await axios.put(
+        `http://127.0.0.1:8000/api/hotel/${hotel.id}`,
+        urlEncodedData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: "application/json",
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+        }
+      );
 
       onSuccess();
       handleClose();
     } catch (err: any) {
       setErrors({
-        general: err.response?.data?.message || 
-                err.response?.data?.error || 
-                "Failed to update hotel"
+        general:
+          err.response?.data?.message ||
+          err.response?.data?.error ||
+          "Failed to update hotel",
       });
     } finally {
       setLoading(false);
@@ -147,7 +168,7 @@ const EditHotelModal: React.FC<EditHotelModalProps> = ({
   if (!isOpen || !hotel) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <div className="fixed inset-0 bg-black/30 backdrop-blur-sm bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto">
         <div className="sticky top-0 bg-white border-b px-6 py-4">
           <div className="flex justify-between items-center">
@@ -170,7 +191,9 @@ const EditHotelModal: React.FC<EditHotelModalProps> = ({
 
           {/* Current Hotel Info */}
           <div className="bg-gray-50 rounded-lg p-4">
-            <h3 className="text-sm font-medium text-gray-700 mb-2">Current Hotel Information</h3>
+            <h3 className="text-sm font-medium text-gray-700 mb-2">
+              Current Hotel Information
+            </h3>
             <div className="grid grid-cols-2 gap-3 text-sm">
               <div>
                 <span className="text-gray-600">ID:</span>
@@ -178,11 +201,15 @@ const EditHotelModal: React.FC<EditHotelModalProps> = ({
               </div>
               <div>
                 <span className="text-gray-600">Current City:</span>
-                <span className="ml-2">{hotel.city.name}, {hotel.country.name}</span>
+                <span className="ml-2">
+                  {hotel.city.name}, {hotel.country.name}
+                </span>
               </div>
               <div>
                 <span className="text-gray-600">Created:</span>
-                <span className="ml-2">{new Date(hotel.created_at).toLocaleDateString()}</span>
+                <span className="ml-2">
+                  {new Date(hotel.created_at).toLocaleDateString()}
+                </span>
               </div>
               <div>
                 <span className="text-gray-600">Images:</span>
@@ -203,10 +230,12 @@ const EditHotelModal: React.FC<EditHotelModalProps> = ({
               onChange={handleInputChange}
               placeholder="Enter hotel name"
               className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 ${
-                errors.name ? 'border-red-500' : 'border-gray-300'
+                errors.name ? "border-red-500" : "border-gray-300"
               }`}
             />
-            {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
+            {errors.name && (
+              <p className="text-red-500 text-xs mt-1">{errors.name}</p>
+            )}
           </div>
 
           {/* City Selection */}
@@ -220,7 +249,7 @@ const EditHotelModal: React.FC<EditHotelModalProps> = ({
               onChange={handleInputChange}
               disabled={loadingCities}
               className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 ${
-                errors.city_id ? 'border-red-500' : 'border-gray-300'
+                errors.city_id ? "border-red-500" : "border-gray-300"
               }`}
             >
               <option value="">
@@ -232,7 +261,9 @@ const EditHotelModal: React.FC<EditHotelModalProps> = ({
                 </option>
               ))}
             </select>
-            {errors.city_id && <p className="text-red-500 text-xs mt-1">{errors.city_id}</p>}
+            {errors.city_id && (
+              <p className="text-red-500 text-xs mt-1">{errors.city_id}</p>
+            )}
           </div>
 
           {/* Rating */}
@@ -246,25 +277,31 @@ const EditHotelModal: React.FC<EditHotelModalProps> = ({
                 value={formData.rating}
                 onChange={handleInputChange}
                 className={`px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 ${
-                  errors.rating ? 'border-red-500' : 'border-gray-300'
+                  errors.rating ? "border-red-500" : "border-gray-300"
                 }`}
               >
-                {[1, 2, 3, 4, 5].map(num => (
-                  <option key={num} value={num}>{num}</option>
+                {[1, 2, 3, 4, 5].map((num) => (
+                  <option key={num} value={num}>
+                    {num}
+                  </option>
                 ))}
               </select>
               <div className="flex">
-                {[1, 2, 3, 4, 5].map(star => (
+                {[1, 2, 3, 4, 5].map((star) => (
                   <FaStar
                     key={star}
                     className={`text-lg ${
-                      star <= parseInt(formData.rating) ? 'text-yellow-400' : 'text-gray-300'
+                      star <= parseInt(formData.rating)
+                        ? "text-yellow-400"
+                        : "text-gray-300"
                     }`}
                   />
                 ))}
               </div>
             </div>
-            {errors.rating && <p className="text-red-500 text-xs mt-1">{errors.rating}</p>}
+            {errors.rating && (
+              <p className="text-red-500 text-xs mt-1">{errors.rating}</p>
+            )}
           </div>
 
           {/* Description */}
@@ -279,17 +316,20 @@ const EditHotelModal: React.FC<EditHotelModalProps> = ({
               rows={4}
               placeholder="Enter hotel description..."
               className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 resize-vertical ${
-                errors.description ? 'border-red-500' : 'border-gray-300'
+                errors.description ? "border-red-500" : "border-gray-300"
               }`}
             />
-            {errors.description && <p className="text-red-500 text-xs mt-1">{errors.description}</p>}
+            {errors.description && (
+              <p className="text-red-500 text-xs mt-1">{errors.description}</p>
+            )}
           </div>
 
           {/* Note about images */}
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
             <p className="text-blue-800 text-sm">
-              <strong>Note:</strong> To update hotel images, use the "Manage Images" action from the main table. 
-              This form only updates basic hotel information.
+              <strong>Note:</strong> To update hotel images, use the "Manage
+              Images" action from the main table. This form only updates basic
+              hotel information.
             </p>
           </div>
 

@@ -1,15 +1,19 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { FaKey, FaTimes, FaSpinner, FaExclamationTriangle } from "react-icons/fa";
-import { RemovePermissionFromUserModalProps, ROLE_PERMISSION_ENDPOINTS } from "../../../types/rolePermission";
+import {
+  FaKey,
+  FaTimes,
+  FaSpinner,
+  FaExclamationTriangle,
+} from "react-icons/fa";
+import {
+  RemovePermissionFromUserModalProps,
+  ROLE_PERMISSION_ENDPOINTS,
+} from "../../../types/rolePermission";
 
-const RemovePermissionFromUserModal: React.FC<RemovePermissionFromUserModalProps> = ({
-  isOpen,
-  onClose,
-  onSuccess,
-  user,
-  permissionToRemove,
-}) => {
+const RemovePermissionFromUserModal: React.FC<
+  RemovePermissionFromUserModalProps
+> = ({ isOpen, onClose, onSuccess, user, permissionToRemove }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [confirmationText, setConfirmationText] = useState("");
@@ -54,9 +58,9 @@ const RemovePermissionFromUserModal: React.FC<RemovePermissionFromUserModalProps
     } catch (err: any) {
       console.error("Error removing permission:", err);
       setError(
-        err.response?.data?.message || 
-        err.response?.data?.errors?.permission_name?.[0] ||
-        "Failed to remove permission"
+        err.response?.data?.message ||
+          err.response?.data?.errors?.permission_name?.[0] ||
+          "Failed to remove permission"
       );
     } finally {
       setLoading(false);
@@ -72,7 +76,7 @@ const RemovePermissionFromUserModal: React.FC<RemovePermissionFromUserModalProps
   if (!isOpen || !user || !permissionToRemove) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-black/30 backdrop-blur-sm bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
           <div className="flex items-center">
@@ -96,8 +100,10 @@ const RemovePermissionFromUserModal: React.FC<RemovePermissionFromUserModalProps
               <p className="font-medium text-red-800">Warning</p>
             </div>
             <p className="text-sm text-red-700">
-              You are about to remove the direct permission "{permissionToRemove.name}" from user "{user.name}". 
-              This will only remove the direct permission assignment, not permissions granted through roles.
+              You are about to remove the direct permission "
+              {permissionToRemove.name}" from user "{user.name}". This will only
+              remove the direct permission assignment, not permissions granted
+              through roles.
             </p>
           </div>
 
@@ -109,13 +115,16 @@ const RemovePermissionFromUserModal: React.FC<RemovePermissionFromUserModalProps
 
           <div className="mb-4 p-3 bg-gray-50 rounded-lg">
             <p className="text-sm text-gray-600">Permission to remove:</p>
-            <p className="font-medium text-gray-900">{permissionToRemove.name}</p>
+            <p className="font-medium text-gray-900">
+              {permissionToRemove.name}
+            </p>
           </div>
 
           {user.roles && user.roles.length > 0 && (
             <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
               <p className="text-sm text-blue-800">
-                <strong>Note:</strong> This user may still have this permission through their roles:
+                <strong>Note:</strong> This user may still have this permission
+                through their roles:
               </p>
               <div className="flex flex-wrap gap-1 mt-2">
                 {user.roles.map((role) => (

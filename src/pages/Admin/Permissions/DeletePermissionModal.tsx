@@ -41,20 +41,23 @@ const DeletePermissionModal: React.FC<DeletePermissionModalProps> = ({
     setError("");
 
     try {
-      await axios.delete(`http://127.0.0.1:8000/api/permission/${permission.id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          Accept: "application/json",
-        },
-      });
+      await axios.delete(
+        `http://127.0.0.1:8000/api/permission/${permission.id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: "application/json",
+          },
+        }
+      );
 
       onSuccess();
       onClose();
     } catch (err: any) {
       setError(
-        err.response?.data?.message || 
-        err.response?.data?.error || 
-        "Failed to delete permission"
+        err.response?.data?.message ||
+          err.response?.data?.error ||
+          "Failed to delete permission"
       );
     } finally {
       setLoading(false);
@@ -69,15 +72,19 @@ const DeletePermissionModal: React.FC<DeletePermissionModalProps> = ({
   if (!isOpen || !permission) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-black/30 backdrop-blur-sm bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white rounded-lg p-6 w-full max-w-md">
         <div className="flex items-center gap-3 mb-4">
           <div className="flex-shrink-0">
             <FaExclamationTriangle className="text-red-500 text-2xl" />
           </div>
           <div>
-            <h2 className="text-xl font-bold text-gray-800">Delete Permission</h2>
-            <p className="text-gray-600 text-sm">This action cannot be undone</p>
+            <h2 className="text-xl font-bold text-gray-800">
+              Delete Permission
+            </h2>
+            <p className="text-gray-600 text-sm">
+              This action cannot be undone
+            </p>
           </div>
         </div>
 
@@ -89,9 +96,10 @@ const DeletePermissionModal: React.FC<DeletePermissionModalProps> = ({
 
         <div className="mb-6">
           <p className="text-gray-700 mb-4">
-            Are you sure you want to delete the permission <strong>"{permission.name}"</strong>?
+            Are you sure you want to delete the permission{" "}
+            <strong>"{permission.name}"</strong>?
           </p>
-          
+
           {/* Permission Details */}
           <div className="bg-gray-50 rounded-lg p-3 mb-4">
             <div className="grid grid-cols-2 gap-3 text-sm">
@@ -114,7 +122,8 @@ const DeletePermissionModal: React.FC<DeletePermissionModalProps> = ({
               <div className="flex items-center gap-2 mb-2">
                 <FaUsers className="text-yellow-600" />
                 <p className="text-yellow-800 text-sm font-medium">
-                  ⚠️ This permission is associated with {permission.related_roles.length} role(s):
+                  ⚠️ This permission is associated with{" "}
+                  {permission.related_roles.length} role(s):
                 </p>
               </div>
               <div className="flex flex-wrap gap-1">
@@ -133,7 +142,8 @@ const DeletePermissionModal: React.FC<DeletePermissionModalProps> = ({
                 )}
               </div>
               <p className="text-yellow-700 text-xs mt-2">
-                Deleting this permission may affect the functionality of these roles.
+                Deleting this permission may affect the functionality of these
+                roles.
               </p>
             </div>
           )}

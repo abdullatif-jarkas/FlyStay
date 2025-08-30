@@ -1,7 +1,10 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { FaUserPlus, FaTimes, FaSpinner } from "react-icons/fa";
-import { AssignRoleModalProps, ROLE_PERMISSION_ENDPOINTS } from "../../../types/rolePermission";
+import {
+  AssignRoleModalProps,
+  ROLE_PERMISSION_ENDPOINTS,
+} from "../../../types/rolePermission";
 
 const AssignRoleModal: React.FC<AssignRoleModalProps> = ({
   isOpen,
@@ -24,7 +27,9 @@ const AssignRoleModal: React.FC<AssignRoleModalProps> = ({
     setError("");
 
     try {
-      const selectedRole = availableRoles.find(role => role.id.toString() === selectedRoleId);
+      const selectedRole = availableRoles.find(
+        (role) => role.id.toString() === selectedRoleId
+      );
       if (!selectedRole) {
         setError("Please select a valid role");
         return;
@@ -55,9 +60,9 @@ const AssignRoleModal: React.FC<AssignRoleModalProps> = ({
     } catch (err: any) {
       console.error("Error assigning role:", err);
       setError(
-        err.response?.data?.message || 
-        err.response?.data?.errors?.name?.[0] ||
-        "Failed to assign role"
+        err.response?.data?.message ||
+          err.response?.data?.errors?.name?.[0] ||
+          "Failed to assign role"
       );
     } finally {
       setLoading(false);
@@ -73,13 +78,13 @@ const AssignRoleModal: React.FC<AssignRoleModalProps> = ({
   if (!isOpen) return null;
 
   // Filter out roles that user already has
-  const userRoleNames = user?.roles?.map(role => role.name) || [];
+  const userRoleNames = user?.roles?.map((role) => role.name) || [];
   const availableRolesToAssign = availableRoles.filter(
-    role => !userRoleNames.includes(role.name)
+    (role) => !userRoleNames.includes(role.name)
   );
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-black/30 backdrop-blur-sm bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
           <div className="flex items-center">
@@ -125,7 +130,8 @@ const AssignRoleModal: React.FC<AssignRoleModalProps> = ({
               {availableRolesToAssign.map((role) => (
                 <option key={role.id} value={role.id}>
                   {role.name}
-                  {role.permissions && ` (${role.permissions.length} permissions)`}
+                  {role.permissions &&
+                    ` (${role.permissions.length} permissions)`}
                 </option>
               ))}
             </select>
@@ -147,7 +153,11 @@ const AssignRoleModal: React.FC<AssignRoleModalProps> = ({
             </button>
             <button
               type="submit"
-              disabled={loading || !selectedRoleId || availableRolesToAssign.length === 0}
+              disabled={
+                loading ||
+                !selectedRoleId ||
+                availableRolesToAssign.length === 0
+              }
               className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
             >
               {loading && <FaSpinner className="animate-spin mr-2" />}

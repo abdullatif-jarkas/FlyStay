@@ -1,15 +1,20 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { FaKey, FaTimes, FaSpinner, FaExclamationTriangle, FaUserShield } from "react-icons/fa";
-import { RemovePermissionFromRoleModalProps, ROLE_PERMISSION_ENDPOINTS } from "../../../types/rolePermission";
+import {
+  FaKey,
+  FaTimes,
+  FaSpinner,
+  FaExclamationTriangle,
+  FaUserShield,
+} from "react-icons/fa";
+import {
+  RemovePermissionFromRoleModalProps,
+  ROLE_PERMISSION_ENDPOINTS,
+} from "../../../types/rolePermission";
 
-const RemovePermissionFromRoleModal: React.FC<RemovePermissionFromRoleModalProps> = ({
-  isOpen,
-  onClose,
-  onSuccess,
-  role,
-  permissionToRemove,
-}) => {
+const RemovePermissionFromRoleModal: React.FC<
+  RemovePermissionFromRoleModalProps
+> = ({ isOpen, onClose, onSuccess, role, permissionToRemove }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [confirmationText, setConfirmationText] = useState("");
@@ -49,15 +54,17 @@ const RemovePermissionFromRoleModal: React.FC<RemovePermissionFromRoleModalProps
         onClose();
         setConfirmationText("");
       } else {
-        setError(response.data.message || "Failed to remove permission from role");
+        setError(
+          response.data.message || "Failed to remove permission from role"
+        );
       }
     } catch (err: any) {
       console.error("Error removing permission from role:", err);
       setError(
-        err.response?.data?.message || 
-        err.response?.data?.errors?.permission_name?.[0] ||
-        err.response?.data?.errors?.role_name?.[0] ||
-        "Failed to remove permission from role"
+        err.response?.data?.message ||
+          err.response?.data?.errors?.permission_name?.[0] ||
+          err.response?.data?.errors?.role_name?.[0] ||
+          "Failed to remove permission from role"
       );
     } finally {
       setLoading(false);
@@ -73,7 +80,7 @@ const RemovePermissionFromRoleModal: React.FC<RemovePermissionFromRoleModalProps
   if (!isOpen || !role || !permissionToRemove) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-black/30 backdrop-blur-sm bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
           <div className="flex items-center">
@@ -97,9 +104,10 @@ const RemovePermissionFromRoleModal: React.FC<RemovePermissionFromRoleModalProps
               <p className="font-medium text-red-800">Warning</p>
             </div>
             <p className="text-sm text-red-700">
-              You are about to remove the permission "{permissionToRemove.name}" from role "{role.name}". 
-              This will affect all users who have this role and will revoke this permission from them 
-              (unless they have it through another role or direct assignment).
+              You are about to remove the permission "{permissionToRemove.name}"
+              from role "{role.name}". This will affect all users who have this
+              role and will revoke this permission from them (unless they have
+              it through another role or direct assignment).
             </p>
           </div>
 
@@ -118,7 +126,9 @@ const RemovePermissionFromRoleModal: React.FC<RemovePermissionFromRoleModalProps
 
           <div className="mb-4 p-3 bg-gray-50 rounded-lg">
             <p className="text-sm text-gray-600">Permission to remove:</p>
-            <p className="font-medium text-gray-900">{permissionToRemove.name}</p>
+            <p className="font-medium text-gray-900">
+              {permissionToRemove.name}
+            </p>
           </div>
 
           {error && (

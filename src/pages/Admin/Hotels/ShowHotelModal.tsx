@@ -99,7 +99,7 @@ const ShowHotelModal: React.FC<ShowHotelModalProps> = ({
 
   return (
     <>
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="fixed inset-0 bg-black/30 backdrop-blur-sm bg-opacity-50 flex items-center justify-center z-50 p-4">
         <div className="bg-white rounded-lg w-full max-w-4xl max-h-[90vh] overflow-y-auto">
           <div className="sticky z-10 top-0 bg-white border-b px-6 py-4">
             <div className="flex justify-between items-center">
@@ -223,14 +223,14 @@ const ShowHotelModal: React.FC<ShowHotelModalProps> = ({
                         {hotel.images.map((image, index) => {
                           return (
                             <button
-                            key={image.id}
-                            onClick={() => setCurrentImageIndex(index)}
-                            className={`flex-shrink-0 w-16 h-16 rounded border-2 overflow-hidden ${
+                              key={image.id}
+                              onClick={() => setCurrentImageIndex(index)}
+                              className={`flex-shrink-0 w-16 h-16 rounded border-2 overflow-hidden ${
                                 index === currentImageIndex
                                   ? "border-primary-500"
                                   : "border-gray-300"
                               }`}
-                              >
+                            >
                               <img
                                 src={image.url}
                                 alt={`Thumbnail ${index + 1}`}

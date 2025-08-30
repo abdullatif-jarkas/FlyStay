@@ -1,15 +1,14 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { FaKey, FaTimes, FaSpinner } from "react-icons/fa";
-import { AssignPermissionToUserModalProps, ROLE_PERMISSION_ENDPOINTS } from "../../../types/rolePermission";
+import {
+  AssignPermissionToUserModalProps,
+  ROLE_PERMISSION_ENDPOINTS,
+} from "../../../types/rolePermission";
 
-const AssignPermissionToUserModal: React.FC<AssignPermissionToUserModalProps> = ({
-  isOpen,
-  onClose,
-  onSuccess,
-  user,
-  availablePermissions,
-}) => {
+const AssignPermissionToUserModal: React.FC<
+  AssignPermissionToUserModalProps
+> = ({ isOpen, onClose, onSuccess, user, availablePermissions }) => {
   const [selectedPermissionId, setSelectedPermissionId] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -25,7 +24,7 @@ const AssignPermissionToUserModal: React.FC<AssignPermissionToUserModalProps> = 
 
     try {
       const selectedPermission = availablePermissions.find(
-        permission => permission.id.toString() === selectedPermissionId
+        (permission) => permission.id.toString() === selectedPermissionId
       );
       if (!selectedPermission) {
         setError("Please select a valid permission");
@@ -57,9 +56,9 @@ const AssignPermissionToUserModal: React.FC<AssignPermissionToUserModalProps> = 
     } catch (err: any) {
       console.error("Error assigning permission:", err);
       setError(
-        err.response?.data?.message || 
-        err.response?.data?.errors?.permission_name?.[0] ||
-        "Failed to assign permission"
+        err.response?.data?.message ||
+          err.response?.data?.errors?.permission_name?.[0] ||
+          "Failed to assign permission"
       );
     } finally {
       setLoading(false);
@@ -75,13 +74,14 @@ const AssignPermissionToUserModal: React.FC<AssignPermissionToUserModalProps> = 
   if (!isOpen) return null;
 
   // Filter out permissions that user already has (directly assigned)
-  const userPermissionNames = user?.permissions?.map(permission => permission.name) || [];
+  const userPermissionNames =
+    user?.permissions?.map((permission) => permission.name) || [];
   const availablePermissionsToAssign = availablePermissions.filter(
-    permission => !userPermissionNames.includes(permission.name)
+    (permission) => !userPermissionNames.includes(permission.name)
   );
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-black/30 backdrop-blur-sm bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
           <div className="flex items-center">
@@ -130,8 +130,9 @@ const AssignPermissionToUserModal: React.FC<AssignPermissionToUserModalProps> = 
 
           <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
             <p className="text-sm text-blue-800">
-              <strong>Note:</strong> This will assign the permission directly to the user, 
-              in addition to any permissions they may have through their roles.
+              <strong>Note:</strong> This will assign the permission directly to
+              the user, in addition to any permissions they may have through
+              their roles.
             </p>
           </div>
 
@@ -154,7 +155,8 @@ const AssignPermissionToUserModal: React.FC<AssignPermissionToUserModalProps> = 
             </select>
             {availablePermissionsToAssign.length === 0 && (
               <p className="text-sm text-gray-500 mt-2">
-                No additional permissions available to assign directly to this user.
+                No additional permissions available to assign directly to this
+                user.
               </p>
             )}
           </div>
@@ -170,7 +172,11 @@ const AssignPermissionToUserModal: React.FC<AssignPermissionToUserModalProps> = 
             </button>
             <button
               type="submit"
-              disabled={loading || !selectedPermissionId || availablePermissionsToAssign.length === 0}
+              disabled={
+                loading ||
+                !selectedPermissionId ||
+                availablePermissionsToAssign.length === 0
+              }
               className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
             >
               {loading && <FaSpinner className="animate-spin mr-2" />}

@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { 
-  FaTimes, 
-  FaUpload, 
-  FaTrash, 
-  FaImages, 
+import {
+  FaTimes,
+  FaUpload,
+  FaTrash,
+  FaImages,
   FaPlus,
   FaExclamationTriangle,
   FaBed,
 } from "react-icons/fa";
-import { 
-  UpdateRoomImagesModalProps, 
-  ImagePreview, 
+import {
+  UpdateRoomImagesModalProps,
+  ImagePreview,
   // DeleteImageConfirmation,
 } from "../../../types/room";
 
@@ -43,17 +43,18 @@ const UpdateRoomImagesModal: React.FC<UpdateRoomImagesModalProps> = ({
   }, [isOpen, room]);
 
   const formatRoomType = (roomType: string) => {
-    return roomType.split('_').map(word => 
-      word.charAt(0).toUpperCase() + word.slice(1)
-    ).join(' ');
+    return roomType
+      .split("_")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");
   };
 
   const handleNewImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
-    
+
     // Validate file types and sizes
-    const validFiles = files.filter(file => {
-      const isValidType = file.type.startsWith('image/');
+    const validFiles = files.filter((file) => {
+      const isValidType = file.type.startsWith("image/");
       const isValidSize = file.size <= 5 * 1024 * 1024; // 5MB limit
       return isValidType && isValidSize;
     });
@@ -65,36 +66,36 @@ const UpdateRoomImagesModal: React.FC<UpdateRoomImagesModalProps> = ({
     }
 
     // Create previews for new images
-    const newPreviews: ImagePreview[] = validFiles.map(file => ({
+    const newPreviews: ImagePreview[] = validFiles.map((file) => ({
       file,
       url: URL.createObjectURL(file),
       id: Math.random().toString(36).substr(2, 9),
     }));
 
-    setNewImagePreviews(prev => [...prev, ...newPreviews]);
-    setNewImages(prev => [...prev, ...validFiles]);
+    setNewImagePreviews((prev) => [...prev, ...newPreviews]);
+    setNewImages((prev) => [...prev, ...validFiles]);
   };
 
   const removeNewImage = (index: number) => {
     const preview = newImagePreviews[index];
     URL.revokeObjectURL(preview.url);
 
-    setNewImagePreviews(prev => prev.filter((_, i) => i !== index));
-    setNewImages(prev => prev.filter((_, i) => i !== index));
+    setNewImagePreviews((prev) => prev.filter((_, i) => i !== index));
+    setNewImages((prev) => prev.filter((_, i) => i !== index));
   };
 
   const toggleDeleteImage = (imageId: number) => {
-    // setDeleteConfirmations(prev => 
-    //   prev.map((conf: any) => 
-    //     conf.id === imageId 
+    // setDeleteConfirmations(prev =>
+    //   prev.map((conf: any) =>
+    //     conf.id === imageId
     //       ? { ...conf, confirmed: !conf.confirmed }
     //       : conf
     //   )
     // );
 
-    setImagesToDelete(prev => {
+    setImagesToDelete((prev) => {
       if (prev.includes(imageId)) {
-        return prev.filter(id => id !== imageId);
+        return prev.filter((id) => id !== imageId);
       } else {
         return [...prev, imageId];
       }
@@ -103,8 +104,8 @@ const UpdateRoomImagesModal: React.FC<UpdateRoomImagesModalProps> = ({
 
   const handleClose = () => {
     // Clean up new image previews
-    newImagePreviews.forEach(preview => URL.revokeObjectURL(preview.url));
-    
+    newImagePreviews.forEach((preview) => URL.revokeObjectURL(preview.url));
+
     setNewImages([]);
     setNewImagePreviews([]);
     setImagesToDelete([]);
@@ -115,12 +116,14 @@ const UpdateRoomImagesModal: React.FC<UpdateRoomImagesModalProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!room) return;
 
     // Check if there are any changes
     if (newImages.length === 0 && imagesToDelete.length === 0) {
-      setError("No changes to save. Please add new images or select images to delete.");
+      setError(
+        "No changes to save. Please add new images or select images to delete."
+      );
       return;
     }
 
@@ -129,23 +132,23 @@ const UpdateRoomImagesModal: React.FC<UpdateRoomImagesModalProps> = ({
 
     try {
       const formData = new FormData();
-      
+
       // Add method override for Laravel
       formData.append("_method", "PUT");
-      
+
       // Add new images
       newImages.forEach((image, index) => {
         formData.append(`new_photos[${index}]`, image);
       });
-      
+
       // Add images to delete
       imagesToDelete.forEach((imageId, index) => {
         formData.append(`deleted_photos[${index}]`, imageId.toString());
       });
 
       await axios.post(
-        `http://127.0.0.1:8000/api/rooms/${room.id}/update-with-photo`, 
-        formData, 
+        `http://127.0.0.1:8000/api/rooms/${room.id}/update-with-photo`,
+        formData,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -159,9 +162,9 @@ const UpdateRoomImagesModal: React.FC<UpdateRoomImagesModalProps> = ({
       handleClose();
     } catch (err: any) {
       setError(
-        err.response?.data?.message || 
-        err.response?.data?.error || 
-        "Failed to update room images"
+        err.response?.data?.message ||
+          err.response?.data?.error ||
+          "Failed to update room images"
       );
     } finally {
       setLoading(false);
@@ -174,7 +177,7 @@ const UpdateRoomImagesModal: React.FC<UpdateRoomImagesModalProps> = ({
   const hasChanges = newImages.length > 0 || imagesToDelete.length > 0;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <div className="fixed inset-0 bg-black/30 backdrop-blur-sm bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
         <div className="flex justify-between items-center p-6 border-b border-gray-200">
           <h2 className="text-xl font-semibold text-gray-800 flex items-center gap-2">
@@ -203,9 +206,15 @@ const UpdateRoomImagesModal: React.FC<UpdateRoomImagesModalProps> = ({
               Room Information
             </h3>
             <div className="text-sm text-gray-600">
-              <p><strong>Room Type:</strong> {formatRoomType(room.room_type)}</p>
-              <p><strong>Hotel:</strong> {room.hotel.name}</p>
-              <p><strong>Current Images:</strong> {existingImages.length} photos</p>
+              <p>
+                <strong>Room Type:</strong> {formatRoomType(room.room_type)}
+              </p>
+              <p>
+                <strong>Hotel:</strong> {room.hotel.name}
+              </p>
+              <p>
+                <strong>Current Images:</strong> {existingImages.length} photos
+              </p>
             </div>
           </div>
 
@@ -216,19 +225,20 @@ const UpdateRoomImagesModal: React.FC<UpdateRoomImagesModalProps> = ({
                 Current Images ({existingImages.length})
               </h4>
               <p className="text-sm text-gray-600">
-                Click on images you want to delete. Selected images will be marked with a red overlay.
+                Click on images you want to delete. Selected images will be
+                marked with a red overlay.
               </p>
-              
+
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                 {existingImages.map((image) => {
                   const isMarkedForDeletion = imagesToDelete.includes(image.id);
                   return (
                     <div key={image.id} className="relative group">
-                      <div 
+                      <div
                         className={`relative cursor-pointer rounded-lg overflow-hidden border-2 transition-all ${
-                          isMarkedForDeletion 
-                            ? 'border-red-500 ring-2 ring-red-200' 
-                            : 'border-gray-200 hover:border-gray-300'
+                          isMarkedForDeletion
+                            ? "border-red-500 ring-2 ring-red-200"
+                            : "border-gray-200 hover:border-gray-300"
                         }`}
                         onClick={() => toggleDeleteImage(image.id)}
                       >
@@ -237,21 +247,21 @@ const UpdateRoomImagesModal: React.FC<UpdateRoomImagesModalProps> = ({
                           alt={`Room image ${image.id}`}
                           className="w-full h-24 object-cover"
                         />
-                        
+
                         {/* Delete Overlay */}
                         {isMarkedForDeletion && (
                           <div className="absolute inset-0 bg-red-500 bg-opacity-50 flex items-center justify-center">
                             <FaTrash className="text-white text-xl" />
                           </div>
                         )}
-                        
+
                         {/* Delete Button */}
                         <button
                           type="button"
                           className={`absolute top-1 right-1 p-1 rounded-full transition-all ${
                             isMarkedForDeletion
-                              ? 'bg-red-500 text-white'
-                              : 'bg-black bg-opacity-50 text-white opacity-0 group-hover:opacity-100'
+                              ? "bg-red-500 text-white"
+                              : "bg-black bg-opacity-50 text-white opacity-0 group-hover:opacity-100"
                           }`}
                           onClick={(e) => {
                             e.stopPropagation();
@@ -265,7 +275,7 @@ const UpdateRoomImagesModal: React.FC<UpdateRoomImagesModalProps> = ({
                   );
                 })}
               </div>
-              
+
               {imagesToDelete.length > 0 && (
                 <div className="bg-red-50 border border-red-200 p-3 rounded-lg">
                   <div className="flex items-start gap-2">
@@ -274,7 +284,10 @@ const UpdateRoomImagesModal: React.FC<UpdateRoomImagesModalProps> = ({
                       <p className="font-medium">
                         {imagesToDelete.length} image(s) selected for deletion
                       </p>
-                      <p>These images will be permanently removed when you save changes.</p>
+                      <p>
+                        These images will be permanently removed when you save
+                        changes.
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -288,7 +301,7 @@ const UpdateRoomImagesModal: React.FC<UpdateRoomImagesModalProps> = ({
               <FaPlus className="text-green-500" />
               Add New Images
             </h4>
-            
+
             <div>
               <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
                 <FaUpload className="text-primary-500" />
@@ -302,7 +315,8 @@ const UpdateRoomImagesModal: React.FC<UpdateRoomImagesModalProps> = ({
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
               />
               <p className="text-xs text-gray-500 mt-1">
-                Maximum file size: 5MB per image. Supported formats: JPG, PNG, GIF, WebP
+                Maximum file size: 5MB per image. Supported formats: JPG, PNG,
+                GIF, WebP
               </p>
             </div>
 
@@ -337,13 +351,17 @@ const UpdateRoomImagesModal: React.FC<UpdateRoomImagesModalProps> = ({
           {/* Summary */}
           {hasChanges && (
             <div className="bg-blue-50 border border-blue-200 p-4 rounded-lg">
-              <h4 className="font-medium text-blue-800 mb-2">Changes Summary:</h4>
+              <h4 className="font-medium text-blue-800 mb-2">
+                Changes Summary:
+              </h4>
               <ul className="text-sm text-blue-700 space-y-1">
                 {newImages.length > 0 && (
                   <li>• {newImages.length} new image(s) will be added</li>
                 )}
                 {imagesToDelete.length > 0 && (
-                  <li>• {imagesToDelete.length} existing image(s) will be deleted</li>
+                  <li>
+                    • {imagesToDelete.length} existing image(s) will be deleted
+                  </li>
                 )}
               </ul>
             </div>

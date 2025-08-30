@@ -60,21 +60,25 @@ const EditPermissionModal: React.FC<EditPermissionModalProps> = ({
       const urlEncodedData = new URLSearchParams();
       urlEncodedData.append("name", formData.name);
 
-      await axios.put(`http://127.0.0.1:8000/api/permission/${permission.id}`, urlEncodedData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          Accept: "application/json",
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-      });
+      await axios.put(
+        `http://127.0.0.1:8000/api/permission/${permission.id}`,
+        urlEncodedData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: "application/json",
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+        }
+      );
 
       onSuccess();
       onClose();
     } catch (err: any) {
       setError(
-        err.response?.data?.message || 
-        err.response?.data?.error || 
-        "Failed to update permission"
+        err.response?.data?.message ||
+          err.response?.data?.error ||
+          "Failed to update permission"
       );
     } finally {
       setLoading(false);
@@ -83,7 +87,7 @@ const EditPermissionModal: React.FC<EditPermissionModalProps> = ({
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       [name]: value,
     }));
@@ -98,7 +102,7 @@ const EditPermissionModal: React.FC<EditPermissionModalProps> = ({
   if (!isOpen || !permission) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-black/30 backdrop-blur-sm bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white rounded-lg p-6 w-full max-w-md">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-bold text-gray-800">Edit Permission</h2>
@@ -162,7 +166,9 @@ const EditPermissionModal: React.FC<EditPermissionModalProps> = ({
                 <p className="text-gray-800">{permission.guard}</p>
               </div>
               <div>
-                <label className="block text-gray-600 font-medium">Created</label>
+                <label className="block text-gray-600 font-medium">
+                  Created
+                </label>
                 <p className="text-gray-800">
                   {new Date(permission.created_at).toLocaleDateString()}
                 </p>

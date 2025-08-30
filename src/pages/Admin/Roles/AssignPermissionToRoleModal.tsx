@@ -1,15 +1,14 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { FaKey, FaTimes, FaSpinner, FaUserShield } from "react-icons/fa";
-import { AssignPermissionToRoleModalProps, ROLE_PERMISSION_ENDPOINTS } from "../../../types/rolePermission";
+import {
+  AssignPermissionToRoleModalProps,
+  ROLE_PERMISSION_ENDPOINTS,
+} from "../../../types/rolePermission";
 
-const AssignPermissionToRoleModal: React.FC<AssignPermissionToRoleModalProps> = ({
-  isOpen,
-  onClose,
-  onSuccess,
-  role,
-  availablePermissions,
-}) => {
+const AssignPermissionToRoleModal: React.FC<
+  AssignPermissionToRoleModalProps
+> = ({ isOpen, onClose, onSuccess, role, availablePermissions }) => {
   const [selectedPermissionId, setSelectedPermissionId] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -25,7 +24,7 @@ const AssignPermissionToRoleModal: React.FC<AssignPermissionToRoleModalProps> = 
 
     try {
       const selectedPermission = availablePermissions.find(
-        permission => permission.id.toString() === selectedPermissionId
+        (permission) => permission.id.toString() === selectedPermissionId
       );
       if (!selectedPermission) {
         setError("Please select a valid permission");
@@ -52,15 +51,17 @@ const AssignPermissionToRoleModal: React.FC<AssignPermissionToRoleModalProps> = 
         onClose();
         setSelectedPermissionId("");
       } else {
-        setError(response.data.message || "Failed to assign permission to role");
+        setError(
+          response.data.message || "Failed to assign permission to role"
+        );
       }
     } catch (err: any) {
       console.error("Error assigning permission to role:", err);
       setError(
-        err.response?.data?.message || 
-        err.response?.data?.errors?.permission_name?.[0] ||
-        err.response?.data?.errors?.role_name?.[0] ||
-        "Failed to assign permission to role"
+        err.response?.data?.message ||
+          err.response?.data?.errors?.permission_name?.[0] ||
+          err.response?.data?.errors?.role_name?.[0] ||
+          "Failed to assign permission to role"
       );
     } finally {
       setLoading(false);
@@ -76,13 +77,14 @@ const AssignPermissionToRoleModal: React.FC<AssignPermissionToRoleModalProps> = 
   if (!isOpen) return null;
 
   // Filter out permissions that role already has
-  const rolePermissionNames = role?.permissions?.map(permission => permission.name) || [];
+  const rolePermissionNames =
+    role?.permissions?.map((permission) => permission.name) || [];
   const availablePermissionsToAssign = availablePermissions.filter(
-    permission => !rolePermissionNames.includes(permission.name)
+    (permission) => !rolePermissionNames.includes(permission.name)
   );
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-black/30 backdrop-blur-sm bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
           <div className="flex items-center">
@@ -102,7 +104,9 @@ const AssignPermissionToRoleModal: React.FC<AssignPermissionToRoleModalProps> = 
         <form onSubmit={handleSubmit} className="p-6">
           {role && (
             <div className="mb-4 p-3 bg-gray-50 rounded-lg">
-              <p className="text-sm text-gray-600">Assigning permission to role:</p>
+              <p className="text-sm text-gray-600">
+                Assigning permission to role:
+              </p>
               <div className="flex items-center mt-1">
                 <FaUserShield className="text-blue-500 mr-2" />
                 <p className="font-medium text-gray-900">{role.name}</p>
@@ -123,8 +127,8 @@ const AssignPermissionToRoleModal: React.FC<AssignPermissionToRoleModalProps> = 
 
           <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
             <p className="text-sm text-blue-800">
-              <strong>Note:</strong> This permission will be automatically granted to all users 
-              who have this role assigned.
+              <strong>Note:</strong> This permission will be automatically
+              granted to all users who have this role assigned.
             </p>
           </div>
 
@@ -163,7 +167,11 @@ const AssignPermissionToRoleModal: React.FC<AssignPermissionToRoleModalProps> = 
             </button>
             <button
               type="submit"
-              disabled={loading || !selectedPermissionId || availablePermissionsToAssign.length === 0}
+              disabled={
+                loading ||
+                !selectedPermissionId ||
+                availablePermissionsToAssign.length === 0
+              }
               className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
             >
               {loading && <FaSpinner className="animate-spin mr-2" />}

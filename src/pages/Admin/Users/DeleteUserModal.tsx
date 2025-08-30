@@ -1,6 +1,11 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { FaTrash, FaTimes, FaSpinner, FaExclamationTriangle } from "react-icons/fa";
+import {
+  FaTrash,
+  FaTimes,
+  FaSpinner,
+  FaExclamationTriangle,
+} from "react-icons/fa";
 import { User, ROLE_PERMISSION_ENDPOINTS } from "../../../types/rolePermission";
 
 interface DeleteUserModalProps {
@@ -55,9 +60,9 @@ const DeleteUserModal: React.FC<DeleteUserModalProps> = ({
     } catch (err: any) {
       console.error("Error deleting user:", err);
       setError(
-        err.response?.data?.message || 
-        err.response?.data?.errors?.name?.[0] ||
-        "Failed to delete user"
+        err.response?.data?.message ||
+          err.response?.data?.errors?.name?.[0] ||
+          "Failed to delete user"
       );
     } finally {
       setLoading(false);
@@ -73,14 +78,12 @@ const DeleteUserModal: React.FC<DeleteUserModalProps> = ({
   if (!isOpen || !user) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-black/30 backdrop-blur-sm bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
           <div className="flex items-center">
             <FaTrash className="text-red-500 mr-3" />
-            <h3 className="text-lg font-semibold text-gray-900">
-              Delete User
-            </h3>
+            <h3 className="text-lg font-semibold text-gray-900">Delete User</h3>
           </div>
           <button
             onClick={handleClose}
@@ -97,8 +100,9 @@ const DeleteUserModal: React.FC<DeleteUserModalProps> = ({
               <p className="font-medium text-red-800">Danger Zone</p>
             </div>
             <p className="text-sm text-red-700">
-              You are about to permanently delete the user "{user.name}". 
-              This action cannot be undone and will remove all associated data, roles, and permissions.
+              You are about to permanently delete the user "{user.name}". This
+              action cannot be undone and will remove all associated data,
+              roles, and permissions.
             </p>
           </div>
 
@@ -113,7 +117,8 @@ const DeleteUserModal: React.FC<DeleteUserModalProps> = ({
             )}
             {user.permissions && user.permissions.length > 0 && (
               <p className="text-sm text-gray-500">
-                This user has {user.permissions.length} direct permission(s) assigned
+                This user has {user.permissions.length} direct permission(s)
+                assigned
               </p>
             )}
           </div>

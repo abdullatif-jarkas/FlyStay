@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { 
-  FaTimes, 
-  FaBed, 
-  FaHotel, 
-  FaDollarSign, 
-  FaUsers, 
-  FaCalendarAlt, 
-  FaImages, 
+import {
+  FaTimes,
+  FaBed,
+  FaHotel,
+  FaDollarSign,
+  FaUsers,
+  FaCalendarAlt,
+  FaImages,
   FaInfoCircle,
   FaChevronLeft,
   FaChevronRight,
-  FaExpand
+  FaExpand,
 } from "react-icons/fa";
 import { ShowRoomModalProps, Room } from "../../../types/room";
 
@@ -40,12 +40,15 @@ const ShowRoomModal: React.FC<ShowRoomModalProps> = ({
     setLoading(true);
     setError("");
     try {
-      const response = await axios.get(`http://127.0.0.1:8000/api/room/${roomId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          Accept: "application/json",
-        },
-      });
+      const response = await axios.get(
+        `http://127.0.0.1:8000/api/room/${roomId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: "application/json",
+          },
+        }
+      );
 
       if (response.data.status === "success") {
         setRoom(response.data.data[0]);
@@ -54,9 +57,9 @@ const ShowRoomModal: React.FC<ShowRoomModalProps> = ({
       }
     } catch (err: any) {
       setError(
-        err.response?.data?.message || 
-        err.response?.data?.error || 
-        "Failed to load room details"
+        err.response?.data?.message ||
+          err.response?.data?.error ||
+          "Failed to load room details"
       );
     } finally {
       setLoading(false);
@@ -73,7 +76,7 @@ const ShowRoomModal: React.FC<ShowRoomModalProps> = ({
 
   const nextImage = () => {
     if (room?.images && room.images.length > 0) {
-      setCurrentImageIndex((prev) => 
+      setCurrentImageIndex((prev) =>
         prev === room.images!.length - 1 ? 0 : prev + 1
       );
     }
@@ -81,36 +84,39 @@ const ShowRoomModal: React.FC<ShowRoomModalProps> = ({
 
   const prevImage = () => {
     if (room?.images && room.images.length > 0) {
-      setCurrentImageIndex((prev) => 
+      setCurrentImageIndex((prev) =>
         prev === 0 ? room.images!.length - 1 : prev - 1
       );
     }
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
+    return new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
     });
   };
 
   const formatRoomType = (roomType: string) => {
-    return roomType.split('_').map(word => 
-      word.charAt(0).toUpperCase() + word.slice(1)
-    ).join(' ');
+    return roomType
+      .split("_")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");
   };
 
   if (!isOpen) return null;
 
   return (
     <>
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="fixed inset-0 bg-black/30 backdrop-blur-sm bg-opacity-50 flex items-center justify-center z-50 p-4">
         <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
           <div className="flex justify-between items-center p-6 border-b border-gray-200">
-            <h2 className="text-xl font-semibold text-gray-800">Room Details</h2>
+            <h2 className="text-xl font-semibold text-gray-800">
+              Room Details
+            </h2>
             <button
               onClick={handleClose}
               className="text-gray-400 hover:text-gray-600 transition-colors"
@@ -123,7 +129,9 @@ const ShowRoomModal: React.FC<ShowRoomModalProps> = ({
             {loading && (
               <div className="flex items-center justify-center py-8">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
-                <span className="ml-2 text-gray-600">Loading room details...</span>
+                <span className="ml-2 text-gray-600">
+                  Loading room details...
+                </span>
               </div>
             )}
 
@@ -148,8 +156,8 @@ const ShowRoomModal: React.FC<ShowRoomModalProps> = ({
                       </div>
                       <div className="flex items-center gap-4 text-sm text-gray-600">
                         <span className="flex items-center gap-1">
-                          <FaDollarSign className="text-green-500" />
-                          ${room.price_per_night}/night
+                          <FaDollarSign className="text-green-500" />$
+                          {room.price_per_night}/night
                         </span>
                         <span className="flex items-center gap-1">
                           <FaUsers className="text-blue-500" />
@@ -167,7 +175,7 @@ const ShowRoomModal: React.FC<ShowRoomModalProps> = ({
                       <FaImages className="text-primary-500" />
                       Room Images ({room.images.length})
                     </h4>
-                    
+
                     {/* Main Image */}
                     <div className="relative">
                       <img
@@ -176,7 +184,7 @@ const ShowRoomModal: React.FC<ShowRoomModalProps> = ({
                         className="w-full h-64 object-cover rounded-lg border border-gray-200 cursor-pointer"
                         onClick={() => setShowImageModal(true)}
                       />
-                      
+
                       {/* Image Navigation */}
                       {room.images.length > 1 && (
                         <>
@@ -192,7 +200,7 @@ const ShowRoomModal: React.FC<ShowRoomModalProps> = ({
                           >
                             <FaChevronRight />
                           </button>
-                          
+
                           {/* Expand Button */}
                           <button
                             onClick={() => setShowImageModal(true)}
@@ -202,7 +210,7 @@ const ShowRoomModal: React.FC<ShowRoomModalProps> = ({
                           </button>
                         </>
                       )}
-                      
+
                       {/* Image Counter */}
                       <div className="absolute bottom-2 left-2 bg-black bg-opacity-50 text-white px-2 py-1 rounded text-sm">
                         {currentImageIndex + 1} / {room.images.length}
@@ -218,9 +226,9 @@ const ShowRoomModal: React.FC<ShowRoomModalProps> = ({
                             src={image.url}
                             alt={`Thumbnail ${index + 1}`}
                             className={`w-16 h-16 object-cover rounded cursor-pointer border-2 transition-all ${
-                              index === currentImageIndex 
-                                ? 'border-primary-500' 
-                                : 'border-gray-200 hover:border-gray-300'
+                              index === currentImageIndex
+                                ? "border-primary-500"
+                                : "border-gray-200 hover:border-gray-300"
                             }`}
                             onClick={() => setCurrentImageIndex(index)}
                           />
@@ -240,7 +248,9 @@ const ShowRoomModal: React.FC<ShowRoomModalProps> = ({
                     </h4>
                     <div className="space-y-2 text-sm">
                       <div>
-                        <span className="font-medium text-gray-700">Hotel Name:</span>
+                        <span className="font-medium text-gray-700">
+                          Hotel Name:
+                        </span>
                         <p className="text-gray-600">{room.hotel.name}</p>
                       </div>
                       {/* <div>
@@ -262,15 +272,25 @@ const ShowRoomModal: React.FC<ShowRoomModalProps> = ({
                     </h4>
                     <div className="space-y-2 text-sm">
                       <div>
-                        <span className="font-medium text-gray-700">Room Type:</span>
-                        <p className="text-gray-600">{formatRoomType(room.room_type)}</p>
+                        <span className="font-medium text-gray-700">
+                          Room Type:
+                        </span>
+                        <p className="text-gray-600">
+                          {formatRoomType(room.room_type)}
+                        </p>
                       </div>
                       <div>
-                        <span className="font-medium text-gray-700">Price per Night:</span>
-                        <p className="text-2xl font-bold text-green-600">${room.price_per_night}</p>
+                        <span className="font-medium text-gray-700">
+                          Price per Night:
+                        </span>
+                        <p className="text-2xl font-bold text-green-600">
+                          ${room.price_per_night}
+                        </p>
                       </div>
                       <div>
-                        <span className="font-medium text-gray-700">Maximum Capacity:</span>
+                        <span className="font-medium text-gray-700">
+                          Maximum Capacity:
+                        </span>
                         <p className="text-gray-600">{room.capacity} guests</p>
                       </div>
                     </div>
@@ -285,11 +305,15 @@ const ShowRoomModal: React.FC<ShowRoomModalProps> = ({
                   </h4>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                     <div>
-                      <span className="font-medium text-gray-700">Room ID:</span>
+                      <span className="font-medium text-gray-700">
+                        Room ID:
+                      </span>
                       <p className="text-gray-600">#{room.id}</p>
                     </div>
                     <div>
-                      <span className="font-medium text-gray-700">Created:</span>
+                      <span className="font-medium text-gray-700">
+                        Created:
+                      </span>
                       <p className="text-gray-600 flex items-center gap-1">
                         <FaCalendarAlt className="text-primary-500" />
                         {formatDate(room.created_at)}
@@ -297,7 +321,9 @@ const ShowRoomModal: React.FC<ShowRoomModalProps> = ({
                     </div>
                     {room.updated_at && (
                       <div>
-                        <span className="font-medium text-gray-700">Last Updated:</span>
+                        <span className="font-medium text-gray-700">
+                          Last Updated:
+                        </span>
                         <p className="text-gray-600 flex items-center gap-1">
                           <FaCalendarAlt className="text-primary-500" />
                           {formatDate(room.updated_at)}
@@ -305,8 +331,12 @@ const ShowRoomModal: React.FC<ShowRoomModalProps> = ({
                       </div>
                     )}
                     <div>
-                      <span className="font-medium text-gray-700">Total Images:</span>
-                      <p className="text-gray-600">{room.images?.length || 0} photos</p>
+                      <span className="font-medium text-gray-700">
+                        Total Images:
+                      </span>
+                      <p className="text-gray-600">
+                        {room.images?.length || 0} photos
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -334,7 +364,7 @@ const ShowRoomModal: React.FC<ShowRoomModalProps> = ({
               alt={`Room image ${currentImageIndex + 1}`}
               className="max-w-full max-h-full object-contain"
             />
-            
+
             {/* Close Button */}
             <button
               onClick={() => setShowImageModal(false)}
@@ -342,7 +372,7 @@ const ShowRoomModal: React.FC<ShowRoomModalProps> = ({
             >
               <FaTimes />
             </button>
-            
+
             {/* Navigation */}
             {room.images.length > 1 && (
               <>
@@ -360,7 +390,7 @@ const ShowRoomModal: React.FC<ShowRoomModalProps> = ({
                 </button>
               </>
             )}
-            
+
             {/* Image Counter */}
             <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-50 text-white px-3 py-1 rounded">
               {currentImageIndex + 1} / {room.images.length}
