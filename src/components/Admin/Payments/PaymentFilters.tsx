@@ -1,12 +1,6 @@
-import React from 'react';
-import {
-  FaFilter,
-  FaTimes,
-  FaSearch,
-  FaCalendarAlt,
-  FaDollarSign,
-} from 'react-icons/fa';
-import { AdminPaymentFiltersProps } from '../../../types/payment';
+import React from "react";
+import { FaFilter, FaTimes, FaCalendarAlt, FaDollarSign } from "react-icons/fa";
+import { AdminPaymentFiltersProps } from "../../../types/payment";
 
 const PaymentFilters: React.FC<AdminPaymentFiltersProps> = ({
   filters,
@@ -22,7 +16,7 @@ const PaymentFilters: React.FC<AdminPaymentFiltersProps> = ({
   };
 
   const hasActiveFilters = Object.values(filters).some(
-    (value) => value !== '' && value !== undefined && value !== null
+    (value) => value !== "" && value !== undefined && value !== null
   );
 
   return (
@@ -45,31 +39,14 @@ const PaymentFilters: React.FC<AdminPaymentFiltersProps> = ({
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* Search */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Search
-          </label>
-          <div className="relative">
-            <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Transaction ID, User..."
-              value={filters.search || ''}
-              onChange={(e) => handleFilterChange('search', e.target.value)}
-              className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-            />
-          </div>
-        </div>
-
         {/* Status Filter */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Status
           </label>
           <select
-            value={filters.status || ''}
-            onChange={(e) => handleFilterChange('status', e.target.value)}
+            value={filters.status || ""}
+            onChange={(e) => handleFilterChange("status", e.target.value)}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
           >
             <option value="">All Statuses</option>
@@ -85,8 +62,8 @@ const PaymentFilters: React.FC<AdminPaymentFiltersProps> = ({
             Payment Method
           </label>
           <select
-            value={filters.method || ''}
-            onChange={(e) => handleFilterChange('method', e.target.value)}
+            value={filters.method || ""}
+            onChange={(e) => handleFilterChange("method", e.target.value)}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
           >
             <option value="">All Methods</option>
@@ -95,60 +72,89 @@ const PaymentFilters: React.FC<AdminPaymentFiltersProps> = ({
           </select>
         </div>
 
-        {/* Verification Filter */}
+        {/* Object Type Filter */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            Verification
+            Booking Type
           </label>
           <select
-            value={filters.verified === true ? 'true' : filters.verified === false ? 'false' : ''}
-            onChange={(e) => 
-              handleFilterChange('verified', e.target.value === '' ? '' : e.target.value === 'true')
-            }
+            value={filters.object_type || ""}
+            onChange={(e) => handleFilterChange("object_type", e.target.value)}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
           >
-            <option value="">All</option>
-            <option value="true">Verified</option>
-            <option value="false">Unverified</option>
+            <option value="">All Types</option>
+            <option value="FlightBooking">Flight Bookings</option>
+            <option value="HotelBooking">Hotel Bookings</option>
           </select>
         </div>
 
-        {/* Date From */}
+        {/* Sort Type Filter */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            Date From
+            Date Sort Order
+          </label>
+          <select
+            value={filters.sort_type || "desc"}
+            onChange={(e) => handleFilterChange("sort_type", e.target.value)}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+          >
+            <option value="desc">Newest First</option>
+            <option value="asc">Oldest First</option>
+          </select>
+        </div>
+
+        {/* Exact Date Filter */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Exact Date
           </label>
           <div className="relative">
             <FaCalendarAlt className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
             <input
               type="date"
-              value={filters.date_from || ''}
-              onChange={(e) => handleFilterChange('date_from', e.target.value)}
+              value={filters.date || ""}
+              onChange={(e) => handleFilterChange("date", e.target.value)}
               className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
             />
           </div>
         </div>
 
-        {/* Date To */}
+        {/* From Date */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            Date To
+            From Date
           </label>
           <div className="relative">
             <FaCalendarAlt className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
             <input
               type="date"
-              value={filters.date_to || ''}
-              onChange={(e) => handleFilterChange('date_to', e.target.value)}
+              value={filters.from_date || ""}
+              onChange={(e) => handleFilterChange("from_date", e.target.value)}
               className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
             />
           </div>
         </div>
 
-        {/* Amount Min */}
+        {/* To Date */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            Min Amount
+            To Date
+          </label>
+          <div className="relative">
+            <FaCalendarAlt className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+            <input
+              type="date"
+              value={filters.to_date || ""}
+              onChange={(e) => handleFilterChange("to_date", e.target.value)}
+              className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+            />
+          </div>
+        </div>
+
+        {/* Minimum Amount */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Minimum Amount
           </label>
           <div className="relative">
             <FaDollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
@@ -157,27 +163,13 @@ const PaymentFilters: React.FC<AdminPaymentFiltersProps> = ({
               placeholder="0"
               min="0"
               step="0.01"
-              value={filters.amount_min || ''}
-              onChange={(e) => handleFilterChange('amount_min', e.target.value ? parseFloat(e.target.value) : undefined)}
-              className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-            />
-          </div>
-        </div>
-
-        {/* Amount Max */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Max Amount
-          </label>
-          <div className="relative">
-            <FaDollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-            <input
-              type="number"
-              placeholder="1000"
-              min="0"
-              step="0.01"
-              value={filters.amount_max || ''}
-              onChange={(e) => handleFilterChange('amount_max', e.target.value ? parseFloat(e.target.value) : undefined)}
+              value={filters.amount || ""}
+              onChange={(e) =>
+                handleFilterChange(
+                  "amount",
+                  e.target.value ? parseFloat(e.target.value) : undefined
+                )
+              }
               className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
             />
           </div>

@@ -32,9 +32,10 @@ const PaymentDetailsModal: React.FC<AdminPaymentDetailsModalProps> = ({
       minute: '2-digit',
     });
   };
-
+  console.log("payment", payment)
   const formatAmount = (amount: number) => {
-    return `$${amount.toString('en-US', { minimumFractionDigits: 2 })}`;
+    console.log("amount", amount)
+    return `$${amount}`;
   };
 
   const getBookingTypeIcon = (type: string) => {
@@ -70,7 +71,7 @@ const PaymentDetailsModal: React.FC<AdminPaymentDetailsModalProps> = ({
               <FaSpinner className="animate-spin text-4xl text-primary-600 mb-4" />
               <p className="text-gray-600 ml-4">Loading payment details...</p>
             </div>
-          ) : payment ? (
+          ) : payment[0] ? (
             <div className="space-y-6">
               {/* Payment Overview */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -79,7 +80,7 @@ const PaymentDetailsModal: React.FC<AdminPaymentDetailsModalProps> = ({
                     <FaReceipt className="text-gray-500 mr-2" />
                     <span className="text-sm font-medium text-gray-600">Payment ID</span>
                   </div>
-                  <p className="text-lg font-semibold text-gray-900">#{payment.id}</p>
+                  <p className="text-lg font-semibold text-gray-900">#{payment[0].id}</p>
                 </div>
 
                 <div className="bg-gray-50 rounded-lg p-4">
@@ -87,27 +88,27 @@ const PaymentDetailsModal: React.FC<AdminPaymentDetailsModalProps> = ({
                     <FaDollarSign className="text-green-500 mr-2" />
                     <span className="text-sm font-medium text-gray-600">Amount</span>
                   </div>
-                  <p className="text-lg font-semibold text-gray-900">{formatAmount(payment.amount)}</p>
+                  <p className="text-lg font-semibold text-gray-900">{formatAmount(payment[0].amount)}</p>
                 </div>
 
                 <div className="bg-gray-50 rounded-lg p-4">
                   <div className="flex items-center mb-2">
-                    <PaymentMethodIcon method={payment.method} size="sm" />
+                    <PaymentMethodIcon method={payment[0].method} size="sm" />
                     <span className="text-sm font-medium text-gray-600 ml-2">Method</span>
                   </div>
-                  <p className="text-lg font-semibold text-gray-900 capitalize">{payment.method}</p>
+                  <p className="text-lg font-semibold text-gray-900 capitalize">{payment[0].method}</p>
                 </div>
 
                 <div className="bg-gray-50 rounded-lg p-4">
                   <div className="flex items-center mb-2">
                     <span className="text-sm font-medium text-gray-600">Status</span>
                   </div>
-                  <PaymentStatusBadge status={payment.status} size="lg" />
+                  <PaymentStatusBadge status={payment[0].status} size="lg" />
                 </div>
               </div>
 
               {/* User Information */}
-              {payment.user && (
+              {payment[0].user && (
                 <div className="bg-white border border-gray-200 rounded-lg p-6">
                   <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
                     <FaUser className="mr-2 text-blue-600" />
@@ -127,53 +128,53 @@ const PaymentDetailsModal: React.FC<AdminPaymentDetailsModalProps> = ({
               )}
 
               {/* Booking Information */}
-              {payment.payable && (
+              {payment[0].payable && (
                 <div className="bg-white border border-gray-200 rounded-lg p-6">
                   <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                    {getBookingTypeIcon(payment.payable_type)}
-                    <span className="ml-2">{getBookingTypeName(payment.payable_type)} Information</span>
+                    {getBookingTypeIcon(payment[0].payable_type)}
+                    <span className="ml-2">{getBookingTypeName(payment[0].payable_type)} Information</span>
                   </h3>
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-600 mb-1">Booking ID</label>
-                      <p className="text-gray-900">#{payment.payable_id}</p>
+                      <p className="text-gray-900">#{payment[0].payable_id}</p>
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-600 mb-1">Booking Date</label>
                       <p className="text-gray-900">
                         {formatDate(
-                          'booking_date' in payment.payable 
-                            ? payment.payable.booking_date 
-                            : payment.created_at
+                          'booking_date' in payment[0].payable 
+                            ? payment[0].payable.booking_date 
+                            : payment[0].created_at
                         )}
                       </p>
                     </div>
                   </div>
 
                   {/* Additional booking details based on type */}
-                  {payment.payable_type.includes('Hotel') && 'check_in_date' in payment.payable && (
+                  {payment[0].payable_type.includes('Hotel') && 'check_in_date' in payment[0].payable && (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                       <div>
                         <label className="block text-sm font-medium text-gray-600 mb-1">Check-in Date</label>
-                        <p className="text-gray-900">{formatDate(payment.payable.check_in_date)}</p>
+                        <p className="text-gray-900">{formatDate(payment[0].payable.check_in_date)}</p>
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-gray-600 mb-1">Check-out Date</label>
-                        <p className="text-gray-900">{formatDate(payment.payable.check_out_date)}</p>
+                        <p className="text-gray-900">{formatDate(payment[0].payable.check_out_date)}</p>
                       </div>
                     </div>
                   )}
 
-                  {payment.payable_type.includes('Flight') && 'seat_number' in payment.payable && (
+                  {payment[0].payable_type.includes('Flight') && 'seat_number' in payment[0].payable && (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                       <div>
                         <label className="block text-sm font-medium text-gray-600 mb-1">Seat Number</label>
-                        <p className="text-gray-900">{payment.payable.seat_number}</p>
+                        <p className="text-gray-900">{payment[0].payable.seat_number}</p>
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-gray-600 mb-1">Flight Cabin ID</label>
-                        <p className="text-gray-900">#{payment.payable.flight_cabins_id}</p>
+                        <p className="text-gray-900">#{payment[0].payable.flight_cabins_id}</p>
                       </div>
                     </div>
                   )}
@@ -188,27 +189,27 @@ const PaymentDetailsModal: React.FC<AdminPaymentDetailsModalProps> = ({
                 </h3>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {payment.transaction_id && (
+                  {payment[0].transaction_id && (
                     <div>
                       <label className="block text-sm font-medium text-gray-600 mb-1">Transaction ID</label>
-                      <p className="text-gray-900 font-mono text-sm">{payment.transaction_id}</p>
+                      <p className="text-gray-900 font-mono text-sm">{payment[0].transaction_id}</p>
                     </div>
                   )}
                   
                   <div>
                     <label className="block text-sm font-medium text-gray-600 mb-1">Created At</label>
-                    <p className="text-gray-900">{formatDate(payment.created_at)}</p>
+                    <p className="text-gray-900">{formatDate(payment[0].created_at)}</p>
                   </div>
 
                   <div>
                     <label className="block text-sm font-medium text-gray-600 mb-1">Updated At</label>
-                    <p className="text-gray-900">{formatDate(payment.updated_at)}</p>
+                    <p className="text-gray-900">{formatDate(payment[0].updated_at)}</p>
                   </div>
 
                   <div>
                     <label className="block text-sm font-medium text-gray-600 mb-1">Verification Status</label>
                     <div className="flex items-center">
-                      {payment.verified ? (
+                      {payment[0].verified ? (
                         <>
                           <FaCheckCircle className="text-green-600 mr-2" />
                           <span className="text-green-600 font-medium">Verified</span>
@@ -223,10 +224,10 @@ const PaymentDetailsModal: React.FC<AdminPaymentDetailsModalProps> = ({
                   </div>
                 </div>
 
-                {payment.verified && payment.verifier && (
+                {payment[0].verified && payment[0].verifier && (
                   <div className="mt-4 pt-4 border-t border-gray-200">
                     <label className="block text-sm font-medium text-gray-600 mb-1">Verified By</label>
-                    <p className="text-gray-900">{payment.verifier.name} ({payment.verifier.email})</p>
+                    <p className="text-gray-900">{payment[0].verifier.name} ({payment[0].verifier.email})</p>
                   </div>
                 )}
               </div>
