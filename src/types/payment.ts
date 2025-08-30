@@ -261,16 +261,12 @@ export interface AdminPaymentDetailsResponse {
 export interface AdminPaymentFilters {
   status?: "completed" | "pending" | "failed" | "";
   method?: "cash" | "stripe" | "";
-  verified?: boolean | "";
-  date_from?: string;
-  date_to?: string;
-  amount_min?: number;
-  amount_max?: number;
-  search?: string;
-  payable_type?:
-    | "App\\Models\\FlightBooking"
-    | "App\\Models\\HotelBooking"
-    | "";
+  amount?: number;
+  date?: string;
+  from_date?: string;
+  to_date?: string;
+  sort_type?: "asc" | "desc" | "";
+  object_type?: string;
 }
 
 export interface AdminPaymentStats {
