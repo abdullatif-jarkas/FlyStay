@@ -79,7 +79,6 @@ const FlightBookingModal: React.FC<FlightBookingModalProps> = ({
 
         // Show suggested hotels for the destination city
         if (flight.arrival_airport?.city_name) {
-          console.log("show")
           setShowSuggestedHotels(true);
         } else {
           // If no destination city, redirect to profile after delay

@@ -69,7 +69,6 @@ const HotelBookings: React.FC = () => {
           },
         }
       );
-      console.log("hotel bookings: ", response.data.data);
       if (response.data.status === "success") {
         setBookings(response.data.data);
         if (response.data.meta) {
@@ -104,9 +103,7 @@ const HotelBookings: React.FC = () => {
           },
         }
       );
-      console.log("debug: ", response);
       if (response.status === 200) {
-        console.log("success");
         setSelectedBooking(response.data.data);
         setShowDetailsModal(true);
       } else {

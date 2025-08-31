@@ -70,7 +70,6 @@ const FlightBookings: React.FC = () => {
           },
         }
       );
-      console.log("response", response.data.data)
       if (response.data.status === "success") {
         setBookings(response.data.data);
         if (response.data.meta) {
@@ -105,7 +104,6 @@ const FlightBookings: React.FC = () => {
           },
         }
       );
-      console.log("response2", response.data.data)
       if (response.data.status === "success") {
         setSelectedBooking(response.data.data[0]);
         setShowDetailsModal(true);
@@ -390,7 +388,6 @@ const FlightBookings: React.FC = () => {
                 <tbody className="bg-white divide-y divide-gray-200">
                   {bookings.map((booking) => (
                     <tr key={booking.id} className="hover:bg-gray-50">
-                      {console.log("booking", booking)}
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm font-medium text-gray-900">
                           FL{booking.id.toString().padStart(6, "0")}
@@ -604,7 +601,6 @@ const FlightBookings: React.FC = () => {
             <div className="flex items-center justify-between p-6 border-b">
               <h2 className="text-xl font-semibold text-gray-900">
                 Flight Booking Details - FL
-                {console.log("selectedBooking ", selectedBooking)}
                 {selectedBooking.id.toString().padStart(6, "0")}
               </h2>
               <button

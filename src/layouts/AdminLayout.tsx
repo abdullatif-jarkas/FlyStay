@@ -221,7 +221,7 @@ const AdminLayout = () => {
         </div>
       </Sidebar>
 
-      <main className="flex-1 bg-gray-100 p-6">
+      <main className="flex-1 bg-gray-100 p-6 h-dvh overflow-y-auto">
         <Outlet />
       </main>
     </div>

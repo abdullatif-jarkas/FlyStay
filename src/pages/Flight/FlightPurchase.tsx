@@ -412,9 +412,6 @@ const FlightPurchase = () => {
             </div>
           )}
         </div>
-      {
-        console.log("flight__ : ", flight)
-      }
       </div>
       {/* Flight Booking Modal */}
       <FlightBookingModal

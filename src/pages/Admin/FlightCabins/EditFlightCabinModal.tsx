@@ -100,9 +100,6 @@ const EditFlightCabinModal: React.FC<EditFlightCabinModalProps> = ({
 
         // Set all flights to state
         setFlights(allFlights);
-        console.log(
-          `Fetched ${allFlights.length} flights from ${totalPages} page(s)`
-        );
       }
     } catch (err: unknown) {
       console.error("Error fetching flights:", err);

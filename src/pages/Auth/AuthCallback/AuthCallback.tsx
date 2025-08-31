@@ -7,7 +7,6 @@ export default function AuthCallback() {
 
   useEffect(() => {
     const token = Cookies.get("jwt_token"); 
-    console.log("token: ", token)
     const roles = localStorage.getItem("roles"); // أو من API لاحقًا
 
     if (token) {

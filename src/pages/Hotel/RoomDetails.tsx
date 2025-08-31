@@ -22,6 +22,8 @@ import {
 } from "../../types/hotel";
 import { useBooking, HotelBookingAPI } from "../../contexts/BookingContext";
 import FavoriteButton from "../../components/Favorites/FavoriteButton";
+import { useAppDispatch } from "../../store/hooks";
+import { setActiveSection } from "../../store/sectionSlice";
 
 // API Response interface for hotel booking
 interface HotelBookingResponse {
@@ -40,6 +42,7 @@ const RoomDetails = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>("");
   const [bookingLoading, setBookingLoading] = useState(false);
+  const dispatch = useAppDispatch();
 
   // Booking form state
   const [checkInDate, setCheckInDate] = useState<string>("");
@@ -194,6 +197,7 @@ const RoomDetails = () => {
 
           // Navigate to profile bookings section
           navigate("/user/profile");
+          dispatch(setActiveSection("bookings"));
         } else {
           toast.error(response.data.message || "Booking failed");
         }

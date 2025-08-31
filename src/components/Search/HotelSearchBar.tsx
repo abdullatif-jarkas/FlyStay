@@ -13,14 +13,6 @@ const HotelSearchBar = () => {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     // Implement your search logic here
-    console.log({
-      destination,
-      checkInDate,
-      checkOutDate,
-      adults,
-      children,
-      rooms
-    });
   };
 
   return (

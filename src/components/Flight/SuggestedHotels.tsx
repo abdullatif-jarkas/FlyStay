@@ -39,11 +39,6 @@ const SuggestedHotels: React.FC<SuggestedHotelsProps> = ({
   });
 
   const [showFilters, setShowFilters] = useState(false);
-  
-  console.log("cityId: ", cityId);
-  console.log("cityName: ", cityName);
-  console.log("isVisible: ", isVisible);
-  console.log("onClose: ", onClose);
 
   // Fetch suggested hotels
   const fetchHotels = async (
@@ -62,7 +57,6 @@ const SuggestedHotels: React.FC<SuggestedHotelsProps> = ({
           per_page: 6, // Show 6 hotels per page for better layout
           filters,
         });
-      console.log("suggested: ", response);
       setState((prev) => ({
         ...prev,
         hotels: response.data,
@@ -108,7 +102,7 @@ const SuggestedHotels: React.FC<SuggestedHotelsProps> = ({
   const handleViewDetails = (hotelId: number) => {
     navigate(`/hotel/${hotelId}`);
   };
-  
+
   // Render star rating
   const renderStarRating = (rating: number) => {
     return (

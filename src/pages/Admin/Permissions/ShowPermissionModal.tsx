@@ -59,7 +59,6 @@ const ShowPermissionModal: React.FC<ShowPermissionModalProps> = ({
 
       if (response.data.status === "success") {
         setPermission(response.data.data[0]);
-        console.log(response.data.data[0]);
       } else {
         setError("Failed to load permission details");
       }

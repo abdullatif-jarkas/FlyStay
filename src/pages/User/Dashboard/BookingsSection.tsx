@@ -250,7 +250,6 @@ const BookingsSection: React.FC<BookingsSectionProps> = () => {
 
   // Handle payment for hotel booking
   const handlePayment = async (bookingId: number, amount: number) => {
-    console.log("first");
     if (!token) {
       toast.error("Please login to complete payment");
       return;
@@ -276,13 +275,13 @@ const BookingsSection: React.FC<BookingsSectionProps> = () => {
         response.data.data.length > 0
       ) {
         const clientSecret = response.data.data[0];
-
         // Set up payment modal with client secret
         setCurrentPayment({
           bookingId,
           amount,
           clientSecret,
         });
+
         setPaymentModalOpen(true);
 
         toast.info("Redirecting to secure payment...");
@@ -323,7 +322,6 @@ const BookingsSection: React.FC<BookingsSectionProps> = () => {
           },
         }
       );
-
       if (
         response.data.status === "success" &&
         response.data.data &&
@@ -337,7 +335,6 @@ const BookingsSection: React.FC<BookingsSectionProps> = () => {
           amount,
           clientSecret,
         });
-        console.log("test: ", amount)
         setPaymentModalOpen(true);
 
         toast.info("Redirecting to secure payment...");
@@ -401,7 +398,7 @@ const BookingsSection: React.FC<BookingsSectionProps> = () => {
           email: "guest@example.com",
         },
         status: booking.status,
-        total_amount: 0, // This would be fetched from room pricing
+        amount: booking.amount, // This would be fetched from room pricing
         booking_date: booking.booking_date,
         nights: nights > 0 ? nights : 1,
         type: "hotel" as const,
@@ -427,7 +424,7 @@ const BookingsSection: React.FC<BookingsSectionProps> = () => {
         email: "passenger@example.com",
       },
       status: booking.status,
-      total_amount: 0, // This would need to be fetched from flight cabin pricing
+      amount: booking.amount, // This would need to be fetched from flight cabin pricing
       booking_date: booking.booking_date,
       seat_number: booking.seat_number,
       type: "flight" as const,
@@ -445,7 +442,7 @@ const BookingsSection: React.FC<BookingsSectionProps> = () => {
       (a, b) =>
         new Date(b.booking_date).getTime() - new Date(a.booking_date).getTime()
     );
-
+    
     switch (activeTab) {
       case "flights":
         return allBookings.filter((booking) => booking.type === "flight");
@@ -483,7 +480,7 @@ const BookingsSection: React.FC<BookingsSectionProps> = () => {
     ...convertedHotelBookingsForStats,
   ]
     .filter((b) => b.status === "confirmed")
-    .reduce((sum, booking) => sum + booking.total_amount, 0);
+    .reduce((sum, booking) => sum + booking.amount, 0);
 
   // Flight Booking Card Component
   function FlightBookingCard({
@@ -497,7 +494,7 @@ const BookingsSection: React.FC<BookingsSectionProps> = () => {
       const bookingId = parseInt(
         booking.booking_reference.replace("FL", "").replace(/^0+/, "")
       );
-      handleFlightPayment(bookingId, booking.total_amount);
+      handleFlightPayment(bookingId, booking.amount);
     };
 
     return (
@@ -540,7 +537,7 @@ const BookingsSection: React.FC<BookingsSectionProps> = () => {
 
         <div className="text-right">
           <div className="text-lg font-bold text-gray-900 mb-2">
-            {formatCurrency(booking.total_amount)}
+            {formatCurrency(booking.amount)}
           </div>
           <div className="space-y-2">
             {booking.status === "pending" && (
@@ -606,7 +603,7 @@ const BookingsSection: React.FC<BookingsSectionProps> = () => {
           <div className="space-y-2">
             {booking.status === "pending" ? (
               <button
-                onClick={() => handlePayment(booking.id, booking.total_amount)}
+                onClick={() => handlePayment(booking.id, booking.amount)}
                 disabled={paymentLoading === booking.id}
                 className="inline-flex items-center px-3 py-1 bg-green-600 text-white rounded-md text-sm hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
@@ -854,7 +851,7 @@ const BookingsSection: React.FC<BookingsSectionProps> = () => {
           )}
         </div>
       </div>
-
+      
       {/* Payment Modal */}
       {currentPayment && (
         <PaymentModal
