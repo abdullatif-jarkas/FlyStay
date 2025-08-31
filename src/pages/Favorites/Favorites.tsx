@@ -390,9 +390,6 @@ const Favorites = () => {
                     className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow cursor-pointer"
                     onClick={() => handleFlightClick(flight)}
                     >
-                      {
-                        console.log("filtered:, ",flight)
-                      }
                       <div className="relative">
                         <div className="h-48 bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
                           <FaPlane className="text-4xl text-white" />

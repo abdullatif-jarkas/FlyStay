@@ -32,9 +32,7 @@ const PaymentDetailsModal: React.FC<AdminPaymentDetailsModalProps> = ({
       minute: '2-digit',
     });
   };
-  console.log("payment", payment)
   const formatAmount = (amount: number) => {
-    console.log("amount", amount)
     return `$${amount}`;
   };
 

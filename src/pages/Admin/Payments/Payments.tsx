@@ -123,7 +123,7 @@ const Payments: React.FC = () => {
     const newStats: AdminPaymentStats = {
       total_payments: paymentsData.length,
       total_amount: paymentsData.reduce(
-        (sum, payment) => sum + payment.amount,
+        (sum, payment) => sum + parseFloat(payment.amount),
         0
       ),
       completed_payments: paymentsData.filter((p) => p.status === "completed")
@@ -133,9 +133,12 @@ const Payments: React.FC = () => {
       failed_payments: paymentsData.filter((p) => p.status === "failed").length,
       cash_payments: paymentsData.filter((p) => p.method === "cash").length,
       stripe_payments: paymentsData.filter((p) => p.method === "stripe").length,
-      verified_payments: paymentsData.filter((p) => p.verified).length,
-      unverified_payments: paymentsData.filter((p) => !p.verified).length,
+      verified_payments: paymentsData.filter((p) => p.verified_by !== null)
+        .length,
+      unverified_payments: paymentsData.filter((p) => p.verified_by === null)
+        .length,
     };
+    
     setStats(newStats);
   };
 

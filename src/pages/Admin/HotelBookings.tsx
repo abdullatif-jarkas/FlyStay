@@ -69,7 +69,6 @@ const HotelBookings: React.FC = () => {
           },
         }
       );
-
       if (response.data.status === "success") {
         setBookings(response.data.data);
         if (response.data.meta) {
@@ -104,8 +103,7 @@ const HotelBookings: React.FC = () => {
           },
         }
       );
-
-      if (response.data.status === "success") {
+      if (response.status === 200) {
         setSelectedBooking(response.data.data);
         setShowDetailsModal(true);
       } else {
@@ -145,7 +143,9 @@ const HotelBookings: React.FC = () => {
       }
     } catch (error: any) {
       console.error("Error cancelling booking:", error);
-      toast.error(error.response?.data?.errors[0] || "Failed to cancel booking");
+      toast.error(
+        error.response?.data?.errors[0] || "Failed to cancel booking"
+      );
     } finally {
       setActionLoading(null);
       setShowConfirmModal(false);
@@ -395,7 +395,7 @@ const HotelBookings: React.FC = () => {
                           HB{booking.id.toString().padStart(6, "0")}
                         </div>
                         <div className="text-sm text-gray-500">
-                          Room: {booking.room?.room_number || "N/A"}
+                          Room: {booking.Room?.id || "N/A"}
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
@@ -403,29 +403,29 @@ const HotelBookings: React.FC = () => {
                           <FaUser className="text-gray-400 mr-2" />
                           <div>
                             <div className="text-sm font-medium text-gray-900">
-                              {booking.user?.name || "N/A"}
+                              {booking.user_Info?.name || "N/A"}
                             </div>
                             <div className="text-sm text-gray-500">
-                              {booking.user?.email || "N/A"}
+                              {booking.user_Info?.email || "N/A"}
                             </div>
                           </div>
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm font-medium text-gray-900">
-                          {booking.room?.hotel?.name || "N/A"}
+                          {booking.Hotel?.name || "N/A"}
                         </div>
                         <div className="text-sm text-gray-500">
-                          {booking.room?.hotel?.city?.name || "N/A"},{" "}
-                          {booking.room?.hotel?.city?.country || "N/A"}
+                          {booking.Hotel?.city_name || "N/A"},{" "}
+                          {booking.Hotel?.country_name || "N/A"}
                         </div>
                         <div className="text-sm text-gray-500">
-                          Rating: {booking.room?.hotel?.rating || "N/A"}★
+                          Rating: {booking.Hotel?.rating || "N/A"}★
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm font-medium text-gray-900">
-                          {booking.room?.type || "N/A"}
+                          {booking.Room?.room_type || "N/A"}
                         </div>
                         <div className="text-sm text-gray-500">
                           Check-in: {formatDate(booking.check_in_date)}
@@ -443,7 +443,7 @@ const HotelBookings: React.FC = () => {
                           nights
                         </div>
                         <div className="text-sm text-gray-500">
-                          ${booking.room?.price_per_night || "N/A"}/night
+                          ${booking.Room?.price_per_night || "N/A"}/night
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
@@ -549,15 +549,50 @@ const HotelBookings: React.FC = () => {
                     <div>
                       <span className="font-medium text-gray-700">Name:</span>
                       <span className="ml-2 text-gray-900">
-                        {selectedBooking.user?.name || "N/A"}
+                        {selectedBooking.user_Info.name || "N/A"}
+                      </span>
+                    </div>
+                    {/* <div>
+                      <span className="font-medium text-gray-700">Email:</span>
+                      <span className="ml-2 text-gray-900">
+                        {selectedBooking.user_Info.email || "N/A"}
+                      </span>
+                    </div> */}
+                    <div>
+                      <span className="font-medium text-gray-700">
+                        Email:
+                      </span>
+                      <span className="ml-2 text-gray-900">
+                        {selectedBooking.user_Info.email ? (
+                          <a
+                            href={`mailto:${selectedBooking.user_Info.email}`}
+                            className="text-primary-500 hover:underline"
+                          >
+                            {selectedBooking.user_Info.email}
+                          </a>
+                        ) : (
+                          "N/A"
+                        )}
                       </span>
                     </div>
                     <div>
-                      <span className="font-medium text-gray-700">Email:</span>
+                      <span className="font-medium text-gray-700">
+                        Phone Number:
+                      </span>
                       <span className="ml-2 text-gray-900">
-                        {selectedBooking.user?.email || "N/A"}
+                        {selectedBooking.user_Info.phone_number ? (
+                          <a
+                            href={`tel:${selectedBooking.user_Info.phone_number}`}
+                            className="text-primary-500 hover:underline"
+                          >
+                            {selectedBooking.user_Info.phone_number}
+                          </a>
+                        ) : (
+                          "N/A"
+                        )}
                       </span>
                     </div>
+
                     <div>
                       <span className="font-medium text-gray-700">
                         User ID:
@@ -581,30 +616,30 @@ const HotelBookings: React.FC = () => {
                         Hotel Name:
                       </span>
                       <span className="ml-2 text-gray-900">
-                        {selectedBooking.room?.hotel?.name || "N/A"}
+                        {selectedBooking.Hotel?.name || "N/A"}
                       </span>
                     </div>
                     <div>
                       <span className="font-medium text-gray-700">
-                        Address:
+                        Description:
                       </span>
-                      <span className="ml-2 text-gray-900">
-                        {selectedBooking.room?.hotel?.address || "N/A"}
-                      </span>
+                      <div className="ml-2 text-gray-900">
+                        {selectedBooking.Hotel?.description || "N/A"}
+                      </div>
                     </div>
                     <div>
                       <span className="font-medium text-gray-700">
                         Location:
                       </span>
                       <span className="ml-2 text-gray-900">
-                        {selectedBooking.room?.hotel?.city?.name || "N/A"},{" "}
-                        {selectedBooking.room?.hotel?.city?.country || "N/A"}
+                        {selectedBooking.Hotel?.city_name || "N/A"},{" "}
+                        {selectedBooking.Hotel?.country_name || "N/A"}
                       </span>
                     </div>
                     <div>
                       <span className="font-medium text-gray-700">Rating:</span>
                       <span className="ml-2 text-gray-900">
-                        {selectedBooking.room?.hotel?.rating || "N/A"}★
+                        {selectedBooking.Hotel?.rating || "N/A"}★
                       </span>
                     </div>
                   </div>
@@ -622,7 +657,7 @@ const HotelBookings: React.FC = () => {
                         Room Number:
                       </span>
                       <span className="ml-2 text-gray-900">
-                        {selectedBooking.room?.room_number || "N/A"}
+                        {selectedBooking.Room?.id || "N/A"}
                       </span>
                     </div>
                     <div>
@@ -630,15 +665,23 @@ const HotelBookings: React.FC = () => {
                         Room Type:
                       </span>
                       <span className="ml-2 text-gray-900">
-                        {selectedBooking.room?.type || "N/A"}
+                        {selectedBooking.Room?.room_type || "N/A"}
                       </span>
                     </div>
                     <div>
                       <span className="font-medium text-gray-700">
                         Price per Night:
                       </span>
-                      <span className="ml-2 text-gray-900">
-                        ${selectedBooking.room?.price_per_night || "N/A"}
+                      <span className="ml-2 text-green-500 font-bold">
+                        ${selectedBooking.Room?.price_per_night || "N/A"}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="font-medium text-gray-700">
+                        Capacity:
+                      </span>
+                      <span className="ml-2 text-gray-700">
+                        {selectedBooking.Room?.capacity || "N/A"}
                       </span>
                     </div>
                     <div>
@@ -651,6 +694,14 @@ const HotelBookings: React.FC = () => {
                           selectedBooking.check_out_date
                         )}{" "}
                         nights
+                      </span>
+                    </div>
+                    <div>
+                      <span className="font-medium text-gray-700">
+                        Description:
+                      </span>
+                      <span className="ml-2 text-gray-700">
+                        {selectedBooking.Room?.description || "N/A"}
                       </span>
                     </div>
                   </div>

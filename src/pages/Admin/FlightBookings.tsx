@@ -70,7 +70,6 @@ const FlightBookings: React.FC = () => {
           },
         }
       );
-      console.log("response", response.data.data)
       if (response.data.status === "success") {
         setBookings(response.data.data);
         if (response.data.meta) {
@@ -105,7 +104,6 @@ const FlightBookings: React.FC = () => {
           },
         }
       );
-      console.log("response2", response.data.data)
       if (response.data.status === "success") {
         setSelectedBooking(response.data.data[0]);
         setShowDetailsModal(true);
@@ -390,7 +388,6 @@ const FlightBookings: React.FC = () => {
                 <tbody className="bg-white divide-y divide-gray-200">
                   {bookings.map((booking) => (
                     <tr key={booking.id} className="hover:bg-gray-50">
-                      {console.log("booking", booking)}
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm font-medium text-gray-900">
                           FL{booking.id.toString().padStart(6, "0")}
@@ -404,21 +401,21 @@ const FlightBookings: React.FC = () => {
                           <FaUser className="text-gray-400 mr-2" />
                           <div>
                             <div className="text-sm font-medium text-gray-900">
-                              {booking.user?.name || "N/A"}
+                              {booking.user_name || "N/A"}
                             </div>
                             <div className="text-sm text-gray-500">
-                              {booking.user?.email || "N/A"}
+                              {booking.user_email || "N/A"}
                             </div>
                           </div>
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm font-medium text-gray-900">
-                          {booking.flight_cabin?.flight?.airline || "N/A"}
+                          {booking.flight?.airline || "N/A"}
                         </div>
                         <div className="text-sm text-gray-500">
                           Flight{" "}
-                          {booking.flight_cabin?.flight?.flight_number || "N/A"}
+                          {booking.flight?.flight_number || "N/A"}
                         </div>
                         <div className="text-sm text-gray-500">
                           {booking.flight_cabin?.class_name || "N/A"}
@@ -426,38 +423,34 @@ const FlightBookings: React.FC = () => {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm font-medium text-gray-900">
-                          {booking.flight_cabin?.flight?.departure_airport
-                            ?.IATA_code || "N/A"}{" "}
+                          {booking.departure_airport?.IATA_code || "N/A"}{" "}
                           →{" "}
-                          {booking.flight_cabin?.flight?.arrival_airport
-                            ?.IATA_code || "N/A"}
+                          {booking.arrival_airport?.IATA_code || "N/A"}
                         </div>
                         <div className="text-sm text-gray-500">
-                          {booking.flight_cabin?.flight?.departure_airport?.city
-                            ?.name || "N/A"}{" "}
+                          {booking.departure_airport?.city_name || "N/A"}{" "}
                           →{" "}
-                          {booking.flight_cabin?.flight?.arrival_airport?.city
-                            ?.name || "N/A"}
+                          {booking.arrival_airport?.city_name || "N/A"}
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm font-medium text-gray-900">
-                          {booking.flight_cabin?.flight?.departure_time
+                          {booking.flight?.departure_time
                             ? formatDate(
-                                booking.flight_cabin.flight.departure_time
+                                booking.flight.departure_time
                               )
                             : "N/A"}
                         </div>
                         <div className="text-sm text-gray-500">
-                          {booking.flight_cabin?.flight?.departure_time
+                          {booking.flight?.departure_time
                             ? formatTime(
-                                booking.flight_cabin.flight.departure_time
+                                booking.flight.departure_time
                               )
                             : "N/A"}{" "}
                           -{" "}
-                          {booking.flight_cabin?.flight?.arrival_time
+                          {booking.flight?.arrival_time
                             ? formatTime(
-                                booking.flight_cabin.flight.arrival_time
+                                booking.flight.arrival_time
                               )
                             : "N/A"}
                         </div>
@@ -632,13 +625,13 @@ const FlightBookings: React.FC = () => {
                     <div>
                       <span className="font-medium text-gray-700">Name:</span>
                       <span className="ml-2 text-gray-900">
-                        {selectedBooking.user?.name || "N/A"}
+                        {selectedBooking.user_name || "N/A"}
                       </span>
                     </div>
                     <div>
                       <span className="font-medium text-gray-700">Email:</span>
                       <span className="ml-2 text-gray-900">
-                        {selectedBooking.user?.email || "N/A"}
+                        {selectedBooking.user_email || "N/A"}
                       </span>
                     </div>
                     <div>
@@ -664,7 +657,7 @@ const FlightBookings: React.FC = () => {
                         Airline:
                       </span>
                       <span className="ml-2 text-gray-900">
-                        {selectedBooking.flight_cabin?.flight?.airline || "N/A"}
+                        {selectedBooking.flight?.airline || "N/A"}
                       </span>
                     </div>
                     <div>
@@ -672,7 +665,7 @@ const FlightBookings: React.FC = () => {
                         Flight Number:
                       </span>
                       <span className="ml-2 text-gray-900">
-                        {selectedBooking.flight_cabin?.flight?.flight_number ||
+                        {selectedBooking.flight?.flight_number ||
                           "N/A"}
                       </span>
                     </div>
@@ -692,7 +685,7 @@ const FlightBookings: React.FC = () => {
                     </div>
                     <div>
                       <span className="font-medium text-gray-700">Price:</span>
-                      <span className="ml-2 text-gray-900">
+                      <span className="ml-2 text-green-600 font-bold">
                         ${selectedBooking.flight_cabin?.price || "N/A"}
                       </span>
                     </div>
@@ -709,22 +702,18 @@ const FlightBookings: React.FC = () => {
                     <div>
                       <span className="font-medium text-gray-700">From:</span>
                       <span className="ml-2 text-gray-900">
-                        {selectedBooking.flight_cabin?.flight?.departure_airport
-                          ?.name || "N/A"}{" "}
+                        {selectedBooking.departure_airport?.name || "N/A"}{" "}
                         (
-                        {selectedBooking.flight_cabin?.flight?.departure_airport
-                          ?.IATA_code || "N/A"}
+                        {selectedBooking.departure_airport?.IATA_code || "N/A"}
                         )
                       </span>
                     </div>
                     <div>
                       <span className="font-medium text-gray-700">To:</span>
                       <span className="ml-2 text-gray-900">
-                        {selectedBooking.flight_cabin?.flight?.arrival_airport
-                          ?.name || "N/A"}{" "}
+                        {selectedBooking.arrival_airport?.name || "N/A"}{" "}
                         (
-                        {selectedBooking.flight_cabin?.flight?.arrival_airport
-                          ?.IATA_code || "N/A"}
+                        {selectedBooking.arrival_airport?.IATA_code || "N/A"}
                         )
                       </span>
                     </div>
@@ -733,9 +722,9 @@ const FlightBookings: React.FC = () => {
                         Departure:
                       </span>
                       <span className="ml-2 text-gray-900">
-                        {selectedBooking.flight_cabin?.flight?.departure_time
+                        {selectedBooking.flight?.departure_time
                           ? new Date(
-                              selectedBooking.flight_cabin.flight.departure_time
+                              selectedBooking.flight.departure_time
                             ).toLocaleString()
                           : "N/A"}
                       </span>
@@ -745,9 +734,9 @@ const FlightBookings: React.FC = () => {
                         Arrival:
                       </span>
                       <span className="ml-2 text-gray-900">
-                        {selectedBooking.flight_cabin?.flight?.arrival_time
+                        {selectedBooking.flight?.arrival_time
                           ? new Date(
-                              selectedBooking.flight_cabin.flight.arrival_time
+                              selectedBooking.flight.arrival_time
                             ).toLocaleString()
                           : "N/A"}
                       </span>
@@ -776,7 +765,7 @@ const FlightBookings: React.FC = () => {
                         {getStatusBadge(selectedBooking.status)}
                       </span>
                     </div>
-                    <div>
+                    {/* <div>
                       <span className="font-medium text-gray-700">
                         Created:
                       </span>
@@ -791,7 +780,7 @@ const FlightBookings: React.FC = () => {
                       <span className="ml-2 text-gray-900">
                         {new Date(selectedBooking.updated_at).toLocaleString()}
                       </span>
-                    </div>
+                    </div> */}
                   </div>
                 </div>
               </div>

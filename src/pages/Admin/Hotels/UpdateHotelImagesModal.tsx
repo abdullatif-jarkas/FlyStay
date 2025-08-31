@@ -5,6 +5,7 @@ import {
   UpdateHotelImagesModalProps,
   ImagePreview,
 } from "../../../types/hotel";
+import { toast } from "sonner";
 
 const UpdateHotelImagesModal: React.FC<UpdateHotelImagesModalProps> = ({
   isOpen,
@@ -140,6 +141,7 @@ const UpdateHotelImagesModal: React.FC<UpdateHotelImagesModalProps> = ({
         }
       );
 
+      toast.success("Images updated successfully")
       onSuccess();
       handleClose();
     } catch (err: any) {
@@ -173,7 +175,7 @@ const UpdateHotelImagesModal: React.FC<UpdateHotelImagesModalProps> = ({
   return (
     <div className="fixed inset-0 bg-black/30 backdrop-blur-sm bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg w-full max-w-4xl max-h-[90vh] overflow-y-auto">
-        <div className="sticky top-0 bg-white border-b px-6 py-4">
+        <div className="sticky top-0 bg-white border-b px-6 py-4 z-10">
           <div className="flex justify-between items-center">
             <h2 className="text-xl font-bold text-gray-800 flex items-center gap-2">
               <FaImages className="text-primary-600" />

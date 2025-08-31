@@ -56,7 +56,6 @@ const CreateFlightCabinModal: React.FC<CreateFlightCabinModalProps> = ({
           },
         }
       );
-      console.log("first", firstPageResponse)
       if (firstPageResponse.data.status === "success") {
         const firstPageData: FlightsResponse = firstPageResponse.data;
         let allFlights: Flight[] = [...firstPageData.data];
@@ -103,10 +102,6 @@ const CreateFlightCabinModal: React.FC<CreateFlightCabinModalProps> = ({
 
         // Set all flights to state
         setFlights(allFlights);
-        console.log(allFlights)
-        console.log(
-          `Fetched ${allFlights.length} flights from ${totalPages} page(s)`
-        );
       }
     } catch (err: unknown) {
       console.error("Error fetching flights:", err);
