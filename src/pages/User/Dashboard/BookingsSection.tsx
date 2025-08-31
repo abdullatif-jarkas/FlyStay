@@ -337,18 +337,19 @@ const BookingsSection: React.FC<BookingsSectionProps> = () => {
           amount,
           clientSecret,
         });
+        console.log("test: ", amount)
         setPaymentModalOpen(true);
 
         toast.info("Redirecting to secure payment...");
       } else {
-        toast.error(response.data.message || "Failed to initialize payment");
+        toast.error(response.data.errors[0] || "Failed to initialize payment");
       }
     } catch (err: unknown) {
       console.error("Error initializing flight payment:", err);
       const errorMessage =
         err instanceof Error && "response" in err
           ? (err as { response?: { data?: { message?: string } } }).response
-              ?.data?.message
+              ?.data?.errors[0]
           : undefined;
       toast.error(errorMessage || "Failed to initialize payment");
     } finally {
@@ -551,10 +552,6 @@ const BookingsSection: React.FC<BookingsSectionProps> = () => {
                 Pay Now
               </button>
             )}
-            <button className="inline-flex items-center px-3 py-1 border border-gray-300 rounded-md text-sm text-gray-700 hover:bg-gray-50 transition-colors w-full justify-center">
-              <FaEye className="mr-1" />
-              View Details
-            </button>
           </div>
         </div>
       </div>
@@ -604,7 +601,7 @@ const BookingsSection: React.FC<BookingsSectionProps> = () => {
 
         <div className="text-right">
           <div className="text-lg font-bold text-gray-900 mb-2">
-            {formatCurrency(booking.total_amount)}
+            {formatCurrency(booking.amount)}
           </div>
           <div className="space-y-2">
             {booking.status === "pending" ? (

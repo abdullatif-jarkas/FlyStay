@@ -192,7 +192,7 @@ const AdminLayout = () => {
               </SubMenu>
 
               {/* 6. Finance Management */}
-              {role === "finance_officer" && (
+              {(role === "finance_officer" || role === "admin") && (
                 <MenuItem
                   icon={<FaCreditCard />}
                   onClick={() => navigate("/admin/payments")}
