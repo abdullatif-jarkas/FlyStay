@@ -12,8 +12,9 @@ import {
 import CreateFlightModal from "./CreateFlightModal";
 import EditFlightModal from "./EditFlightModal";
 import ShowFlightModal from "./ShowFlightModal";
+import FlightFilters from "../../../components/Admin/Flights/FlightFilters";
 import { toast } from "sonner";
-import { Flight } from "../../../types/flight";
+import { Flight, AdminFlightFilters } from "../../../types/flight";
 
 const FlightAdmin = () => {
   const [data, setData] = useState<Flight[]>([]);
@@ -22,6 +23,9 @@ const FlightAdmin = () => {
   const [pagination, setPagination] = useState<Pagination | null>();
   const [error, setError] = useState("");
   const [sorting, setSorting] = useState<SortingState>([]);
+  const [filters, setFilters] = useState<AdminFlightFilters>({
+    sort_type: "desc", // Default to newest first
+  });
 
   // Modal states
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -32,38 +36,85 @@ const FlightAdmin = () => {
 
   const token = localStorage.getItem("token");
 
-  const fetchFlights = useCallback(async () => {
-    try {
-      const params = {
-        page,
-      };
+  const fetchFlights = useCallback(
+    async (currentFilters: AdminFlightFilters = {}) => {
+      try {
+        setLoading(true);
+        setError("");
 
-      const res = await axios.get("http://127.0.0.1:8000/api/flight", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          Accept: "application/json",
-        },
-        params,
-      });
-      if (res.data.data.length === 0) {
-        setError("No flights found!");
-        return;
-      }
+        // Build query parameters
+        const queryParams = new URLSearchParams({
+          page: page.toString(),
+        });
 
-      if (res.data.status === "success") {
-        setData(res.data.data);
-        setPagination(res.data.pagination);
+        // Add filters to query params
+        Object.entries(currentFilters).forEach(([key, value]) => {
+          if (value !== "" && value !== undefined && value !== null) {
+            if (typeof value === "boolean") {
+              // Only add boolean filters if they are true
+              if (value) {
+                queryParams.append(key, "1");
+              }
+            } else {
+              queryParams.append(key, value.toString());
+            }
+          }
+        });
+
+        const res = await axios.get(
+          `http://127.0.0.1:8000/api/flight?${queryParams.toString()}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              Accept: "application/json",
+            },
+          }
+        );
+
+        if (res.data.status === "success") {
+          setData(res.data.data);
+          setPagination(res.data.pagination);
+
+          if (res.data.data.length === 0) {
+            setError("No flights found with the current filters!");
+          }
+        } else {
+          setError(res.data.message || "Failed to fetch flights");
+        }
+      } catch (error) {
+        console.error("Error fetching flights:", error);
+        const errorMessage =
+          error instanceof Error && "response" in error
+            ? (error as { response?: { data?: { message?: string } } }).response
+                ?.data?.message
+            : undefined;
+        setError(errorMessage || "Failed to load flights!");
+      } finally {
+        setLoading(false);
       }
-    } catch (err) {
-      setError("Faild to load data!");
-    } finally {
-      setLoading(false);
-    }
-  }, [page, token]);
+    },
+    [page, token]
+  );
 
   useEffect(() => {
-    fetchFlights();
-  }, [page]);
+    fetchFlights(filters);
+  }, [page, filters, fetchFlights]);
+
+  // Filter handlers
+  const handleFiltersChange = (newFilters: AdminFlightFilters) => {
+    setFilters(newFilters);
+    setPage(1); // Reset to first page when filters change
+    fetchFlights(newFilters);
+  };
+
+  const handleClearFilters = () => {
+    const emptyFilters: AdminFlightFilters = {
+      sort_type: "desc", // Keep default sort
+    };
+    setFilters(emptyFilters);
+    setPage(1);
+    fetchFlights(emptyFilters);
+  };
 
   // Handler functions
   const handleView = useCallback((flight: Flight) => {
@@ -94,25 +145,25 @@ const FlightAdmin = () => {
           },
         });
 
-        fetchFlights(); // Refresh the table
+        fetchFlights(filters); // Refresh the table
         toast.error("Flight deleted successfully");
       } catch (err) {
         console.error("Error deleting flight:", err);
         alert("Failed to delete flight");
       }
     },
-    [token, fetchFlights]
+    [token, fetchFlights, filters]
   );
 
   const handleCreateSuccess = useCallback(() => {
-    fetchFlights(); // Refresh the table
+    fetchFlights(filters); // Refresh the table
     toast.success("Flight created successfully");
-  }, [fetchFlights]);
+  }, [fetchFlights, filters]);
 
   const handleEditSuccess = useCallback(() => {
-    fetchFlights(); // Refresh the table
+    fetchFlights(filters); // Refresh the table
     toast.info("Flight updated successfully");
-  }, [fetchFlights]);
+  }, [fetchFlights, filters]);
 
   const columns = useMemo<ColumnDef<Flight>[]>(
     () => [
@@ -122,28 +173,63 @@ const FlightAdmin = () => {
         enableSorting: true,
       },
       {
+        header: "Flight Number",
+        accessorKey: "flight_number",
+        enableSorting: true,
+      },
+      {
         header: "Airline",
         accessorKey: "airline",
         enableSorting: true,
       },
-      // {
-      //   header: "Arrival Airport",
-      //   accessorKey: "arrival_airport.name",
-      //   enableSorting: true,
-      // },
-      // {
-      //   header: "Departure Airport",
-      //   accessorKey: "departure_airport.name",
-      //   enableSorting: true,
-      // },
       {
-        header: "Departure Time",
+        header: "Departure",
         accessorKey: "departure_time",
         cell: (info) => {
           const date = new Date(info.getValue() as string);
-          return date.toLocaleString();
+          return (
+            <div className="text-sm">
+              <div className="font-medium">{date.toLocaleDateString()}</div>
+              <div className="text-gray-500">{date.toLocaleTimeString()}</div>
+            </div>
+          );
         },
         enableSorting: true,
+      },
+      {
+        header: "Arrival",
+        accessorKey: "arrival_time",
+        cell: (info) => {
+          const date = new Date(info.getValue() as string);
+          return (
+            <div className="text-sm">
+              <div className="font-medium">{date.toLocaleDateString()}</div>
+              <div className="text-gray-500">{date.toLocaleTimeString()}</div>
+            </div>
+          );
+        },
+        enableSorting: true,
+      },
+      {
+        header: "Route",
+        id: "route",
+        cell: ({ row }) => {
+          const flight = row.original;
+          return (
+            <div className="text-sm">
+              <div className="font-medium">
+                {flight.departure_airport?.city_name || "N/A"} →{" "}
+                {flight.arrival_airport?.city_name || "N/A"}
+              </div>
+              <div className="text-gray-500">
+                {console.log("route: ", flight)}
+                {flight.departure_airport?.country_name || "N/A"} →{" "}
+                {flight.arrival_airport?.country_name || "N/A"}
+              </div>
+            </div>
+          );
+        },
+        enableSorting: false,
       },
       {
         header: "Actions",
@@ -163,10 +249,23 @@ const FlightAdmin = () => {
     [handleView, handleEdit, handleDelete]
   );
 
+  // Handle page change
+  const handlePageChange = (newPage: number) => {
+    setPage(newPage);
+  };
+
   return (
-    <div className="p-4 bg-white rounded shadow">
-      <div className="flex justify-between items-center mb-4">
-        <h1 className="text-2xl font-bold">Flight Management</h1>
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">
+            Flight Management
+          </h1>
+          <p className="text-gray-600 mt-1">
+            Manage and monitor all flight schedules
+          </p>
+        </div>
         <button
           onClick={() => setIsCreateModalOpen(true)}
           className="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 transition-colors"
@@ -175,19 +274,35 @@ const FlightAdmin = () => {
         </button>
       </div>
 
-      {error && <p className="text-red-500 mb-4">{error}</p>}
-
-      <TableContainer
-        title="Flights List"
-        data={data}
-        columns={columns}
+      {/* Filters */}
+      <FlightFilters
+        filters={filters}
+        onFiltersChange={handleFiltersChange}
+        onClearFilters={handleClearFilters}
         loading={loading}
-        sorting={sorting}
-        onSortingChange={setSorting}
-        pagination={pagination || undefined}
-        onPageChange={pagination ? setPage : undefined}
-        emptyMessage="No Flights found"
       />
+
+      {/* Error Message */}
+      {error && (
+        <div className="bg-red-50 border border-red-200 rounded-md p-4">
+          <p className="text-red-600">{error}</p>
+        </div>
+      )}
+
+      {/* Flights Table */}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+        <TableContainer
+          title="Flights List"
+          data={data}
+          columns={columns}
+          loading={loading}
+          sorting={sorting}
+          onSortingChange={setSorting}
+          pagination={pagination || undefined}
+          onPageChange={handlePageChange}
+          emptyMessage="No Flights found"
+        />
+      </div>
 
       {/* Modals */}
       <CreateFlightModal

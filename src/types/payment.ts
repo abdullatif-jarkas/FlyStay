@@ -107,7 +107,8 @@ export interface PaymentMethodOption {
 export const PAYMENT_ENDPOINTS = {
   CREATE_FLIGHT_PAYMENT_INTENT: (bookingId: number) =>
     `/api/payments/flight-booking/${bookingId}`,
-  CONFIRM_PAYMENT: (bookingId: number) => `/api/payments/flight-booking/${bookingId}`,
+  CONFIRM_PAYMENT: (bookingId: number) =>
+    `/api/payments/flight-booking/${bookingId}`,
   GET_PAYMENT_STATUS: (paymentIntentId: string) =>
     `/api/payments/status/${paymentIntentId}`,
 } as const;
@@ -281,6 +282,7 @@ export interface AdminPaymentStats {
   unverified_payments: number;
 }
 
+// Export data interface for Excel export
 export interface AdminPaymentExportData {
   id: number;
   user_name: string;
