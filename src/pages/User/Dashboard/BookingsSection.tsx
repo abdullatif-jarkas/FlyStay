@@ -15,6 +15,7 @@ import {
   FaCreditCard,
   FaExclamationTriangle,
   FaSync,
+  FaBan,
 } from "react-icons/fa";
 import { useBooking } from "../../../contexts/BookingContext";
 import PaymentModal from "../../../components/Payment/PaymentModal";
@@ -100,6 +101,16 @@ const BookingsSection: React.FC<BookingsSectionProps> = () => {
     "all"
   );
   const [paymentLoading, setPaymentLoading] = useState<number | null>(null);
+  const [cancelLoading, setCancelLoading] = useState<number | null>(null);
+  const [confirmCancelModal, setConfirmCancelModal] = useState<{
+    isOpen: boolean;
+    booking: any;
+    type: "flight" | "hotel";
+  }>({
+    isOpen: false,
+    booking: null,
+    type: "flight",
+  });
 
   // Payment modal state
   const [paymentModalOpen, setPaymentModalOpen] = useState(false);
@@ -376,6 +387,146 @@ const BookingsSection: React.FC<BookingsSectionProps> = () => {
     setCurrentPayment(null);
   };
 
+  // Handle cancel booking confirmation
+  const handleCancelBooking = (booking: any, type: "flight" | "hotel") => {
+    setConfirmCancelModal({
+      isOpen: true,
+      booking,
+      type,
+    });
+  };
+
+  // Cancel flight booking
+  const cancelFlightBooking = async (bookingId: number) => {
+    if (!token) {
+      toast.error("Please login to cancel booking");
+      return;
+    }
+
+    setCancelLoading(bookingId);
+
+    try {
+      const response = await axios.post(
+        `http://127.0.0.1:8000/api/flight-bookings/${bookingId}/cancel`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: "application/json",
+          },
+        }
+      );
+
+      if (response.data.status === "success") {
+        toast.success("Flight booking cancelled successfully");
+        // Update the booking status in the local state
+        setApiFlightBookings((prev) =>
+          prev.map((booking) =>
+            booking.id === bookingId
+              ? { ...booking, status: "cancelled" as const }
+              : booking
+          )
+        );
+        // Refresh bookings to get updated data
+        fetchBookings();
+      } else {
+        toast.error(response.data.message || "Failed to cancel booking");
+      }
+    } catch (err: unknown) {
+      console.error("Error cancelling flight booking:", err);
+      const errorMessage =
+        err instanceof Error && "response" in err
+          ? (err as { response?: { data?: { message?: string } } }).response
+              ?.data?.message
+          : undefined;
+      toast.error(errorMessage || "Failed to cancel booking");
+    } finally {
+      setCancelLoading(null);
+    }
+  };
+
+  // Cancel hotel booking
+  const cancelHotelBooking = async (bookingId: number) => {
+    if (!token) {
+      toast.error("Please login to cancel booking");
+      return;
+    }
+
+    setCancelLoading(bookingId);
+
+    try {
+      const response = await axios.post(
+        `http://127.0.0.1:8000/api/hotel-bookings/${bookingId}/cancel`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: "application/json",
+          },
+        }
+      );
+
+      if (response.data.status === "success") {
+        toast.success("Hotel booking cancelled successfully");
+        // Update the booking status in the local state
+        setApiHotelBookings((prev) =>
+          prev.map((booking) =>
+            booking.id === bookingId
+              ? { ...booking, status: "cancelled" as const }
+              : booking
+          )
+        );
+        // Refresh bookings to get updated data
+        fetchBookings();
+      } else {
+        toast.error(response.data.message || "Failed to cancel booking");
+      }
+    } catch (err: unknown) {
+      console.error("Error cancelling hotel booking:", err);
+      const errorMessage =
+        err instanceof Error && "response" in err
+          ? (err as { response?: { data?: { message?: string } } }).response
+              ?.data?.message
+          : undefined;
+      toast.error(errorMessage || "Failed to cancel booking");
+    } finally {
+      setCancelLoading(null);
+    }
+  };
+
+  // Confirm cancellation
+  const confirmCancellation = async () => {
+    const { booking, type } = confirmCancelModal;
+    if (!booking) return;
+
+    if (type === "flight") {
+      await cancelFlightBooking(booking.id);
+    } else {
+      await cancelHotelBooking(booking.id);
+    }
+
+    // Close confirmation modal
+    setConfirmCancelModal({
+      isOpen: false,
+      booking: null,
+      type: "flight",
+    });
+  };
+
+  // Close confirmation modal
+  const closeCancelModal = () => {
+    setConfirmCancelModal({
+      isOpen: false,
+      booking: null,
+      type: "flight",
+    });
+  };
+
+  // Check if booking can be cancelled
+  const canCancelBooking = (status: string): boolean => {
+    return ["pending", "confirmed"].includes(status);
+  };
+
   // Convert API hotel bookings to display format
   const convertApiHotelBookings = (apiBookings: ApiHotelBooking[]) => {
     return apiBookings.map((booking) => {
@@ -398,7 +549,7 @@ const BookingsSection: React.FC<BookingsSectionProps> = () => {
           email: "guest@example.com",
         },
         status: booking.status,
-        amount: booking.amount, // This would be fetched from room pricing
+        total_amount: 100, // Default amount - would be fetched from room pricing
         booking_date: booking.booking_date,
         nights: nights > 0 ? nights : 1,
         type: "hotel" as const,
@@ -424,7 +575,7 @@ const BookingsSection: React.FC<BookingsSectionProps> = () => {
         email: "passenger@example.com",
       },
       status: booking.status,
-      amount: booking.amount, // This would need to be fetched from flight cabin pricing
+      total_amount: 200, // Default amount - would need to be fetched from flight cabin pricing
       booking_date: booking.booking_date,
       seat_number: booking.seat_number,
       type: "flight" as const,
@@ -442,7 +593,7 @@ const BookingsSection: React.FC<BookingsSectionProps> = () => {
       (a, b) =>
         new Date(b.booking_date).getTime() - new Date(a.booking_date).getTime()
     );
-    
+
     switch (activeTab) {
       case "flights":
         return allBookings.filter((booking) => booking.type === "flight");
@@ -480,7 +631,7 @@ const BookingsSection: React.FC<BookingsSectionProps> = () => {
     ...convertedHotelBookingsForStats,
   ]
     .filter((b) => b.status === "confirmed")
-    .reduce((sum, booking) => sum + booking.amount, 0);
+    .reduce((sum, booking) => sum + booking.total_amount, 0);
 
   // Flight Booking Card Component
   function FlightBookingCard({
@@ -537,18 +688,74 @@ const BookingsSection: React.FC<BookingsSectionProps> = () => {
 
         <div className="text-right">
           <div className="text-lg font-bold text-gray-900 mb-2">
-            {formatCurrency(booking.amount)}
+            {formatCurrency(booking.total_amount)}
           </div>
           <div className="space-y-2">
             {booking.status === "pending" && (
-              <button
-                onClick={handlePayNow}
-                className="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-md text-sm hover:bg-green-700 transition-colors w-full justify-center"
-              >
-                <FaCreditCard className="mr-2" />
-                Pay Now
-              </button>
+              <div className="flex flex-col space-y-2">
+                <button
+                  onClick={handlePayNow}
+                  disabled={paymentLoading === booking.id}
+                  className="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-md text-sm hover:bg-green-700 transition-colors w-full justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {paymentLoading === booking.id ? (
+                    <>
+                      <FaSpinner className="animate-spin mr-2" />
+                      Processing...
+                    </>
+                  ) : (
+                    <>
+                      <FaCreditCard className="mr-2" />
+                      Pay Now
+                    </>
+                  )}
+                </button>
+                <button
+                  onClick={() => handleCancelBooking(booking, "flight")}
+                  disabled={cancelLoading === booking.id}
+                  className="inline-flex items-center px-4 py-2 bg-red-600 text-white rounded-md text-sm hover:bg-red-700 transition-colors w-full justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {cancelLoading === booking.id ? (
+                    <>
+                      <FaSpinner className="animate-spin mr-2" />
+                      Cancelling...
+                    </>
+                  ) : (
+                    <>
+                      <FaBan className="mr-2" />
+                      Cancel
+                    </>
+                  )}
+                </button>
+              </div>
             )}
+            {canCancelBooking(booking.status) &&
+              booking.status !== "pending" && (
+                <button
+                  onClick={() => handleCancelBooking(booking, "flight")}
+                  disabled={cancelLoading === booking.id}
+                  className="inline-flex items-center px-4 py-2 bg-red-600 text-white rounded-md text-sm hover:bg-red-700 transition-colors w-full justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {cancelLoading === booking.id ? (
+                    <>
+                      <FaSpinner className="animate-spin mr-2" />
+                      Cancelling...
+                    </>
+                  ) : (
+                    <>
+                      <FaBan className="mr-2" />
+                      Cancel Booking
+                    </>
+                  )}
+                </button>
+              )}
+            {!canCancelBooking(booking.status) &&
+              booking.status !== "pending" && (
+                <button className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md text-sm text-gray-700 hover:bg-gray-50 transition-colors w-full justify-center">
+                  <FaEye className="mr-2" />
+                  View Details
+                </button>
+              )}
           </div>
         </div>
       </div>
@@ -598,24 +805,63 @@ const BookingsSection: React.FC<BookingsSectionProps> = () => {
 
         <div className="text-right">
           <div className="text-lg font-bold text-gray-900 mb-2">
-            {formatCurrency(booking.amount)}
+            {formatCurrency(booking.total_amount)}
           </div>
           <div className="space-y-2">
             {booking.status === "pending" ? (
+              <div className="flex flex-col space-y-2">
+                <button
+                  onClick={() =>
+                    handlePayment(booking.id, booking.total_amount)
+                  }
+                  disabled={paymentLoading === booking.id}
+                  className="inline-flex items-center px-3 py-1 bg-green-600 text-white rounded-md text-sm hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {paymentLoading === booking.id ? (
+                    <>
+                      <FaSpinner className="animate-spin mr-1" />
+                      Processing...
+                    </>
+                  ) : (
+                    <>
+                      <FaCreditCard className="mr-1" />
+                      Pay Now
+                    </>
+                  )}
+                </button>
+                <button
+                  onClick={() => handleCancelBooking(booking, "hotel")}
+                  disabled={cancelLoading === booking.id}
+                  className="inline-flex items-center px-3 py-1 bg-red-600 text-white rounded-md text-sm hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {cancelLoading === booking.id ? (
+                    <>
+                      <FaSpinner className="animate-spin mr-1" />
+                      Cancelling...
+                    </>
+                  ) : (
+                    <>
+                      <FaBan className="mr-1" />
+                      Cancel
+                    </>
+                  )}
+                </button>
+              </div>
+            ) : canCancelBooking(booking.status) ? (
               <button
-                onClick={() => handlePayment(booking.id, booking.amount)}
-                disabled={paymentLoading === booking.id}
-                className="inline-flex items-center px-3 py-1 bg-green-600 text-white rounded-md text-sm hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                onClick={() => handleCancelBooking(booking, "hotel")}
+                disabled={cancelLoading === booking.id}
+                className="inline-flex items-center px-3 py-1 bg-red-600 text-white rounded-md text-sm hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {paymentLoading === booking.id ? (
+                {cancelLoading === booking.id ? (
                   <>
                     <FaSpinner className="animate-spin mr-1" />
-                    Processing...
+                    Cancelling...
                   </>
                 ) : (
                   <>
-                    <FaCreditCard className="mr-1" />
-                    Pay Now
+                    <FaBan className="mr-1" />
+                    Cancel Booking
                   </>
                 )}
               </button>
@@ -851,7 +1097,7 @@ const BookingsSection: React.FC<BookingsSectionProps> = () => {
           )}
         </div>
       </div>
-      
+
       {/* Payment Modal */}
       {currentPayment && (
         <PaymentModal
@@ -863,6 +1109,83 @@ const BookingsSection: React.FC<BookingsSectionProps> = () => {
           onSuccess={handlePaymentSuccess}
           onError={handlePaymentError}
         />
+      )}
+
+      {/* Cancel Confirmation Modal */}
+      {confirmCancelModal.isOpen && (
+        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+            <div className="p-6">
+              <div className="flex items-center mb-4">
+                <div className="flex-shrink-0">
+                  <FaExclamationTriangle className="h-6 w-6 text-red-600" />
+                </div>
+                <div className="ml-3">
+                  <h3 className="text-lg font-medium text-gray-900">
+                    Cancel Booking
+                  </h3>
+                </div>
+              </div>
+
+              <div className="mb-6">
+                <p className="text-sm text-gray-600">
+                  Are you sure you want to cancel this{" "}
+                  {confirmCancelModal.type === "flight" ? "flight" : "hotel"}{" "}
+                  booking? This action cannot be undone.
+                </p>
+
+                {confirmCancelModal.booking && (
+                  <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+                    <div className="text-sm">
+                      <p className="font-medium text-gray-900">
+                        {confirmCancelModal.type === "flight"
+                          ? `${confirmCancelModal.booking.flight_details?.departure_airport} → ${confirmCancelModal.booking.flight_details?.arrival_airport}`
+                          : confirmCancelModal.booking.hotel_name}
+                      </p>
+                      <p className="text-gray-600">
+                        Booking Reference:{" "}
+                        {confirmCancelModal.booking.booking_reference}
+                      </p>
+                      <p className="text-gray-600">
+                        Amount:{" "}
+                        {formatCurrency(
+                          confirmCancelModal.booking.total_amount
+                        )}
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <div className="flex justify-end space-x-3">
+                <button
+                  onClick={closeCancelModal}
+                  disabled={cancelLoading !== null}
+                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Keep Booking
+                </button>
+                <button
+                  onClick={confirmCancellation}
+                  disabled={cancelLoading !== null}
+                  className="px-4 py-2 text-sm font-medium text-white bg-red-600 border border-transparent rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {cancelLoading !== null ? (
+                    <>
+                      <FaSpinner className="animate-spin mr-2 inline" />
+                      Cancelling...
+                    </>
+                  ) : (
+                    <>
+                      <FaBan className="mr-2 inline" />
+                      Cancel Booking
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
     </>
   );
