@@ -124,7 +124,7 @@ const SuggestedHotels: React.FC<SuggestedHotelsProps> = ({
   const renderHotelCard = (hotel: SuggestedHotel) => (
     <div
       key={hotel.id}
-      className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 overflow-hidden"
+      className="flex flex-col bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 overflow-hidden"
     >
       {/* Hotel Image */}
       <div className="h-48 bg-gray-200 relative">
@@ -145,45 +145,48 @@ const SuggestedHotels: React.FC<SuggestedHotelsProps> = ({
       </div>
 
       {/* Hotel Info */}
-      <div className="p-4">
-        <h3 className="font-semibold text-lg text-gray-900 mb-2 truncate">
-          {hotel.name}
-        </h3>
+      <div className="p-4 flex flex-col justify-between grow">
+        <div className="">
+          <h3 className="font-semibold text-lg text-gray-900 mb-2 truncate">
+            {hotel.name}
+          </h3>
 
-        <div className="flex items-center text-gray-600 mb-2">
-          <FaMapMarkerAlt className="text-sm mr-1" />
-          <span className="text-sm">{hotel.city_name}</span>
-        </div>
-
-        <p
-          className="text-gray-600 text-sm mb-4 overflow-hidden"
-          style={{
-            display: "-webkit-box",
-            WebkitLineClamp: 2,
-            WebkitBoxOrient: "vertical",
-          }}
-        >
-          {hotel.description}
-        </p>
-
-        {hotel.price_per_night && (
-          <div className="mb-4">
-            <span className="text-lg font-bold text-primary-600">
-              ${hotel.price_per_night}
-            </span>
-            <span className="text-sm text-gray-600 ml-1">per night</span>
+          <div className="flex items-center text-gray-600 mb-2">
+            <FaMapMarkerAlt className="text-sm mr-1" />
+            <span className="text-sm">{hotel.city_name}</span>
           </div>
-        )}
 
-        {/* Action Buttons */}
-        <div className="flex space-x-2">
-          <button
-            onClick={() => handleViewDetails(hotel.id)}
-            className="flex-1 px-3 py-2 text-sm font-medium text-primary-600 border border-primary-600 rounded-md hover:bg-primary-50 transition-colors flex items-center justify-center"
+          <p
+            className="text-gray-600 text-sm mb-4 overflow-hidden"
+            style={{
+              display: "-webkit-box",
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: "vertical",
+            }}
           >
-            <FaEye className="mr-1" />
-            View Details
-          </button>
+            {hotel.description}
+          </p>
+
+          {hotel.price_per_night && (
+            <div className="mb-4">
+              <span className="text-lg font-bold text-primary-600">
+                ${hotel.price_per_night}
+              </span>
+              <span className="text-sm text-gray-600 ml-1">per night</span>
+            </div>
+          )}
+        </div>
+        <div className="">
+          {/* Action Buttons */}
+          <div className="flex space-x-2">
+            <button
+              onClick={() => handleViewDetails(hotel.id)}
+              className="flex-1 px-3 py-2 text-sm font-medium text-primary-600 border border-primary-600 rounded-md hover:bg-primary-50 transition-colors flex items-center justify-center"
+            >
+              <FaEye className="mr-1" />
+              View Details
+            </button>
+          </div>
         </div>
       </div>
     </div>
