@@ -153,8 +153,8 @@ const FlightBookingModal: React.FC<FlightBookingModalProps> = ({
 
   const handleViewProfile = () => {
     onClose();
-    // navigate("/user/profile");
-    // dispatch(setActiveSection("bookings"));
+    navigate("/user/profile");
+    dispatch(setActiveSection("bookings"));
   };
 
   if (!isOpen || !flight || !flightCabin) return null;
