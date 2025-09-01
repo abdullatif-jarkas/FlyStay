@@ -12,6 +12,7 @@ import {
   FaShieldAlt,
   FaDownload,
   FaSync,
+  FaSpinner,
 } from "react-icons/fa";
 import {
   AdminPayment,
@@ -24,12 +25,16 @@ import PaymentsList from "../../../components/Admin/Payments/PaymentsList";
 import PaymentDetailsModal from "../../../components/Admin/Payments/PaymentDetailsModal";
 import PaymentFilters from "../../../components/Admin/Payments/PaymentFilters";
 import PaymentStatsCard from "../../../components/Admin/Payments/PaymentStatsCard";
+import { paymentExportService } from "../../../services/paymentExportService";
+import { useAppSelector } from "../../../store/hooks";
+import { useUser } from "../../../hooks/useUser";
 
 const Payments: React.FC = () => {
   // State
   const [payments, setPayments] = useState<AdminPayment[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [exportLoading, setExportLoading] = useState(false);
   const [selectedPayment, setSelectedPayment] = useState<AdminPayment | null>(
     null
   );
@@ -54,6 +59,8 @@ const Payments: React.FC = () => {
   });
 
   const token = localStorage.getItem("token");
+  const { user } = useUser();
+  const userRole = useAppSelector((state) => state.user.role);
 
   // Fetch payments
   const fetchPayments = useCallback(
@@ -123,7 +130,7 @@ const Payments: React.FC = () => {
     const newStats: AdminPaymentStats = {
       total_payments: paymentsData.length,
       total_amount: paymentsData.reduce(
-        (sum, payment) => sum + parseFloat(payment.amount),
+        (sum, payment) => sum + parseFloat(payment.amount.toString()),
         0
       ),
       completed_payments: paymentsData.filter((p) => p.status === "completed")
@@ -138,7 +145,7 @@ const Payments: React.FC = () => {
       unverified_payments: paymentsData.filter((p) => p.verified_by === null)
         .length,
     };
-    
+
     setStats(newStats);
   };
 
@@ -206,9 +213,58 @@ const Payments: React.FC = () => {
     fetchPayments(currentPage, filters);
   };
 
-  // Export payments (placeholder)
-  const handleExport = () => {
-    toast.info("Export functionality will be implemented soon");
+  // Export payments
+  const handleExport = async () => {
+    // Check role-based access
+    if (!userRole || !["admin", "finance_officer"].includes(userRole)) {
+      toast.error("You don't have permission to export payment data");
+      return;
+    }
+
+    // Check if there's data to export
+    if (!payments || payments.length === 0) {
+      toast.error("No payment data available to export");
+      return;
+    }
+
+    try {
+      setExportLoading(true);
+      toast.info("Preparing export file...");
+
+      // Prepare metadata for export
+      const metadata = {
+        totalRecords: totalResults,
+        exportedBy: user?.name || user?.email || "Admin User",
+        exportDate: new Date().toLocaleString("en-US", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
+        filters: {
+          ...filters,
+          currentPage,
+          totalPages,
+        },
+      };
+
+      // Export with metadata
+      await paymentExportService.exportPaymentsWithMetadata(payments, metadata);
+
+      toast.success(
+        `Successfully exported ${payments.length} payment records to Excel file`
+      );
+    } catch (error) {
+      console.error("Export error:", error);
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "Failed to export payment data";
+      toast.error(errorMessage);
+    } finally {
+      setExportLoading(false);
+    }
   };
 
   // Load initial data
@@ -231,10 +287,15 @@ const Payments: React.FC = () => {
         <div className="flex items-center space-x-3">
           <button
             onClick={handleExport}
-            className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors"
+            disabled={exportLoading || loading || payments.length === 0}
+            className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <FaDownload className="mr-2" />
-            Export
+            {exportLoading ? (
+              <FaSpinner className="mr-2 animate-spin" />
+            ) : (
+              <FaDownload className="mr-2" />
+            )}
+            {exportLoading ? "Exporting..." : "Export"}
           </button>
           <button
             onClick={handleRefresh}

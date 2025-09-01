@@ -228,3 +228,22 @@ export interface FlightUtils {
   calculateLayoverTime: (flight: Flight) => string;
   getStopsText: (stops: number) => string;
 }
+
+// Admin Flight Filters (matching Laravel scope filters)
+export interface AdminFlightFilters {
+  old_flights?: boolean;
+  later_flight?: boolean;
+  airline?: string;
+  from_date?: string;
+  to_date?: string;
+  arrival_country?: string;
+  sort_type?: "asc" | "desc";
+}
+
+// Admin Flight Filters Props
+export interface AdminFlightFiltersProps {
+  filters: AdminFlightFilters;
+  onFiltersChange: (filters: AdminFlightFilters) => void;
+  onClearFilters: () => void;
+  loading: boolean;
+}

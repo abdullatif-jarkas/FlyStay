@@ -34,7 +34,7 @@ function TableContainer<T>({
     <div className={`space-y-4 ${className}`}>
       {/* Header Section */}
       {(title || actions) && (
-        <div className="flex items-center justify-between">
+        <div className="pt-3 pl-3 flex items-center justify-between">
           {title && (
             <h2 className="text-xl font-semibold text-gray-900">{title}</h2>
           )}

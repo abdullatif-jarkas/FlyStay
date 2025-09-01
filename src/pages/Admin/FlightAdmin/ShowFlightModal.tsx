@@ -26,17 +26,20 @@ const ShowFlightModal: React.FC<ShowFlightModalProps> = ({
 
   const fetchFlightDetails = async () => {
     if (!flightId) return;
-    
+
     setLoading(true);
     setError("");
 
     try {
-      const res = await axios.get(`http://127.0.0.1:8000/api/flight/${flightId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          Accept: "application/json",
-        },
-      });
+      const res = await axios.get(
+        `http://127.0.0.1:8000/api/flight/${flightId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: "application/json",
+          },
+        }
+      );
 
       if (res.data.status === "success") {
         setFlight(res.data.data[0]);
@@ -54,7 +57,14 @@ const ShowFlightModal: React.FC<ShowFlightModalProps> = ({
 
   const formatDateTime = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleString();
+    return date.toLocaleString([], {
+      year: "numeric",
+      month: "numeric",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true,
+    });
   };
 
   const formatDate = (dateString: string) => {
@@ -64,7 +74,11 @@ const ShowFlightModal: React.FC<ShowFlightModalProps> = ({
 
   const formatTime = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleTimeString();
+    return date.toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true,
+    });
   };
 
   return (
@@ -96,42 +110,66 @@ const ShowFlightModal: React.FC<ShowFlightModalProps> = ({
           <div className="space-y-6">
             {/* Flight Basic Info */}
             <div className="bg-gray-50 rounded-lg p-4">
-              <h3 className="text-lg font-semibold text-gray-800 mb-3">Flight Information</h3>
+              <h3 className="text-lg font-semibold text-gray-800 mb-3">
+                Flight Information
+              </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-600">Flight ID</label>
+                  <label className="block text-sm font-medium text-gray-600">
+                    Flight ID
+                  </label>
                   <p className="text-gray-800 font-medium">{flight.id}</p>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-600">Airline</label>
+                  <label className="block text-sm font-medium text-gray-600">
+                    Airline
+                  </label>
                   <p className="text-gray-800 font-medium">{flight.airline}</p>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-600">Flight Number</label>
-                  <p className="text-gray-800 font-medium">{flight.flight_number}</p>
+                  <label className="block text-sm font-medium text-gray-600">
+                    Flight Number
+                  </label>
+                  <p className="text-gray-800 font-medium">
+                    {flight.flight_number}
+                  </p>
                 </div>
               </div>
             </div>
 
             {/* Airport Information */}
             <div className="bg-blue-50 rounded-lg p-4">
-              <h3 className="text-lg font-semibold text-gray-800 mb-3">Route Information</h3>
+              <h3 className="text-lg font-semibold text-gray-800 mb-3">
+                Route Information
+              </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Departure */}
                 <div className="border-r border-blue-200 pr-4">
                   <h4 className="font-medium text-blue-800 mb-2">Departure</h4>
                   <div className="space-y-2">
                     <div>
-                      <label className="block text-sm font-medium text-gray-600">Airport</label>
-                      <p className="text-gray-800">{flight.departure_airport.name}</p>
+                      <label className="block text-sm font-medium text-gray-600">
+                        Airport
+                      </label>
+                      <p className="text-gray-800">
+                        {flight.departure_airport.name}
+                      </p>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-600">IATA Code</label>
-                      <p className="text-gray-800 font-mono">{flight.departure_airport.IATA_code}</p>
+                      <label className="block text-sm font-medium text-gray-600">
+                        IATA Code
+                      </label>
+                      <p className="text-gray-800 font-mono">
+                        {flight.departure_airport.IATA_code}
+                      </p>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-600">Date & Time</label>
-                      <p className="text-gray-800">{formatDateTime(flight.departure_time)}</p>
+                      <label className="block text-sm font-medium text-gray-600">
+                        Date & Time
+                      </label>
+                      <p className="text-gray-800">
+                        {formatDateTime(flight.departure_time)}
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -141,16 +179,28 @@ const ShowFlightModal: React.FC<ShowFlightModalProps> = ({
                   <h4 className="font-medium text-green-800 mb-2">Arrival</h4>
                   <div className="space-y-2">
                     <div>
-                      <label className="block text-sm font-medium text-gray-600">Airport</label>
-                      <p className="text-gray-800">{flight.arrival_airport.name}</p>
+                      <label className="block text-sm font-medium text-gray-600">
+                        Airport
+                      </label>
+                      <p className="text-gray-800">
+                        {flight.arrival_airport.name}
+                      </p>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-600">IATA Code</label>
-                      <p className="text-gray-800 font-mono">{flight.arrival_airport.IATA_code}</p>
+                      <label className="block text-sm font-medium text-gray-600">
+                        IATA Code
+                      </label>
+                      <p className="text-gray-800 font-mono">
+                        {flight.arrival_airport.IATA_code}
+                      </p>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-600">Date & Time</label>
-                      <p className="text-gray-800">{formatDateTime(flight.arrival_time)}</p>
+                      <label className="block text-sm font-medium text-gray-600">
+                        Date & Time
+                      </label>
+                      <p className="text-gray-800">
+                        {formatDateTime(flight.arrival_time)}
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -159,34 +209,33 @@ const ShowFlightModal: React.FC<ShowFlightModalProps> = ({
 
             {/* Flight Duration */}
             <div className="bg-yellow-50 rounded-lg p-4">
-              <h3 className="text-lg font-semibold text-gray-800 mb-3">Flight Duration</h3>
+              <h3 className="text-lg font-semibold text-gray-800 mb-3">
+                Flight Duration
+              </h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-600">Departure Date</label>
-                  <p className="text-gray-800">{formatDate(flight.departure_time)}</p>
+                  <label className="block text-sm font-medium text-gray-600">
+                    Departure Date
+                  </label>
+                  <p className="text-gray-800">
+                    {formatDate(flight.departure_time)}
+                  </p>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-600">Departure Time</label>
-                  <p className="text-gray-800">{formatTime(flight.departure_time)}</p>
+                  <label className="block text-sm font-medium text-gray-600">
+                    Departure Time
+                  </label>
+                  <p className="text-gray-800">
+                    {formatTime(flight.departure_time)}
+                  </p>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-600">Arrival Time</label>
-                  <p className="text-gray-800">{formatTime(flight.arrival_time)}</p>
-                </div>
-              </div>
-            </div>
-
-            {/* System Information */}
-            <div className="bg-gray-50 rounded-lg p-4">
-              <h3 className="text-lg font-semibold text-gray-800 mb-3">System Information</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-600">Created At</label>
-                  <p className="text-gray-800">{formatDateTime(flight.created_at)}</p>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-600">Last Updated</label>
-                  <p className="text-gray-800">{formatDateTime(flight.updated_at)}</p>
+                  <label className="block text-sm font-medium text-gray-600">
+                    Arrival Time
+                  </label>
+                  <p className="text-gray-800">
+                    {formatTime(flight.arrival_time)}
+                  </p>
                 </div>
               </div>
             </div>
