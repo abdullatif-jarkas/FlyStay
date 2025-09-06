@@ -10,7 +10,7 @@ const lazyImport = (path: string) => lazy(() => import(path));
 // Layouts
 const Layout = lazyImport("./layouts/Layout");
 const AuthLayout = lazyImport("./layouts/AuthLayout");
-const AdminLayout = lazyImport("./layouts/AdminLayout");
+const DashLayout = lazyImport("./layouts/DashLayout");
 
 // Pages
 const Home = lazyImport("./pages/Home/Home");
@@ -136,7 +136,7 @@ export const routes = createBrowserRouter([
           "flight_agent",
         ]}
       >
-        <AdminLayout />
+        <DashLayout />
       </ProtectedRoute>
     ),
     children: [

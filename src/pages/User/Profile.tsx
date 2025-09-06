@@ -1,12 +1,9 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useUser } from "../../hooks/useUser";
 import {
   FiUser,
   FiSettings,
-  // FiCreditCard,
-  // FiHelpCircle,
-  // FiHeart,
   FiChevronRight,
   FiLogOut,
 } from "react-icons/fi";
@@ -14,7 +11,7 @@ import { FaCalendarCheck } from "react-icons/fa";
 
 // Dashboard sections
 import ProfileSection from "./Dashboard/ProfileSection";
-import BookingsSection from "./Dashboard/BookingsSection";
+import BookingsSection from "./Dashboard/BookingsSection/BookingsSection";
 import SettingsSection from "./Dashboard/SettingsSection";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../store";
@@ -88,8 +85,8 @@ const Profile = () => {
     ProfileSection;
 
   const handleActiveSection = (item) => {
-    dispatch(setActiveSection(item))
-  }
+    dispatch(setActiveSection(item));
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">

@@ -222,7 +222,6 @@ const FlightAdmin = () => {
                 {flight.arrival_airport?.city_name || "N/A"}
               </div>
               <div className="text-gray-500">
-                {console.log("route: ", flight)}
                 {flight.departure_airport?.country_name || "N/A"} →{" "}
                 {flight.arrival_airport?.country_name || "N/A"}
               </div>

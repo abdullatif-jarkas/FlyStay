@@ -22,7 +22,7 @@ import LogoImg from "./../assets/Logo/Logo.png";
 import { MdFlight } from "react-icons/md";
 import { useAppSelector } from "../store/hooks";
 
-const AdminLayout = () => {
+const DashLayout = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [collapsed, setCollapsed] = useState(false);
@@ -80,14 +80,14 @@ const AdminLayout = () => {
               }}
             >
               {/* 1. General */}
-              {/* <MenuItem
+              <MenuItem
                 icon={<FaTachometerAlt />}
                 onClick={() => navigate("/admin")}
                 active={currentPath === "/admin"}
                 title="Dashboard"
               >
                 Dashboard
-              </MenuItem> */}
+              </MenuItem>
 
               {/* 2. User Management */}
               {role === "admin" && (
@@ -228,4 +228,4 @@ const AdminLayout = () => {
   );
 };
 
-export default AdminLayout;
+export default DashLayout;

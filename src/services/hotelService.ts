@@ -238,7 +238,6 @@ export const getHotelById = async (hotelId: number): Promise<Hotel> => {
 export const getHotelCountries = async (): Promise<string[]> => {
   try {
     const hotels = await getAllHotels();
-    console.log("hotels: ", hotels.data);
     const countries = [
       ...new Set(hotels.data.map((hotel) => hotel.country.name)),
     ];

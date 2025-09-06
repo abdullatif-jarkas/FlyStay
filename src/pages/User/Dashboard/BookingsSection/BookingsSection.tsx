@@ -9,7 +9,6 @@ import {
   FaCheckCircle,
   FaClock,
   FaTimes,
-  FaEye,
   FaSpinner,
   FaInbox,
   FaCreditCard,
@@ -17,84 +16,16 @@ import {
   FaSync,
   FaBan,
 } from "react-icons/fa";
-import { useBooking } from "../../../contexts/BookingContext";
-import PaymentModal from "../../../components/Payment/PaymentModal";
-
-// API Response interfaces
-interface ApiHotelBooking {
-  id: number;
-  user_id: number;
-  room_id: number;
-  check_in_date: string;
-  check_out_date: string;
-  booking_date: string;
-  status: "confirmed" | "pending" | "failed" | "cancelled";
-}
-
-interface ApiFlightBooking {
-  id: number;
-  user_id: number;
-  flight_cabins_id: number;
-  booking_date: string;
-  seat_number: number;
-  status: "confirmed" | "pending" | "failed" | "cancelled";
-}
-
-interface ApiBookingsResponse {
-  status: string;
-  message: string;
-  data: {
-    "hotel-bookings": ApiHotelBooking[];
-    "flight-bookings": ApiFlightBooking[];
-  };
-}
-
-// Display interfaces (converted from API data)
-interface FlightBooking {
-  id: number;
-  booking_reference: string;
-  flight_details: {
-    airline: string;
-    flight_number: string;
-    departure_airport: string;
-    arrival_airport: string;
-    departure_time: string;
-    arrival_time: string;
-  };
-  passenger_details: {
-    name: string;
-    email: string;
-  };
-  status: "confirmed" | "pending" | "cancelled" | "failed";
-  total_amount: number;
-  booking_date: string;
-  seat_number: number;
-}
-
-interface HotelBooking {
-  id: number;
-  booking_reference: string;
-  hotel_name: string;
-  room_type: string;
-  check_in_date: string;
-  check_out_date: string;
-  guest_details: {
-    name: string;
-    email: string;
-  };
-  status: "confirmed" | "pending" | "cancelled" | "failed";
-  total_amount: number;
-  booking_date: string;
-  nights: number;
-}
-
-interface BookingsSectionProps {
-  user?: {
-    id: number;
-    name: string;
-    email: string;
-  };
-}
+import { useBooking } from "../../../../contexts/BookingContext";
+import PaymentModal from "../../../../components/Payment/PaymentModal";
+import {
+  ApiBookingsResponse,
+  ApiFlightBooking,
+  ApiHotelBooking,
+  BookingsSectionProps,
+  FlightBooking,
+  HotelBooking,
+} from "../../../../types/bookingsSection";
 
 const BookingsSection: React.FC<BookingsSectionProps> = () => {
   const [activeTab, setActiveTab] = useState<"all" | "flights" | "hotels">(
@@ -372,6 +303,7 @@ const BookingsSection: React.FC<BookingsSectionProps> = () => {
       toast.success(
         "Payment completed successfully! Your booking is now confirmed."
       );
+      fetchBookings();
       setCurrentPayment(null);
     }
   };
@@ -524,7 +456,7 @@ const BookingsSection: React.FC<BookingsSectionProps> = () => {
 
   // Check if booking can be cancelled
   const canCancelBooking = (status: string): boolean => {
-    return ["pending", "confirmed"].includes(status);
+    return ["pending"].includes(status);
   };
 
   // Convert API hotel bookings to display format
@@ -545,11 +477,11 @@ const BookingsSection: React.FC<BookingsSectionProps> = () => {
         check_in_date: booking.check_in_date.split("T")[0],
         check_out_date: booking.check_out_date.split("T")[0],
         guest_details: {
-          name: "Guest", // This would be fetched from user data
+          name: "Guest",
           email: "guest@example.com",
         },
         status: booking.status,
-        total_amount: 100, // Default amount - would be fetched from room pricing
+        total_amount: booking.amount,
         booking_date: booking.booking_date,
         nights: nights > 0 ? nights : 1,
         type: "hotel" as const,
@@ -581,7 +513,6 @@ const BookingsSection: React.FC<BookingsSectionProps> = () => {
       type: "flight" as const,
     }));
   };
-
   // Filter bookings based on active tab
   const getFilteredBookings = () => {
     const convertedHotelBookings = convertApiHotelBookings(apiHotelBookings);
@@ -609,9 +540,9 @@ const BookingsSection: React.FC<BookingsSectionProps> = () => {
   // Calculate booking statistics
   const convertedHotelBookingsForStats =
     convertApiHotelBookings(apiHotelBookings);
-
   const convertedFlightBookingsForStats =
     convertApiFlightBookings(apiFlightBookings);
+
   const totalBookings =
     convertedFlightBookingsForStats.length +
     convertedHotelBookingsForStats.length;
@@ -749,13 +680,6 @@ const BookingsSection: React.FC<BookingsSectionProps> = () => {
                   )}
                 </button>
               )}
-            {!canCancelBooking(booking.status) &&
-              booking.status !== "pending" && (
-                <button className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md text-sm text-gray-700 hover:bg-gray-50 transition-colors w-full justify-center">
-                  <FaEye className="mr-2" />
-                  View Details
-                </button>
-              )}
           </div>
         </div>
       </div>
@@ -866,10 +790,7 @@ const BookingsSection: React.FC<BookingsSectionProps> = () => {
                 )}
               </button>
             ) : (
-              <button className="inline-flex items-center px-3 py-1 border border-gray-300 rounded-md text-sm text-gray-700 hover:bg-gray-50 transition-colors">
-                <FaEye className="mr-1" />
-                View Details
-              </button>
+              ""
             )}
           </div>
         </div>
@@ -877,7 +798,6 @@ const BookingsSection: React.FC<BookingsSectionProps> = () => {
     );
   }
 
-  // Loading state
   if (loading) {
     return (
       <div className="bg-white rounded-lg shadow-sm">
@@ -898,7 +818,6 @@ const BookingsSection: React.FC<BookingsSectionProps> = () => {
     );
   }
 
-  // Error state
   if (error) {
     return (
       <div className="bg-white rounded-lg shadow-sm">

@@ -1,23 +1,15 @@
 import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import Cookies from "js-cookie";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 export default function AuthCallback() {
+  const [searchParams] = useSearchParams();
+  const token = searchParams.get("token");
   const navigate = useNavigate();
 
   useEffect(() => {
-    const token = Cookies.get("jwt_token"); 
-    const roles = localStorage.getItem("roles"); // أو من API لاحقًا
-
     if (token) {
-      localStorage.setItem("token", token);
-      if (roles) localStorage.setItem("roles", roles);
-      navigate("/"); // أو أي صفحة بعد الدخول
-    } else {
-      console.warn("لم يتم العثور على التوكن في الكوكي");
-      navigate("/login"); // fallback لو ما فيش توكن
+      localStorage.setItem("token", token); // أو خزنه في Redux/Context
     }
-  }, [navigate]);
-
-  return <p>Loading...</p>;
+    navigate("/");
+  }, [token, navigate]);
 }
