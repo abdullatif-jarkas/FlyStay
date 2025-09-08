@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import {
   FaPlane,
   FaSearch,
-  FaFilter,
   FaEye,
   FaTimes,
   FaTrash,

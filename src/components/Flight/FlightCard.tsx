@@ -2,7 +2,6 @@ import {
   FaPlane,
   FaInfoCircle,
   FaArrowRight,
-  FaCreditCard,
 } from "react-icons/fa";
 import { FlightCardProps } from "../../types/flight";
 import FavoriteButton from "../Favorites/FavoriteButton";
@@ -10,8 +9,6 @@ import FavoriteButton from "../Favorites/FavoriteButton";
 const FlightCard: React.FC<FlightCardProps> = ({
   flight,
   onSelect,
-  onViewDetails,
-  onBookNow,
   isSelected = false,
 }) => {
   const formatTime = (dateString: string) => {
@@ -155,15 +152,6 @@ const FlightCard: React.FC<FlightCardProps> = ({
               Select
               <FaArrowRight className="ml-1" />
             </button>
-            {onBookNow && (
-              <button
-                onClick={() => onBookNow(flight)}
-                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center"
-              >
-                <FaCreditCard className="mr-1" />
-                Book Now
-              </button>
-            )}
           </div>
         </div>
 
