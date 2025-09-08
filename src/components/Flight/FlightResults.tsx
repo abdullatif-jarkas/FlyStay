@@ -1,14 +1,12 @@
 import { useState } from "react";
 import { FaSpinner, FaExclamationTriangle, FaPlane } from "react-icons/fa";
-import { FlightResultsProps, SORT_OPTIONS } from "../../types/flight";
+import { FlightResultsProps } from "../../types/flight";
 import FlightCard from "./FlightCard";
 
 const FlightResults: React.FC<FlightResultsProps> = ({
   flights,
   loading,
   error,
-  sortBy,
-  onSortChange,
   onFlightSelect,
   onViewDetails,
   onBookNow,
@@ -20,12 +18,6 @@ const FlightResults: React.FC<FlightResultsProps> = ({
     setSelectedFlightId(flight.id);
     onFlightSelect(flight);
   };
-
-  // const getSortIcon = (sortOption: string) => {
-  //   if (sortBy !== sortOption) return <FaSort className="text-gray-400" />;
-  //   return sortOption.includes('_asc') ? <FaSortUp /> : <FaSortDown />;
-  // };
-
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center py-16">
@@ -76,22 +68,6 @@ const FlightResults: React.FC<FlightResultsProps> = ({
             </span>
           )}
         </div>
-
-        {/* Sort Dropdown */}
-        {/* <div className="flex items-center space-x-2">
-          <label className="text-sm font-medium text-gray-700">Sort by:</label>
-          <select
-            value={sortBy}
-            onChange={(e) => onSortChange(e.target.value as any)}
-            className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-          >
-            {SORT_OPTIONS.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
-        </div> */}
       </div>
 
       {/* Flight Cards */}

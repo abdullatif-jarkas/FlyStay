@@ -4,7 +4,6 @@ import React, {
   useState,
   useCallback,
   useEffect,
-  ReactNode,
 } from "react";
 import axios from "axios";
 import { toast } from "sonner";
@@ -14,6 +13,7 @@ import {
   UserFavoritesResponse,
   FavoriteActionResponse,
   Favorite,
+  FavoritesProviderProps,
 } from "../types/favorites";
 
 const FavoritesContext = createContext<FavoritesContextType | undefined>(
@@ -28,9 +28,7 @@ export const useFavorites = () => {
   return context;
 };
 
-interface FavoritesProviderProps {
-  children: ReactNode;
-}
+
 
 export const FavoritesProvider: React.FC<FavoritesProviderProps> = ({
   children,

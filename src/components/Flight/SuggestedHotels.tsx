@@ -7,7 +7,6 @@ import {
   FaChevronLeft,
   FaChevronRight,
   FaEye,
-  FaCalendarCheck,
   FaTimes,
 } from "react-icons/fa";
 import { toast } from "sonner";

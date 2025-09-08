@@ -16,16 +16,16 @@ import {
   FaSync,
   FaBan,
 } from "react-icons/fa";
-import { useBooking } from "../../../../contexts/BookingContext";
-import PaymentModal from "../../../../components/Payment/PaymentModal";
+import { useBooking } from "../../contexts/BookingContext";
+import PaymentModal from "./../../components/Payment/PaymentModal";
 import {
-  ApiBookingsResponse,
+  // ApiBookingsResponse,
   ApiFlightBooking,
   ApiHotelBooking,
   BookingsSectionProps,
   FlightBooking,
   HotelBooking,
-} from "../../../../types/bookingsSection";
+} from "./../../types/bookingsSection";
 
 const BookingsSection: React.FC<BookingsSectionProps> = () => {
   const [activeTab, setActiveTab] = useState<"all" | "flights" | "hotels">(

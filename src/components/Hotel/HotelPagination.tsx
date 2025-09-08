@@ -5,18 +5,8 @@ import {
   FaAngleDoubleLeft,
   FaAngleDoubleRight,
 } from 'react-icons/fa';
+import { HotelPaginationProps } from '../../types/hotel';
 
-interface HotelPaginationProps {
-  currentPage: number;
-  totalPages: number;
-  totalResults: number;
-  hasNextPage: boolean;
-  hasPrevPage: boolean;
-  onNextPage: () => void;
-  onPrevPage: () => void;
-  onGoToPage: (page: number) => void;
-  loading?: boolean;
-}
 
 const HotelPagination: React.FC<HotelPaginationProps> = ({
   currentPage,
@@ -74,9 +64,6 @@ const HotelPagination: React.FC<HotelPaginationProps> = ({
   };
 
   const pageNumbers = getPageNumbers();
-
-  // Calculate results range
-  const resultsPerPage = Math.ceil(totalResults / totalPages);
 
   return (
     <div className="bg-white border-t border-gray-200 px-4 py-3 sm:px-6">

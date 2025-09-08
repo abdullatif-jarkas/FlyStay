@@ -5,7 +5,7 @@ interface SectionState {
 }
 
 const initialState: SectionState = {
-  activeSection: "profile", // القيمة الافتراضية
+  activeSection: "profile",
 };
 
 const sectionSlice = createSlice({

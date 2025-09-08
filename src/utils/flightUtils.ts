@@ -1,4 +1,3 @@
-// Utility functions for flight data formatting and manipulation
 
 export const formatDuration = (minutes: number): string => {
   const hours = Math.floor(minutes / 60);

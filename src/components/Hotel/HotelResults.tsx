@@ -5,17 +5,8 @@ import {
   FaHotel,
   FaSearch,
 } from "react-icons/fa";
-import { Hotel } from "../../types/hotel";
 import HotelCard from "./HotelCard";
-
-export interface HotelResultsProps {
-  hotels: Hotel[];
-  loading: boolean;
-  error?: string;
-  onViewDetails: (hotel: Hotel) => void;
-  onAddToFavorites?: (hotel: Hotel) => void;
-  hasFilters?: boolean;
-}
+import { HotelResultsProps } from "../../types/hotel";
 
 const HotelResults: React.FC<HotelResultsProps> = ({
   hotels,

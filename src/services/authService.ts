@@ -1,4 +1,3 @@
-// src/services/authService.ts
 import axios from "../api/axios";
 import { LoginData, RegisterData } from "../types/components/Auth/auth";
 

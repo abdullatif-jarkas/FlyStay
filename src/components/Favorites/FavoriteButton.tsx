@@ -1,14 +1,7 @@
 import React, { useState } from "react";
 import { FaHeart, FaSpinner } from "react-icons/fa";
 import { useFavorites } from "../../contexts/FavoritesContext";
-
-interface FavoriteButtonProps {
-  type: "hotel" | "room" | "flight";
-  id: number;
-  className?: string;
-  size?: "sm" | "md" | "lg";
-  showText?: boolean;
-}
+import { FavoriteButtonProps } from "../../types/favoriteButton";
 
 const FavoriteButton: React.FC<FavoriteButtonProps> = ({
   type,

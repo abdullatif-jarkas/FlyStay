@@ -2,27 +2,11 @@ import { useState, useCallback, useEffect } from "react";
 import { toast } from "sonner";
 import {
   getAllHotels,
-  getFilteredHotels,
   getHotelCountries,
   getHotelCities,
   HotelFilters,
 } from "../services/hotelService";
-import { Hotel } from "../types/hotel";
-
-export interface HotelState {
-  hotels: Hotel[];
-  loading: boolean;
-  error: string | null;
-  countries: string[];
-  cities: string[];
-  filters: HotelFilters;
-  // Pagination state
-  currentPage: number;
-  totalPages: number;
-  totalResults: number;
-  hasNextPage: boolean;
-  hasPrevPage: boolean;
-}
+import { HotelState } from "../types/hotel";
 
 export const useHotels = () => {
   const [state, setState] = useState<HotelState>({

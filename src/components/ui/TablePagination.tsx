@@ -1,24 +1,6 @@
 import React from "react";
 import { FiChevronLeft, FiChevronRight, FiChevronsLeft, FiChevronsRight } from "react-icons/fi";
-
-export interface PaginationData {
-  current_page: number;
-  total_pages: number;
-  next_page_url: string | null;
-  prev_page_url: string | null;
-  total?: number;
-  per_page?: number;
-  from?: number;
-  total_results?: number; 
-  to?: number;
-}
-
-interface TablePaginationProps {
-  pagination: PaginationData;
-  onPageChange: (page: number) => void;
-  loading?: boolean;
-  showInfo?: boolean;
-}
+import { TablePaginationProps } from "../../types/tables";
 
 const TablePagination: React.FC<TablePaginationProps> = ({
   pagination,

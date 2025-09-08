@@ -1,3 +1,5 @@
+import { ReactNode } from "react";
+
 export interface ApiHotelBooking {
   id: number;
   user_id: number;
@@ -16,6 +18,48 @@ export interface ApiFlightBooking {
   seat_number: number;
   status: "confirmed" | "pending" | "failed" | "cancelled";
 }
+
+export interface HotelBookingAPI {
+  id: number;
+  user_id: number;
+  room_id: number;
+  check_in_date: string;
+  check_out_date: string;
+  booking_date: string;
+  amount: number;
+  status: 'pending' | 'confirmed' | 'cancelled';
+  duration: string;
+  user_Info: {
+    id: number;
+    name: string;
+    email: string;
+    email_verified_at: string | null;
+    phone_number: string;
+  };
+  Room: {
+    id: number;
+    hotel_id: number;
+    room_type: string;
+    price_per_night: string;
+    capacity: number;
+    description: string;
+  };
+  Payments: any[];
+}
+
+export interface BookingProviderProps {
+  children: ReactNode;
+}
+
+export interface BookingContextType {
+  hotelBookings: HotelBookingAPI[];
+  addHotelBooking: (booking: HotelBookingAPI) => void;
+  updateBookingStatus: (bookingId: number, status: 'pending' | 'confirmed' | 'cancelled') => void;
+  removeBooking: (bookingId: number) => void;
+  getBookingById: (bookingId: number) => HotelBookingAPI | undefined;
+  refreshBookings: () => void;
+}
+
 
 export interface ApiBookingsResponse {
   status: string;

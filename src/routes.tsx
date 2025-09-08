@@ -109,8 +109,6 @@ export const routes = createBrowserRouter([
           { path: "payments", element: withSuspense(<Payments />) },
         ],
       },
-      { path: "about-us", element: withSuspense(<AboutUs />) },
-      { path: "customer-service", element: withSuspense(<CustomerService />) },
       { path: "*", element: withSuspense(<Error />) },
     ],
   },

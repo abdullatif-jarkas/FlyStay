@@ -1,43 +1,7 @@
-import React, { createContext, useContext, useState, useCallback, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useCallback } from 'react';
 import { toast } from 'sonner';
+import { BookingContextType, BookingProviderProps, HotelBookingAPI } from '../types/bookingsSection';
 
-// Booking interfaces based on API response
-export interface HotelBookingAPI {
-  id: number;
-  user_id: number;
-  room_id: number;
-  check_in_date: string;
-  check_out_date: string;
-  booking_date: string;
-  amount: number;
-  status: 'pending' | 'confirmed' | 'cancelled';
-  duration: string;
-  user_Info: {
-    id: number;
-    name: string;
-    email: string;
-    email_verified_at: string | null;
-    phone_number: string;
-  };
-  Room: {
-    id: number;
-    hotel_id: number;
-    room_type: string;
-    price_per_night: string;
-    capacity: number;
-    description: string;
-  };
-  Payments: any[];
-}
-
-export interface BookingContextType {
-  hotelBookings: HotelBookingAPI[];
-  addHotelBooking: (booking: HotelBookingAPI) => void;
-  updateBookingStatus: (bookingId: number, status: 'pending' | 'confirmed' | 'cancelled') => void;
-  removeBooking: (bookingId: number) => void;
-  getBookingById: (bookingId: number) => HotelBookingAPI | undefined;
-  refreshBookings: () => void;
-}
 
 const BookingContext = createContext<BookingContextType | undefined>(undefined);
 
@@ -48,10 +12,6 @@ export const useBooking = () => {
   }
   return context;
 };
-
-interface BookingProviderProps {
-  children: ReactNode;
-}
 
 export const BookingProvider: React.FC<BookingProviderProps> = ({ children }) => {
   const [hotelBookings, setHotelBookings] = useState<HotelBookingAPI[]>([]);

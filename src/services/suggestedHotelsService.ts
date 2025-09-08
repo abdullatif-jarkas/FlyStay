@@ -2,7 +2,6 @@ import axios from 'axios';
 import {
   SuggestedHotelsResponse,
   FetchSuggestedHotelsParams,
-  SuggestedHotelsFilters,
   SUGGESTED_HOTELS_ENDPOINTS,
 } from '../types/suggestedHotels';
 

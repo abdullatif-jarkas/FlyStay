@@ -7,10 +7,8 @@ import {
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "../../store";
 import { setActiveSection } from "../../store/sectionSlice";
+import { UserDropdownProps } from "../../types/userDropdown";
 
-interface UserDropdownProps {
-  onLogout: () => void;
-}
 
 const UserDropdown: FC<UserDropdownProps> = ({ onLogout }) => {
   const dispatch = useDispatch<AppDispatch>();

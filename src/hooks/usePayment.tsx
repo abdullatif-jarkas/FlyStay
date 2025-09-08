@@ -9,7 +9,6 @@ import {
 import {
   PaymentState,
   FlightBookingConfirmation,
-  PaymentStatus,
 } from "../types/payment";
 
 export const usePayment = () => {

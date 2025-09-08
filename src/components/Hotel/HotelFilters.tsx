@@ -8,23 +8,7 @@ import {
   FaSearch,
   FaCity,
 } from "react-icons/fa";
-import { HotelFilters as IHotelFilters } from "../../services/hotelService";
-
-export interface HotelFiltersProps {
-  filters: IHotelFilters;
-  countries: string[];
-  cities: string[];
-  onFilterByName: (name: string) => void;
-  onFilterByRating: (rating: number) => void;
-  onFilterByCity: (city: string) => void;
-  onFilterByCountry: (country: string) => void;
-  onRemoveNameFilter: () => void;
-  onRemoveRatingFilter: () => void;
-  onRemoveCityFilter: () => void;
-  onRemoveCountryFilter: () => void;
-  onClearFilters: () => void;
-  loading?: boolean;
-}
+import { HotelFiltersProps } from "../../types/hotel";
 
 const HotelFilters: React.FC<HotelFiltersProps> = ({
   filters,

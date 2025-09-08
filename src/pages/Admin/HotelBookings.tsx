@@ -744,22 +744,6 @@ const HotelBookings: React.FC = () => {
                         {getStatusBadge(selectedBooking.status)}
                       </span>
                     </div>
-                    <div>
-                      <span className="font-medium text-gray-700">
-                        Created:
-                      </span>
-                      <span className="ml-2 text-gray-900">
-                        {new Date(selectedBooking.created_at).toLocaleString()}
-                      </span>
-                    </div>
-                    <div>
-                      <span className="font-medium text-gray-700">
-                        Updated:
-                      </span>
-                      <span className="ml-2 text-gray-900">
-                        {new Date(selectedBooking.updated_at).toLocaleString()}
-                      </span>
-                    </div>
                   </div>
                 </div>
               </div>

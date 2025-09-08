@@ -1,12 +1,5 @@
 import { NavLink } from "react-router-dom";
-
-interface ButtonProps {
-  title?: string;
-  to?: string;
-  styles?: string;
-  onClick?: () => void;
-  children?: React.ReactNode;
-}
+import { ButtonProps } from "../../types/button";
 
 const Button = ({ title, to, styles, onClick, children }: ButtonProps) => {
   if (to) {
@@ -40,7 +33,3 @@ const Button = ({ title, to, styles, onClick, children }: ButtonProps) => {
 };
 
 export default Button;
-// className={({ isActive }) =>
-//         `${styles ? styles : ""} text-center font-medium text-gray-button rounded-4 w-[189px] py-[9px] ${
-//           isActive ? "bg-primary-500 border-0 text-white font-bold" : ""
-//         }`

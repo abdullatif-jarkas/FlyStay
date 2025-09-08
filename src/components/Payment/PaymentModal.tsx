@@ -1,16 +1,7 @@
 import React from 'react';
 import { FaTimes } from 'react-icons/fa';
 import StripePayment from './StripePayment';
-
-interface PaymentModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  clientSecret: string;
-  bookingId: number;
-  amount: number;
-  onSuccess: () => void;
-  onError: (error: string) => void;
-}
+import { PaymentModalProps } from '../../types/stripe';
 
 const PaymentModal: React.FC<PaymentModalProps> = ({
   isOpen,
@@ -34,7 +25,6 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
 
   const handleError = (error: string) => {
     onError(error);
-    // Don't close modal on error, let user try again
   };
 
   return (

@@ -3,23 +3,11 @@ import {
   getCoreRowModel,
   getSortedRowModel,
   flexRender,
-  ColumnDef,
-  SortingState,
-  OnChangeFn,
 } from "@tanstack/react-table";
 import { FiChevronUp, FiChevronDown } from "react-icons/fi";
 import LoadingSpinner from "../LoadingSpinner/LoadingSpinner";
 import { LuChevronsLeftRight } from "react-icons/lu";
-
-interface DataTableProps<T> {
-  data: T[];
-  columns: ColumnDef<T>[];
-  loading?: boolean;
-  sorting?: SortingState;
-  onSortingChange?: OnChangeFn<SortingState>;
-  emptyMessage?: string;
-  className?: string;
-}
+import { DataTableProps } from "../../types/tables";
 
 function DataTable<T>({
   data,

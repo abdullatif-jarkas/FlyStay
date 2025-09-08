@@ -1,9 +1,52 @@
-// Hotel-related TypeScript interfaces
+import { HotelFilters, HotelFilters as IHotelFilters } from "../services/hotelService";
 
 export interface Country {
   id: number;
   name: string;
   iso2: string;
+}
+
+export interface HotelResultsProps {
+  hotels: Hotel[];
+  loading: boolean;
+  error?: string;
+  onViewDetails: (hotel: Hotel) => void;
+  onAddToFavorites?: (hotel: Hotel) => void;
+  hasFilters?: boolean;
+}
+
+export interface HotelPaginationProps {
+  currentPage: number;
+  totalPages: number;
+  totalResults: number;
+  hasNextPage: boolean;
+  hasPrevPage: boolean;
+  onNextPage: () => void;
+  onPrevPage: () => void;
+  onGoToPage: (page: number) => void;
+  loading?: boolean;
+}
+
+
+export interface HotelFiltersProps {
+  filters: IHotelFilters;
+  countries: string[];
+  cities: string[];
+  onFilterByName: (name: string) => void;
+  onFilterByRating: (rating: number) => void;
+  onFilterByCity: (city: string) => void;
+  onFilterByCountry: (country: string) => void;
+  onRemoveNameFilter: () => void;
+  onRemoveRatingFilter: () => void;
+  onRemoveCityFilter: () => void;
+  onRemoveCountryFilter: () => void;
+  onClearFilters: () => void;
+  loading?: boolean;
+}
+
+export interface HotelCardProps {
+  hotel: Hotel;
+  onViewDetails: (hotel: Hotel) => void;
 }
 
 export interface City {
@@ -14,6 +57,22 @@ export interface City {
     name: string;
   };
 }
+
+export interface HotelState {
+  hotels: Hotel[];
+  loading: boolean;
+  error: string | null;
+  countries: string[];
+  cities: string[];
+  filters: HotelFilters;
+  // Pagination state
+  currentPage: number;
+  totalPages: number;
+  totalResults: number;
+  hasNextPage: boolean;
+  hasPrevPage: boolean;
+}
+
 
 export interface HotelImage {
   id: number;

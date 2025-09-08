@@ -20,7 +20,7 @@ export const stripeConfig = {
   appearance: {
     theme: "stripe" as const,
     variables: {
-      colorPrimary: "#2563eb", // Primary blue color matching FlyStay theme
+      colorPrimary: "#2563eb",
       colorBackground: "#ffffff",
       colorText: "#1f2937",
       colorDanger: "#dc2626",

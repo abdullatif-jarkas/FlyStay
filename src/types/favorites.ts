@@ -1,3 +1,5 @@
+import { ReactNode } from "react";
+
 // Favorites API interfaces
 export interface Favorite {
   id: number;
@@ -7,6 +9,10 @@ export interface Favorite {
     | "App\\Models\\Room"
     | "App\\Models\\Flight";
   favoritable_id: number;
+}
+
+export interface FavoritesProviderProps {
+  children: ReactNode;
 }
 
 export interface UserWithFavorites {

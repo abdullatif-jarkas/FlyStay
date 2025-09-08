@@ -58,6 +58,7 @@ const NavBar = ({ isAuth }: { isAuth?: boolean }) => {
       // await logout();
       localStorage.removeItem("token");
       localStorage.removeItem("userData");
+      localStorage.removeItem("role");
       dispatch(logout());
       setIsLoggedIn(false);
       setShowUserDropdown(false);
@@ -83,16 +84,6 @@ const NavBar = ({ isAuth }: { isAuth?: boolean }) => {
           </Link>
           <SearchInput />
           <div className="flex items-center gap-6">
-            {/* Language selector */}
-            {/* <div className="flex items-center gap-2">
-              <img src={UnitedKingdom} alt="English" className="w-6 h-6" />
-            </div> */}
-
-            {/* Help */}
-            {/* <Link to="/help" className="text-primary-500">
-              <IoMdHelpCircleOutline className="text-xl" />
-            </Link> */}
-
             {/* Favorites */}
             <Link to="/favorites" className="text-primary-500">
               <FaRegHeart className="text-xl" />
@@ -104,7 +95,7 @@ const NavBar = ({ isAuth }: { isAuth?: boolean }) => {
             </Link>
 
             {/* Dashboard */}
-            {!(role === "customer") && (
+            {!(role === "customer" || role === null) && (
               <Link
                 to="/admin"
                 className="text-primary-500 flex items-center gap-1"

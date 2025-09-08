@@ -1,21 +1,6 @@
-import React from "react";
+import { TableContainerProps } from "../../types/tables";
 import DataTable from "./DataTable";
-import TablePagination, { PaginationData } from "./TablePagination";
-import { ColumnDef, OnChangeFn, SortingState } from "@tanstack/react-table";
-
-interface TableContainerProps<T> {
-  title?: string;
-  data: T[];
-  columns: ColumnDef<T>[];
-  loading?: boolean;
-  sorting?: SortingState;
-  onSortingChange?: OnChangeFn<SortingState>;
-  pagination?: PaginationData;
-  onPageChange?: (page: number) => void;
-  emptyMessage?: string;
-  actions?: React.ReactNode;
-  className?: string;
-}
+import TablePagination from "./TablePagination";
 
 function TableContainer<T>({
   title,

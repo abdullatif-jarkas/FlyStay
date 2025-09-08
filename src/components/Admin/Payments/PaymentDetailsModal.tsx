@@ -115,11 +115,11 @@ const PaymentDetailsModal: React.FC<AdminPaymentDetailsModalProps> = ({
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-600 mb-1">Name</label>
-                      <p className="text-gray-900">{payment.user.name}</p>
+                      <p className="text-gray-900">{payment[0].user.name}</p>
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-600 mb-1">Email</label>
-                      <p className="text-gray-900">{payment.user.email}</p>
+                      <p className="text-gray-900">{payment[0].user.email}</p>
                     </div>
                   </div>
                 </div>
@@ -141,11 +141,7 @@ const PaymentDetailsModal: React.FC<AdminPaymentDetailsModalProps> = ({
                     <div>
                       <label className="block text-sm font-medium text-gray-600 mb-1">Booking Date</label>
                       <p className="text-gray-900">
-                        {formatDate(
-                          'booking_date' in payment[0].payable 
-                            ? payment[0].payable.booking_date 
-                            : payment[0].created_at
-                        )}
+                        {formatDate('booking_date' in payment[0].payable ?? payment[0].payable.booking_date )}
                       </p>
                     </div>
                   </div>
@@ -193,16 +189,6 @@ const PaymentDetailsModal: React.FC<AdminPaymentDetailsModalProps> = ({
                       <p className="text-gray-900 font-mono text-sm">{payment[0].transaction_id}</p>
                     </div>
                   )}
-                  
-                  <div>
-                    <label className="block text-sm font-medium text-gray-600 mb-1">Created At</label>
-                    <p className="text-gray-900">{formatDate(payment[0].created_at)}</p>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-600 mb-1">Updated At</label>
-                    <p className="text-gray-900">{formatDate(payment[0].updated_at)}</p>
-                  </div>
 
                   <div>
                     <label className="block text-sm font-medium text-gray-600 mb-1">Verification Status</label>

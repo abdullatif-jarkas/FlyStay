@@ -8,7 +8,6 @@ export interface UserData {
   email: string;
   phone_number?: string;
   profile_image?: string;
-  // Add other user properties as needed
 }
 
 export const useUser = () => {

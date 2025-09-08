@@ -1,12 +1,13 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { toast } from "sonner";
-import { FiShield, FiGlobe, FiTrash2, FiEye, FiEyeOff } from "react-icons/fi";
-import { FaSpinner } from "react-icons/fa";
-
-// interface SettingsSectionProps {
-//   user?: UserData;
-// }
+import { useNavigate } from "react-router-dom";
+import { FiShield, FiTrash2, FiEye, FiEyeOff } from "react-icons/fi";
+import {
+  FaSpinner,
+  FaExclamationTriangle,
+  FaTimes,
+} from "react-icons/fa";
 
 const SettingsSection = () => {
   // Change password state
@@ -30,6 +31,20 @@ const SettingsSection = () => {
   }>({});
 
   const token = localStorage.getItem("token");
+  const navigate = useNavigate();
+
+  // Delete account state
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState(false);
+  const [deleteConfirmation, setDeleteConfirmation] = useState({
+    confirmText: "",
+    confirmCheckbox: false,
+  });
+  const [deleteErrors, setDeleteErrors] = useState<{
+    confirmText?: string;
+    confirmCheckbox?: string;
+    general?: string;
+  }>({});
 
   // Handle password form input changes
   const handlePasswordInputChange = (field: string, value: string) => {
@@ -161,6 +176,132 @@ const SettingsSection = () => {
     });
     setPasswordErrors({});
     setShowChangePassword(false);
+  };
+
+  // Get user data from localStorage
+  const getUserData = () => {
+    const userData = localStorage.getItem("userData");
+    if (userData) {
+      return JSON.parse(userData);
+    }
+    return null;
+  };
+
+  // Handle delete confirmation input changes
+  const handleDeleteInputChange = (field: string, value: string | boolean) => {
+    setDeleteConfirmation((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+
+    // Clear specific field error when user starts typing/changing
+    if (deleteErrors[field as keyof typeof deleteErrors]) {
+      setDeleteErrors((prev) => ({
+        ...prev,
+        [field]: undefined,
+      }));
+    }
+  };
+
+  // Validate delete confirmation
+  const validateDeleteConfirmation = (): boolean => {
+    const errors: typeof deleteErrors = {};
+    const userData = getUserData();
+
+    if (!deleteConfirmation.confirmText.trim()) {
+      errors.confirmText = "Please type DELETE to confirm";
+    } else if (deleteConfirmation.confirmText !== "DELETE") {
+      errors.confirmText = "Please type DELETE exactly as shown";
+    }
+
+    if (!deleteConfirmation.confirmCheckbox) {
+      errors.confirmCheckbox =
+        "You must confirm that you understand the consequences";
+    }
+
+    setDeleteErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  // Handle account deletion
+  const handleDeleteAccount = async () => {
+    if (!token) {
+      toast.error("Please login to delete your account");
+      return;
+    }
+
+    if (!validateDeleteConfirmation()) {
+      return;
+    }
+
+    setDeleteLoading(true);
+    setDeleteErrors({});
+
+    try {
+      const response = await axios.delete(
+        "http://127.0.0.1:8000/api/delete-account",
+        {
+          headers: {
+            Accept: "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (response.data.status === "success") {
+        toast.success("Account deleted successfully");
+
+        // Clear all user data from localStorage
+        localStorage.removeItem("token");
+        localStorage.removeItem("userData");
+        localStorage.removeItem("role");
+
+        // Close modal
+        setShowDeleteModal(false);
+
+        // Redirect to home page after a short delay
+        setTimeout(() => {
+          navigate("/");
+        }, 2000);
+      } else {
+        toast.error(response.data.message || "Failed to delete account");
+      }
+    } catch (err: unknown) {
+      console.error("Error deleting account:", err);
+
+      if (axios.isAxiosError(err) && err.response) {
+        const errorData = err.response.data;
+
+        if (err.response.status === 422 && errorData.errors) {
+          // Handle validation errors
+          setDeleteErrors(errorData.errors);
+        } else if (errorData.message) {
+          setDeleteErrors({ general: errorData.message });
+          toast.error(errorData.message);
+        } else {
+          toast.error("Failed to delete account");
+        }
+      } else {
+        toast.error("Failed to delete account. Please try again.");
+      }
+    } finally {
+      setDeleteLoading(false);
+    }
+  };
+
+  // Handle delete modal close
+  const handleCloseDeleteModal = () => {
+    setDeleteConfirmation({
+      confirmText: "",
+      confirmCheckbox: false,
+    });
+    setDeleteErrors({});
+    setShowDeleteModal(false);
+  };
+
+  // Handle delete button click
+  const handleDeleteButtonClick = () => {
+    setShowDeleteModal(true);
   };
 
   return (
@@ -366,154 +507,8 @@ const SettingsSection = () => {
               </div>
             )}
           </div>
-
-          {/* <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-            <div>
-              <h3 className="font-medium text-gray-900">Two-Factor Authentication</h3>
-              <p className="text-sm text-gray-600">Add an extra layer of security</p>
-            </div>
-            <label className="relative inline-flex items-center cursor-pointer">
-              <input type="checkbox" className="sr-only peer" />
-              <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-            </label>
-          </div>
-          
-          <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-            <div>
-              <h3 className="font-medium text-gray-900">Login Sessions</h3>
-              <p className="text-sm text-gray-600">Manage your active sessions</p>
-            </div>
-            <button className="text-blue-600 hover:text-blue-700 font-medium">
-              View Sessions
-            </button>
-          </div> */}
         </div>
       </div>
-
-      {/* Notification Settings Section */}
-      {/* <div className="bg-white rounded-lg shadow-sm p-6">
-        <div className="flex items-center gap-3 mb-6">
-          <FiBell className="w-6 h-6 text-blue-600" />
-          <h2 className="text-xl font-semibold text-gray-900">Notification Settings</h2>
-        </div>
-        
-        <div className="space-y-4">
-          <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-            <div>
-              <h3 className="font-medium text-gray-900">Email Notifications</h3>
-              <p className="text-sm text-gray-600">Booking confirmations and updates</p>
-            </div>
-            <label className="relative inline-flex items-center cursor-pointer">
-              <input type="checkbox" className="sr-only peer" defaultChecked />
-              <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-            </label>
-          </div>
-          
-          <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-            <div>
-              <h3 className="font-medium text-gray-900">SMS Notifications</h3>
-              <p className="text-sm text-gray-600">Text message alerts</p>
-            </div>
-            <label className="relative inline-flex items-center cursor-pointer">
-              <input type="checkbox" className="sr-only peer" />
-              <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-            </label>
-          </div>
-          
-          <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-            <div>
-              <h3 className="font-medium text-gray-900">Marketing Communications</h3>
-              <p className="text-sm text-gray-600">Promotional offers and deals</p>
-            </div>
-            <label className="relative inline-flex items-center cursor-pointer">
-              <input type="checkbox" className="sr-only peer" defaultChecked />
-              <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-            </label>
-          </div>
-        </div>
-      </div> */}
-
-      {/* Language & Region Section */}
-      {/* <div className="bg-white rounded-lg shadow-sm p-6">
-        <div className="flex items-center gap-3 mb-6">
-          <FiGlobe className="w-6 h-6 text-blue-600" />
-          <h2 className="text-xl font-semibold text-gray-900">Language</h2>
-        </div>
-        
-        <div className="space-y-4">
-          <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-            <div>
-              <h3 className="font-medium text-gray-900">Language</h3>
-              <p className="text-sm text-gray-600">Choose your preferred language</p>
-            </div>
-            <select className="border border-gray-300 rounded-md px-3 py-2">
-              <option>English</option>
-              <option>Spanish</option>
-              <option>French</option>
-              <option>German</option>
-            </select>
-          </div>
-          
-          <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-            <div>
-              <h3 className="font-medium text-gray-900">Currency</h3>
-              <p className="text-sm text-gray-600">Display prices in your currency</p>
-            </div>
-            <select className="border border-gray-300 rounded-md px-3 py-2">
-              <option>USD ($)</option>
-              <option>EUR (€)</option>
-              <option>GBP (£)</option>
-              <option>JPY (¥)</option>
-            </select>
-          </div>
-          
-          <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-            <div>
-              <h3 className="font-medium text-gray-900">Time Zone</h3>
-              <p className="text-sm text-gray-600">Your local time zone</p>
-            </div>
-            <select className="border border-gray-300 rounded-md px-3 py-2">
-              <option>UTC-5 (Eastern Time)</option>
-              <option>UTC-6 (Central Time)</option>
-              <option>UTC-7 (Mountain Time)</option>
-              <option>UTC-8 (Pacific Time)</option>
-            </select>
-          </div>
-        </div>
-      </div> */}
-
-      {/* Privacy Settings Section */}
-      {/* <div className="bg-white rounded-lg shadow-sm p-6">
-        <div className="flex items-center gap-3 mb-6">
-          <FiEye className="w-6 h-6 text-blue-600" />
-          <h2 className="text-xl font-semibold text-gray-900">Privacy Settings</h2>
-        </div>
-        
-        <div className="space-y-4">
-          <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-            <div>
-              <h3 className="font-medium text-gray-900">Profile Visibility</h3>
-              <p className="text-sm text-gray-600">Control who can see your profile</p>
-            </div>
-            <select className="border border-gray-300 rounded-md px-3 py-2">
-              <option>Private</option>
-              <option>Public</option>
-              <option>Friends Only</option>
-            </select>
-          </div>
-          
-          <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-            <div>
-              <h3 className="font-medium text-gray-900">Data Sharing</h3>
-              <p className="text-sm text-gray-600">Share data to improve recommendations</p>
-            </div>
-            <label className="relative inline-flex items-center cursor-pointer">
-              <input type="checkbox" className="sr-only peer" defaultChecked />
-              <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-            </label>
-          </div>
-        </div>
-      </div> */}
 
       {/* Danger Zone Section */}
       <div className="bg-white rounded-lg shadow-sm p-6 border-l-4 border-red-500">
@@ -530,12 +525,163 @@ const SettingsSection = () => {
                 Permanently delete your account and all data
               </p>
             </div>
-            <button className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors">
-              Delete Account
+            <button
+              onClick={handleDeleteButtonClick}
+              disabled={deleteLoading}
+              className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {deleteLoading ? (
+                <>
+                  <FaSpinner className="animate-spin mr-2 inline" />
+                  Deleting...
+                </>
+              ) : (
+                "Delete Account"
+              )}
             </button>
           </div>
         </div>
       </div>
+
+      {/* Delete Account Confirmation Modal */}
+      {showDeleteModal && (
+        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+            <div className="p-6">
+              <div className="flex items-center mb-4">
+                <div className="flex-shrink-0">
+                  <FaExclamationTriangle className="h-6 w-6 text-red-600" />
+                </div>
+                <div className="ml-3">
+                  <h3 className="text-lg font-medium text-gray-900">
+                    Delete Account
+                  </h3>
+                </div>
+              </div>
+
+              <div className="mb-6">
+                <p className="text-sm text-gray-600 mb-4">
+                  Are you sure you want to permanently delete your account? This
+                  action cannot be undone and will:
+                </p>
+
+                <ul className="text-sm text-gray-600 mb-4 list-disc list-inside space-y-1">
+                  <li>Delete all your personal information</li>
+                  <li>Cancel all your bookings</li>
+                  <li>Remove all your travel history</li>
+                  <li>Delete all your saved preferences</li>
+                </ul>
+
+                {getUserData() && (
+                  <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+                    <div className="text-sm">
+                      <p className="font-medium text-gray-900">
+                        Account: {getUserData().name}
+                      </p>
+                      <p className="text-gray-600">
+                        Email: {getUserData().email}
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* General Error */}
+              {deleteErrors.general && (
+                <div className="bg-red-50 border border-red-200 rounded-md p-3 mb-4">
+                  <p className="text-sm text-red-600">{deleteErrors.general}</p>
+                </div>
+              )}
+
+              {/* Confirmation Input */}
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Type <span className="font-bold text-red-600">DELETE</span> to
+                  confirm:
+                </label>
+                <input
+                  type="text"
+                  value={deleteConfirmation.confirmText}
+                  onChange={(e) =>
+                    handleDeleteInputChange("confirmText", e.target.value)
+                  }
+                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent ${
+                    deleteErrors.confirmText
+                      ? "border-red-300 bg-red-50"
+                      : "border-gray-300"
+                  }`}
+                  placeholder="Type DELETE here"
+                  disabled={deleteLoading}
+                />
+                {deleteErrors.confirmText && (
+                  <p className="mt-1 text-sm text-red-600">
+                    {deleteErrors.confirmText}
+                  </p>
+                )}
+              </div>
+
+              {/* Confirmation Checkbox */}
+              <div className="mb-6">
+                <label className="flex items-start">
+                  <input
+                    type="checkbox"
+                    checked={deleteConfirmation.confirmCheckbox}
+                    onChange={(e) =>
+                      handleDeleteInputChange(
+                        "confirmCheckbox",
+                        e.target.checked
+                      )
+                    }
+                    className="mt-1 h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300 rounded"
+                    disabled={deleteLoading}
+                  />
+                  <span className="ml-2 text-sm text-gray-600">
+                    I understand that this action is permanent and cannot be
+                    undone
+                  </span>
+                </label>
+                {deleteErrors.confirmCheckbox && (
+                  <p className="mt-1 text-sm text-red-600">
+                    {deleteErrors.confirmCheckbox}
+                  </p>
+                )}
+              </div>
+
+              <div className="flex justify-end space-x-3">
+                <button
+                  onClick={handleCloseDeleteModal}
+                  disabled={deleteLoading}
+                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <FaTimes className="mr-2 inline" />
+                  Cancel
+                </button>
+                <button
+                  onClick={handleDeleteAccount}
+                  disabled={
+                    deleteLoading ||
+                    !deleteConfirmation.confirmText ||
+                    !deleteConfirmation.confirmCheckbox
+                  }
+                  className="px-4 py-2 text-sm font-medium text-white bg-red-600 border border-transparent rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {deleteLoading ? (
+                    <>
+                      <FaSpinner className="animate-spin mr-2 inline" />
+                      Deleting Account...
+                    </>
+                  ) : (
+                    <>
+                      <FaExclamationTriangle className="mr-2 inline" />
+                      Delete My Account
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

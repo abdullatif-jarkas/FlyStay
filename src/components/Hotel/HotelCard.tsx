@@ -6,13 +6,8 @@ import {
   FaInfoCircle,
   FaImage,
 } from "react-icons/fa";
-import { Hotel } from "../../types/hotel";
+import { HotelCardProps } from "../../types/hotel";
 import FavoriteButton from "../Favorites/FavoriteButton";
-
-export interface HotelCardProps {
-  hotel: Hotel;
-  onViewDetails: (hotel: Hotel) => void;
-}
 
 const HotelCard: React.FC<HotelCardProps> = ({ hotel, onViewDetails }) => {
   // Get primary image or first image

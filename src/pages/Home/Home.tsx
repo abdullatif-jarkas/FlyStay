@@ -233,60 +233,6 @@ const Home = () => {
             </div>
           </div>
         </div>
-                
-        {/* Search Bar */}
-        {/* <div className="container mx-auto px-4 relative">
-          <div className="absolute left-0 right-0 bottom-0 transform translate-y-1/2">
-            <div className="bg-white rounded-lg shadow-xl p-6">
-              <div className="flex mb-6 bg-gray-100 rounded-lg p-1">
-                <button
-                  onClick={() => setActiveSearchTab("hotels")}
-                  className={`flex-1 py-3 px-4 rounded-md font-medium transition-colors flex items-center justify-center gap-2 ${
-                    activeSearchTab === "hotels"
-                      ? "bg-white text-primary-500 shadow-sm"
-                      : "text-gray-600 hover:text-gray-800"
-                  }`}
-                >
-                  <FaHotel />
-                  Hotels
-                </button>
-                <button
-                  onClick={() => setActiveSearchTab("flights")}
-                  className={`flex-1 py-3 px-4 rounded-md font-medium transition-colors flex items-center justify-center gap-2 ${
-                    activeSearchTab === "flights"
-                      ? "bg-white text-primary-500 shadow-sm"
-                      : "text-gray-600 hover:text-gray-800"
-                  }`}
-                >
-                  <FaPlane />
-                  Flights
-                </button>
-              </div>
-
-              {activeSearchTab === "hotels" ? (
-                <HotelSearchBar />
-              ) : (
-                <FlightSearchBar
-                  onSearch={(params) => {
-                    window.location.href = `/flight?${new URLSearchParams({
-                      origin: params.origin,
-                      destination: params.destination,
-                      departure_date: params.departure_date,
-                      return_date: params.return_date || "",
-                      trip_type: params.trip_type,
-                      adults: params.passengers.adults.toString(),
-                      children: params.passengers.children.toString(),
-                      infants: params.passengers.infants.toString(),
-                      flight_class: params.flight_class,
-                    }).toString()}`;
-                  }}
-                />
-              )}
-            </div>
-          </div>
-        </div> */}
-
-        {/* <div className="h-32"></div> */}
       </section>
 
       {/* Services Section */}

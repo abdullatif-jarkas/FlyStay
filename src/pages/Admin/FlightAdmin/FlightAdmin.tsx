@@ -8,7 +8,7 @@ import {
   createViewAction,
   createEditAction,
   createDeleteAction,
-} from "../../../components/ui/table";
+} from "./../../../components/ui/table";
 import CreateFlightModal from "./CreateFlightModal";
 import EditFlightModal from "./EditFlightModal";
 import ShowFlightModal from "./ShowFlightModal";

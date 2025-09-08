@@ -1,25 +1,6 @@
 import React from "react";
 import { FiEdit, FiTrash2, FiEye, FiMoreHorizontal } from "react-icons/fi";
-
-interface ActionButtonProps {
-  onClick: () => void;
-  onView?: () => void;
-  onEdit?: () => void;
-  onDelete?: () => void;
-  icon: React.ReactNode;
-  label: string;
-  variant?: "primary" | "secondary" | "danger" | "success";
-  disabled?: boolean;
-}
-
-interface ActionButtonsProps {
-  actions?: ActionButtonProps[];
-  compact?: boolean;
-  onView?: () => void;
-  onEdit?: () => void;
-  onDelete?: () => void;
-  additionalActions?: ActionButtonProps[];
-}
+import { ActionButtonProps, ActionButtonsProps } from "../../types/ActionButton";
 
 const ActionButton: React.FC<ActionButtonProps> = ({
   onClick,
@@ -42,7 +23,7 @@ const ActionButton: React.FC<ActionButtonProps> = ({
     <button
       onClick={onClick}
       disabled={disabled}
-      className={`${baseClasses} ${variantClasses[variant]}`}
+      className={`${baseClasses} ${variantClasses[variant]} cursor-pointer`}
       title={label}
       aria-label={label}
     >

@@ -1,24 +1,19 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { useUser } from "../../hooks/useUser";
-import {
-  FiUser,
-  FiSettings,
-  FiChevronRight,
-  FiLogOut,
-} from "react-icons/fi";
+import { useUser, UserData } from "../../hooks/useUser";
+import { FiUser, FiSettings, FiChevronRight, FiLogOut } from "react-icons/fi";
 import { FaCalendarCheck } from "react-icons/fa";
 
 // Dashboard sections
-import ProfileSection from "./Dashboard/ProfileSection";
-import BookingsSection from "./Dashboard/BookingsSection/BookingsSection";
-import SettingsSection from "./Dashboard/SettingsSection";
+import ProfileSection from "./ProfileSection";
+import SettingsSection from "./SettingsSection";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../store";
 import { setActiveSection } from "../../store/sectionSlice";
+import BookingsSection from "./BookingsSection";
 
 const Profile = () => {
-  const { user, loading } = useUser();
+  const { user, loading, refetchUser } = useUser();
   const [searchParams] = useSearchParams();
   // const [activeSection, setActiveSection] = useState("profile");
   const dispatch = useDispatch<AppDispatch>();
@@ -28,6 +23,19 @@ const Profile = () => {
   );
 
   const navigate = useNavigate();
+  const [currentUser, setCurrentUser] = useState<UserData | null>(user);
+
+  // Update currentUser when user data changes
+  useEffect(() => {
+    setCurrentUser(user);
+  }, [user]);
+
+  // Handle user profile updates
+  const handleUserUpdate = (updatedUser: UserData) => {
+    setCurrentUser(updatedUser);
+    // Optionally refetch user data to ensure consistency
+    refetchUser();
+  };
 
   // Handle URL parameters for section navigation
   useEffect(() => {
@@ -40,6 +48,7 @@ const Profile = () => {
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("userData");
+    localStorage.removeItem("role");
     navigate("/auth/login");
   };
 
@@ -144,7 +153,14 @@ const Profile = () => {
 
           {/* Main Content */}
           <div className="flex-1">
-            <ActiveComponent user={user} />
+            {activeSection === "profile" ? (
+              <ProfileSection
+                user={currentUser || user}
+                onUserUpdate={handleUserUpdate}
+              />
+            ) : (
+              <ActiveComponent user={currentUser || user} />
+            )}
           </div>
         </div>
       </div>
