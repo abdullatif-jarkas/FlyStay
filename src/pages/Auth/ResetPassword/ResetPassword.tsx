@@ -9,10 +9,9 @@ const ResetPassword = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const token = searchParams.get('token');
-  const email = searchParams.get('email');
   
   const [formData, setFormData] = useState({
-    email: email || '',
+    email: '',
     password: '',
     password_confirmation: '',
     token: token || ''
@@ -82,7 +81,6 @@ const ResetPassword = () => {
                 placeholder="flystay@gmail.Com"
                 className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
                 required
-                readOnly={!!email}
               />
             </div>
 

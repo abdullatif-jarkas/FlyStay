@@ -112,10 +112,6 @@ const FlightPurchase = () => {
       toast.success(
         `Booking confirmed! Reference: ${confirmation.booking_reference}`
       );
-      // setBookingModalOpen(false);
-      // setSelectedFlightCabin(null);
-      // Optionally navigate to booking confirmation page
-      // navigate(`/booking-confirmation/${confirmation.booking_id}`);
     },
     []
   );

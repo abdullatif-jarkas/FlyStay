@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import { toast } from "sonner";
 import {
@@ -38,9 +38,7 @@ import {
 } from "../../types/dashboard";
 
 const Dashboard = () => {
-  const [dashboardData, setDashboardData] = useState<DashboardData | null>(
-    null
-  );
+  const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
@@ -108,7 +106,6 @@ const Dashboard = () => {
     }
   }, [token, fetchDashboardStats]);
 
-  // Format currency
   const formatCurrency = (amount: string | number): string => {
     const numAmount = typeof amount === "string" ? parseFloat(amount) : amount;
     return new Intl.NumberFormat("en-US", {
@@ -117,7 +114,6 @@ const Dashboard = () => {
     }).format(numAmount);
   };
 
-  // Format date
   const formatDate = (dateString: string): string => {
     return new Date(dateString).toLocaleDateString("en-US", {
       year: "numeric",
@@ -128,7 +124,6 @@ const Dashboard = () => {
     });
   };
 
-  // Get status color
   const getStatusColor = (status: string): string => {
     switch (status.toLowerCase()) {
       case "confirmed":
@@ -143,7 +138,6 @@ const Dashboard = () => {
     }
   };
 
-  // Get status icon
   const getStatusIcon = (status: string) => {
     switch (status.toLowerCase()) {
       case "confirmed":
@@ -194,14 +188,14 @@ const Dashboard = () => {
     );
   }
 
-  // Prepare chart data
+  //? Prepare chart data
   const revenueChartData: RevenueChartData[] =
     dashboardData.revenue.monthly_revenue_trend.map((item) => ({
       month: item.month_name,
       revenue: item.revenue,
     }));
 
-  // Prepare booking status chart data
+  //? Prepare booking status chart data
   const flightBookingStatusData: BookingStatusChartData[] = Object.entries(
     dashboardData.bookings.bookings_by_status.flight_bookings
   ).map(([status, count]) => ({
@@ -215,6 +209,7 @@ const Dashboard = () => {
         : "#EF4444",
   }));
 
+  //? Prepare booking status chart data
   const hotelBookingStatusData: BookingStatusChartData[] = Object.entries(
     dashboardData.bookings.bookings_by_status.hotel_bookings
   ).map(([status, count]) => ({

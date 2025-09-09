@@ -23,13 +23,16 @@ const FlightFilters: React.FC<AdminFlightFiltersProps> = ({
     setTempCountry(filters.arrival_country || "");
   }, [filters.airline, filters.arrival_country]);
 
-  const handleFilterChange = (key: keyof typeof filters, value: any) => {
-    onFiltersChange({
-      ...filters,
-      [key]: value,
-    });
-  };
-  
+  const handleFilterChange = useCallback(
+    (key: keyof typeof filters, value: any) => {
+      onFiltersChange({
+        ...filters,
+        [key]: value,
+      });
+    },
+    [filters, onFiltersChange] // لازم تضيف الاثنين لأنك بتستخدمهم
+  );
+
   const handleAirlineChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       setTempAirline(e.target.value);
@@ -66,7 +69,7 @@ const FlightFilters: React.FC<AdminFlightFiltersProps> = ({
             Flight Filters
           </h3>
         </div>
-        {hasActiveFilters && (
+        {!hasActiveFilters && (
           <button
             onClick={onClearFilters}
             disabled={loading}
