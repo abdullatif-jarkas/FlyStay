@@ -274,7 +274,6 @@ const Flight = () => {
                 onSortChange={handleSortChange}
                 onFlightSelect={handleFlightSelect}
                 onViewDetails={handleViewDetails}
-                // onBookNow={handleBookNow}
                 pagination={{
                   current_page: currentPage,
                   total_pages: totalPages,

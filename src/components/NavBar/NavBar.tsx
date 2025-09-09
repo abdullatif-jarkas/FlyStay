@@ -55,7 +55,6 @@ const NavBar = ({ isAuth }: { isAuth?: boolean }) => {
 
   const handleLogout = async () => {
     try {
-      // await logout();
       localStorage.removeItem("token");
       localStorage.removeItem("userData");
       localStorage.removeItem("role");
@@ -109,7 +108,6 @@ const NavBar = ({ isAuth }: { isAuth?: boolean }) => {
               <button
                 onClick={() => {
                   setShowUserDropdown(!showUserDropdown)
-                  // navigate("/user/profile");
                 }}
                 className="cursor-pointer flex items-center gap-2"
               >
@@ -122,7 +120,7 @@ const NavBar = ({ isAuth }: { isAuth?: boolean }) => {
               </button>
 
               {showUserDropdown && (
-                <UserDropdown user={user} onLogout={handleLogout} />
+                <UserDropdown onLogout={handleLogout} />
               )}
             </div>
           </div>

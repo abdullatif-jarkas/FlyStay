@@ -80,7 +80,7 @@ const FlightCard: React.FC<FlightCardProps> = ({
               {departureTime}
             </div>
             <div className="text-sm text-gray-500">
-              {flight.departure_airport.IATA_code}
+              {flight.departure_airport.country_name}
             </div>
             <div className="text-xs text-gray-400">
               {flight.departure_airport.city_name}
@@ -108,7 +108,7 @@ const FlightCard: React.FC<FlightCardProps> = ({
               {arrivalTime}
             </div>
             <div className="text-sm text-gray-500">
-              {flight.arrival_airport.IATA_code}
+              {flight.arrival_airport.country_name}
             </div>
             <div className="text-xs text-gray-400">
               {flight.arrival_airport.city_name}
