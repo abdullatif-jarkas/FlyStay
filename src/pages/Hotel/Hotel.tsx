@@ -15,13 +15,14 @@ const Hotel = () => {
     hotels,
     loading,
     error,
-    countries,
-    cities,
     filters,
     filterByName,
     filterByRating,
+    filterByCity,
     filterByCountry,
+    removeNameFilter,
     removeRatingFilter,
+    removeCityFilter,
     removeCountryFilter,
     clearFilters,
     refreshHotels,
@@ -126,12 +127,13 @@ const Hotel = () => {
           <div className="lg:w-80 flex-shrink-0">
             <HotelFilters
               filters={filters}
-              countries={countries}
-              cities={cities}
               onFilterByName={filterByName}
               onFilterByRating={filterByRating}
+              onFilterByCity={filterByCity}
               onFilterByCountry={filterByCountry}
+              onRemoveNameFilter={removeNameFilter}
               onRemoveRatingFilter={removeRatingFilter}
+              onRemoveCityFilter={removeCityFilter}
               onRemoveCountryFilter={removeCountryFilter}
               onClearFilters={clearFilters}
               loading={loading}

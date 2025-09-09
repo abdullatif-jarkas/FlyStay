@@ -1,4 +1,7 @@
-import { HotelFilters, HotelFilters as IHotelFilters } from "../services/hotelService";
+import {
+  HotelFilters,
+  HotelFilters as IHotelFilters,
+} from "../services/hotelService";
 
 export interface Country {
   id: number;
@@ -27,11 +30,8 @@ export interface HotelPaginationProps {
   loading?: boolean;
 }
 
-
 export interface HotelFiltersProps {
   filters: IHotelFilters;
-  countries: string[];
-  cities: string[];
   onFilterByName: (name: string) => void;
   onFilterByRating: (rating: number) => void;
   onFilterByCity: (city: string) => void;
@@ -72,7 +72,6 @@ export interface HotelState {
   hasNextPage: boolean;
   hasPrevPage: boolean;
 }
-
 
 export interface HotelImage {
   id: number;

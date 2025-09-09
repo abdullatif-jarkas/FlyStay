@@ -12,8 +12,6 @@ import { HotelFiltersProps } from "../../types/hotel";
 
 const HotelFilters: React.FC<HotelFiltersProps> = ({
   filters,
-  countries,
-  cities,
   onFilterByName,
   onFilterByRating,
   onFilterByCity,
@@ -28,13 +26,31 @@ const HotelFilters: React.FC<HotelFiltersProps> = ({
   const ratings = [1, 2, 3, 4, 5];
   const hasFilters = Object.keys(filters).length > 0;
   const [tempName, setTempName] = useState("");
+  const [tempCity, setTempCity] = useState("");
+  const [tempCountry, setTempCountry] = useState("");
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setTempName(e.target.value);
   };
 
-  const handleBlur = () => {
+  const handleCityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setTempCity(e.target.value);
+  };
+
+  const handleCountryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setTempCountry(e.target.value);
+  };
+
+  const handleNameBlur = () => {
     onFilterByName(tempName);
+  };
+
+  const handleCityBlur = () => {
+    onFilterByCity(tempCity);
+  };
+
+  const handleCountryBlur = () => {
+    onFilterByCountry(tempCountry);
   };
 
   const renderStars = (rating: number) => {
@@ -42,10 +58,12 @@ const HotelFilters: React.FC<HotelFiltersProps> = ({
       <FaStar key={i} className="text-yellow-400" />
     ));
   };
-  
+
   useEffect(() => {
     setTempName(filters.name || "");
-  }, [filters.name]);
+    setTempCity(filters.city || "");
+    setTempCountry(filters.country || "");
+  }, [filters.name, filters.city, filters.country]);
 
   return (
     <div className="bg-white rounded-lg shadow-lg p-6">
@@ -81,8 +99,8 @@ const HotelFilters: React.FC<HotelFiltersProps> = ({
               type="text"
               placeholder="Search hotels by name..."
               value={tempName}
-              onChange={handleChange}
-              onBlur={handleBlur}
+              onChange={handleNameChange}
+              onBlur={handleNameBlur}
               disabled={loading}
               className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent disabled:opacity-50"
             />
@@ -148,40 +166,28 @@ const HotelFilters: React.FC<HotelFiltersProps> = ({
             <FaCity className="mr-2 text-blue-500" />
             City
           </h4>
-          {cities.length > 0 ? (
-            <div className="space-y-2 max-h-60 overflow-y-auto">
-              {cities.map((city) => (
-                <button
-                  key={city}
-                  onClick={() => onFilterByCity(city)}
-                  disabled={loading}
-                  className={`w-full flex items-center justify-between p-3 rounded-lg border transition-colors disabled:opacity-50 ${
-                    filters.city === city
-                      ? "border-primary-500 bg-primary-50 text-primary-700"
-                      : "border-gray-200 hover:border-gray-300 hover:bg-gray-50"
-                  }`}
-                >
-                  <span className="text-sm font-medium text-left">{city}</span>
 
-                  {filters.city === city && (
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onRemoveCityFilter();
-                      }}
-                      className="text-primary-600 hover:text-primary-700"
-                    >
-                      <FaTimes />
-                    </button>
-                  )}
-                </button>
-              ))}
-            </div>
-          ) : (
-            <div className="text-sm text-gray-500 p-3 border border-gray-200 rounded-lg">
-              No cities available
-            </div>
-          )}
+          <div className="relative">
+            <FaCity className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Search hotels by city..."
+              value={tempCity}
+              onChange={handleCityChange}
+              onBlur={handleCityBlur}
+              disabled={loading}
+              className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent disabled:opacity-50"
+            />
+            {filters.city && (
+              <button
+                onClick={onRemoveCityFilter}
+                disabled={loading}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 disabled:opacity-50"
+              >
+                <FaTimes />
+              </button>
+            )}
+          </div>
         </div>
 
         {/* Country Filter */}
@@ -191,42 +197,27 @@ const HotelFilters: React.FC<HotelFiltersProps> = ({
             Country
           </h4>
 
-          {countries.length > 0 ? (
-            <div className="space-y-2 max-h-60 overflow-y-auto">
-              {countries.map((country) => (
-                <button
-                  key={country}
-                  onClick={() => onFilterByCountry(country)}
-                  disabled={loading}
-                  className={`w-full flex items-center justify-between p-3 rounded-lg border transition-colors disabled:opacity-50 ${
-                    filters.country === country
-                      ? "border-primary-500 bg-primary-50 text-primary-700"
-                      : "border-gray-200 hover:border-gray-300 hover:bg-gray-50"
-                  }`}
-                >
-                  <span className="text-sm font-medium text-left">
-                    {country}
-                  </span>
-
-                  {filters.country === country && (
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onRemoveCountryFilter();
-                      }}
-                      className="text-primary-600 hover:text-primary-700"
-                    >
-                      <FaTimes />
-                    </button>
-                  )}
-                </button>
-              ))}
-            </div>
-          ) : (
-            <div className="text-sm text-gray-500 p-3 border border-gray-200 rounded-lg">
-              No countries available
-            </div>
-          )}
+          <div className="relative">
+            <FaGlobe className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Search hotels by country..."
+              value={tempCountry}
+              onChange={handleCountryChange}
+              onBlur={handleCountryBlur}
+              disabled={loading}
+              className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent disabled:opacity-50"
+            />
+            {filters.country && (
+              <button
+                onClick={onRemoveCountryFilter}
+                disabled={loading}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 disabled:opacity-50"
+              >
+                <FaTimes />
+              </button>
+            )}
+          </div>
         </div>
       </div>
 
