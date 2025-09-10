@@ -3,12 +3,9 @@ import {
   FaChevronDown,
   FaChevronUp,
   FaTimes,
-  FaClock,
   FaPlane,
   FaCalendarAlt,
   FaGlobe,
-  FaHistory,
-  FaArrowRight,
 } from "react-icons/fa";
 import {
   FlightFiltersProps,
@@ -49,9 +46,9 @@ Section.displayName = "Section";
 
 const FlightFilters: React.FC<FlightFiltersProps> = React.memo(
   ({ filters, onFiltersChange, availableAirlines }) => {
+    // Note: availableAirlines is part of the interface but not currently used in this simplified version
     const [expandedSections, setExpandedSections] = useState({
       airline: true,
-      time_frame: false,
       date_range: false,
       arrival_country: false,
     });
@@ -60,6 +57,13 @@ const FlightFilters: React.FC<FlightFiltersProps> = React.memo(
     useEffect(() => {
       setTempAirline(filters.airline || "");
     }, [filters.airline]);
+
+    // Automatically apply upcoming flights filter on component mount
+    useEffect(() => {
+      if (!filters.later_flight) {
+        onFiltersChange({ ...filters, later_flight: true, old_flights: false });
+      }
+    }, [filters, onFiltersChange]);
 
     // Memoized callbacks to prevent unnecessary re-renders
     const toggleSection = useCallback(
@@ -83,7 +87,7 @@ const FlightFilters: React.FC<FlightFiltersProps> = React.memo(
       onFiltersChange({
         ...filters,
         old_flights: false,
-        later_flight: false,
+        later_flight: true, // Keep upcoming flights filter permanently enabled
         airline: "",
         from_date: "",
         to_date: "",
@@ -91,18 +95,16 @@ const FlightFilters: React.FC<FlightFiltersProps> = React.memo(
       });
     }, [filters, onFiltersChange]);
 
-    // Memoized computed value
+    // Memoized computed value (excluding later_flight since it's permanently enabled)
     const hasActiveFilters = useMemo(() => {
       return (
         filters.old_flights ||
-        filters.later_flight ||
         (filters.airline && filters.airline !== "") ||
         (filters.from_date && filters.to_date) ||
         (filters.arrival_country && filters.arrival_country !== "")
       );
     }, [
       filters.old_flights,
-      filters.later_flight,
       filters.airline,
       filters.from_date,
       filters.to_date,
@@ -129,18 +131,7 @@ const FlightFilters: React.FC<FlightFiltersProps> = React.memo(
       [toggleSection]
     );
 
-    // Memoized event handlers for radio buttons and other inputs
-    const handleAllFlightsChange = useCallback(() => {
-      update({ old_flights: false, later_flight: false });
-    }, [update]);
-
-    const handleOldFlightsChange = useCallback(() => {
-      update({ old_flights: true, later_flight: false });
-    }, [update]);
-
-    const handleLaterFlightsChange = useCallback(() => {
-      update({ old_flights: false, later_flight: true });
-    }, [update]);
+    // Memoized event handlers for other inputs
 
     const handleFromDateChange = useCallback(
       (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -183,53 +174,7 @@ const FlightFilters: React.FC<FlightFiltersProps> = React.memo(
         </div>
 
         <div className="p-4 space-y-4">
-          {/* Time frame: Old or Upcoming */}
-          <Section
-            title="Time Frame"
-            icon={<FaClock />}
-            sectionKey="time_frame"
-            isExpanded={expandedSections.time_frame}
-            onToggle={handleToggleSection}
-          >
-            <div className="space-y-3">
-              <label className="flex items-center cursor-pointer">
-                <input
-                  type="radio"
-                  name="time_frame"
-                  checked={!filters.old_flights && !filters.later_flight}
-                  onChange={handleAllFlightsChange}
-                  className="mr-3 text-primary-600"
-                />
-                <span className="text-sm">All Flights</span>
-              </label>
-              <label className="flex items-center cursor-pointer">
-                <input
-                  type="radio"
-                  name="time_frame"
-                  checked={filters.old_flights}
-                  onChange={handleOldFlightsChange}
-                  className="mr-3 text-primary-600"
-                />
-                <div className="flex items-center">
-                  <FaHistory className="mr-2 text-gray-500" />
-                  <span className="text-sm">Past Flights</span>
-                </div>
-              </label>
-              <label className="flex items-center cursor-pointer">
-                <input
-                  type="radio"
-                  name="time_frame"
-                  checked={filters.later_flight}
-                  onChange={handleLaterFlightsChange}
-                  className="mr-3 text-primary-600"
-                />
-                <div className="flex items-center">
-                  <FaArrowRight className="mr-2 text-green-500" />
-                  <span className="text-sm">Upcoming Flights</span>
-                </div>
-              </label>
-            </div>
-          </Section>
+          {/* Note: Upcoming flights filter is permanently enabled */}
 
           {/* Airline Filter */}
           <Section

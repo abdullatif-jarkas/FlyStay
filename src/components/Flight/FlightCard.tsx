@@ -1,8 +1,4 @@
-import {
-  FaPlane,
-  FaInfoCircle,
-  FaArrowRight,
-} from "react-icons/fa";
+import { FaPlane, FaInfoCircle, FaArrowRight } from "react-icons/fa";
 import { FlightCardProps } from "../../types/flight";
 import FavoriteButton from "../Favorites/FavoriteButton";
 
@@ -12,11 +8,20 @@ const FlightCard: React.FC<FlightCardProps> = ({
   isSelected = false,
 }) => {
   const formatTime = (dateString: string) => {
-    return new Date(dateString).toLocaleTimeString("en-US", {
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: false,
-    });
+  return new Date(dateString).toLocaleTimeString("en-US", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: true,
+  });
+};
+
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
   };
 
   const calculateFlightDuration = (
@@ -79,6 +84,9 @@ const FlightCard: React.FC<FlightCardProps> = ({
             <div className="text-2xl font-bold text-gray-900">
               {departureTime}
             </div>
+            <div className="text-sm text-gray-600">
+              {formatDate(flight.departure_time)}
+            </div>
             <div className="text-sm text-gray-500">
               {flight.departure_airport.country_name}
             </div>
@@ -106,6 +114,9 @@ const FlightCard: React.FC<FlightCardProps> = ({
           <div className="text-center">
             <div className="text-2xl font-bold text-gray-900">
               {arrivalTime}
+            </div>
+            <div className="text-sm text-gray-600">
+              {formatDate(flight.arrival_time)}
             </div>
             <div className="text-sm text-gray-500">
               {flight.arrival_airport.country_name}
