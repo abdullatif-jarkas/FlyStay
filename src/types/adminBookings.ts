@@ -6,12 +6,37 @@ export interface FlightBookingAdmin {
   booking_date: string;
   seat_number: number;
   status: "confirmed" | "pending" | "failed" | "cancelled";
+  total_amount?: number;
   created_at: string;
   updated_at: string;
+  // User information (flattened from API response)
+  user_name?: string;
+  user_email?: string;
   user?: {
     id: number;
     name: string;
     email: string;
+  };
+  // Flight information (flattened from API response)
+  flight?: {
+    id: number;
+    flight_number: string;
+    airline: string;
+    departure_time: string;
+    arrival_time: string;
+  };
+  // Airport information (flattened from API response)
+  departure_airport?: {
+    id: number;
+    name: string;
+    IATA_code: string;
+    city_name?: string;
+  };
+  arrival_airport?: {
+    id: number;
+    name: string;
+    IATA_code: string;
+    city_name?: string;
   };
   flight_cabin?: {
     id: number;
@@ -56,8 +81,31 @@ export interface HotelBookingAdmin {
   check_out_date: string;
   booking_date: string;
   status: "confirmed" | "pending" | "failed" | "cancelled";
+  total_amount?: number;
   created_at: string;
   updated_at: string;
+  // User information (flattened from API response)
+  user_Info?: {
+    name: string;
+    email: string;
+    phone_number?: string;
+  };
+  // Hotel information (flattened from API response)
+  Hotel?: {
+    name: string;
+    description?: string;
+    city_name?: string;
+    country_name?: string;
+    rating?: number;
+  };
+  // Room information (flattened from API response)
+  Room?: {
+    id: number;
+    room_type: string;
+    price_per_night: number;
+    capacity?: number;
+    description?: string;
+  };
   user?: {
     id: number;
     name: string;
@@ -123,7 +171,14 @@ export interface HotelBookingDetailsResponse {
 export interface BookingActionResponse {
   status: string;
   message: string;
-  data?: any;
+  data?: unknown;
+}
+
+// Payment Response Types
+export interface PaymentResponse {
+  status: string;
+  message: string;
+  data: string[]; // Array containing client secret
 }
 
 // Filter and Search Types

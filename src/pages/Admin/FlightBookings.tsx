@@ -10,6 +10,7 @@ import {
   FaUser,
   FaTicketAlt,
   FaPlaneDeparture,
+  FaCreditCard,
 } from "react-icons/fa";
 import { toast } from "sonner";
 import axios from "axios";
@@ -19,7 +20,10 @@ import {
   FlightBookingDetailsResponse,
   BookingActionResponse,
   BookingFilters,
+  PaymentResponse,
 } from "../../types/adminBookings";
+import { useAppSelector } from "../../store/hooks";
+import PaymentModal from "../../components/Payment/PaymentModal";
 
 const FlightBookings: React.FC = () => {
   const [bookings, setBookings] = useState<FlightBookingAdmin[]>([]);
@@ -35,6 +39,18 @@ const FlightBookings: React.FC = () => {
     title: string;
     message: string;
   } | null>(null);
+
+  // Payment state
+  const [paymentLoading, setPaymentLoading] = useState<number | null>(null);
+  const [paymentModalOpen, setPaymentModalOpen] = useState(false);
+  const [currentPayment, setCurrentPayment] = useState<{
+    bookingId: number;
+    amount: number;
+    clientSecret: string;
+  } | null>(null);
+
+  // Get user role for access control
+  const userRole = useAppSelector((state) => state.user.role);
 
   // Pagination and filtering
   const [currentPage, setCurrentPage] = useState(1);
@@ -55,9 +71,14 @@ const FlightBookings: React.FC = () => {
 
     try {
       setLoading(true);
-      const params = new URLSearchParams({
-        page,
-        ...searchFilters,
+      const params = new URLSearchParams();
+      params.append('page', page.toString());
+
+      // Add search filters
+      Object.entries(searchFilters).forEach(([key, value]) => {
+        if (value !== undefined && value !== '') {
+          params.append(key, value.toString());
+        }
       });
 
       const response = await axios.get<FlightBookingsResponse>(
@@ -78,11 +99,12 @@ const FlightBookings: React.FC = () => {
       } else {
         toast.error(response.data.message || "Failed to fetch flight bookings");
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error fetching flight bookings:", error);
-      toast.error(
-        error.response?.data?.message || "Failed to fetch flight bookings"
-      );
+      const errorMessage = axios.isAxiosError(error)
+        ? error.response?.data?.message || "Failed to fetch flight bookings"
+        : "Failed to fetch flight bookings";
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -104,16 +126,17 @@ const FlightBookings: React.FC = () => {
         }
       );
       if (response.data.status === "success") {
-        setSelectedBooking(response.data.data[0]);
+        setSelectedBooking(response.data.data);
         setShowDetailsModal(true);
       } else {
         toast.error(response.data.message || "Failed to fetch booking details");
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error fetching booking details:", error);
-      toast.error(
-        error.response?.data?.message || "Failed to fetch booking details"
-      );
+      const errorMessage = axios.isAxiosError(error)
+        ? error.response?.data?.message || "Failed to fetch booking details"
+        : "Failed to fetch booking details";
+      toast.error(errorMessage);
     }
   };
 
@@ -141,9 +164,12 @@ const FlightBookings: React.FC = () => {
       } else {
         toast.error(response.data.message || "Failed to cancel booking");
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error cancelling booking:", error);
-      toast.error(error.response?.data?.message || "Failed to cancel booking");
+      const errorMessage = axios.isAxiosError(error)
+        ? error.response?.data?.message || "Failed to cancel booking"
+        : "Failed to cancel booking";
+      toast.error(errorMessage);
     } finally {
       setActionLoading(null);
       setShowConfirmModal(false);
@@ -174,14 +200,92 @@ const FlightBookings: React.FC = () => {
       } else {
         toast.error(response.data.message || "Failed to delete booking");
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error deleting booking:", error);
-      toast.error(error.response?.data?.message || "Failed to delete booking");
+      const errorMessage = axios.isAxiosError(error)
+        ? error.response?.data?.message || "Failed to delete booking"
+        : "Failed to delete booking";
+      toast.error(errorMessage);
     } finally {
       setActionLoading(null);
       setShowConfirmModal(false);
       setConfirmAction(null);
     }
+  };
+
+  // Process payment for booking
+  const processPayment = async (
+    bookingId: number,
+    amount: number,
+    userId: number
+  ) => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      toast.error("Please login to process payment");
+      return;
+    }
+
+    // Check if user has flight_agent role
+    if (userRole !== "flight_agent" && userRole !== "admin") {
+      toast.error("You don't have permission to process flight payments");
+      return;
+    }
+
+    try {
+      setPaymentLoading(bookingId);
+      const response = await axios.post<PaymentResponse>(
+        `http://127.0.0.1:8000/api/payments/flight-booking/${bookingId}`,
+        {
+          user_id: userId,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: "application/json",
+          },
+        }
+      );
+
+      if (
+        response.data.status === "success" &&
+        response.data.data &&
+        response.data.data.length > 0
+      ) {
+        const clientSecret = response.data.data[0];
+        setCurrentPayment({
+          bookingId,
+          amount,
+          clientSecret,
+        });
+        setPaymentModalOpen(true);
+        toast.info("Initializing payment...");
+      } else {
+        toast.error(response.data.message || "Failed to initialize payment");
+      }
+    } catch (error: unknown) {
+      console.error("Error processing payment:", error);
+      const errorMessage = axios.isAxiosError(error)
+        ? error.response?.data?.message || "Failed to process payment"
+        : "Failed to process payment";
+      toast.error(errorMessage);
+    } finally {
+      setPaymentLoading(null);
+    }
+  };
+
+  // Handle payment success
+  const handlePaymentSuccess = () => {
+    toast.success("Payment processed successfully!");
+    setPaymentModalOpen(false);
+    setCurrentPayment(null);
+    fetchFlightBookings(currentPage, filters);
+  };
+
+  // Handle payment error
+  const handlePaymentError = (error: string) => {
+    toast.error(error);
+    setPaymentModalOpen(false);
+    setCurrentPayment(null);
   };
 
   // Handle search
@@ -413,8 +517,7 @@ const FlightBookings: React.FC = () => {
                           {booking.flight?.airline || "N/A"}
                         </div>
                         <div className="text-sm text-gray-500">
-                          Flight{" "}
-                          {booking.flight?.flight_number || "N/A"}
+                          Flight {booking.flight?.flight_number || "N/A"}
                         </div>
                         <div className="text-sm text-gray-500">
                           {booking.flight_cabin?.class_name || "N/A"}
@@ -422,35 +525,27 @@ const FlightBookings: React.FC = () => {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm font-medium text-gray-900">
-                          {booking.departure_airport?.IATA_code || "N/A"}{" "}
-                          →{" "}
+                          {booking.departure_airport?.IATA_code || "N/A"} →{" "}
                           {booking.arrival_airport?.IATA_code || "N/A"}
                         </div>
                         <div className="text-sm text-gray-500">
-                          {booking.departure_airport?.city_name || "N/A"}{" "}
-                          →{" "}
+                          {booking.departure_airport?.city_name || "N/A"} →{" "}
                           {booking.arrival_airport?.city_name || "N/A"}
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm font-medium text-gray-900">
                           {booking.flight?.departure_time
-                            ? formatDate(
-                                booking.flight.departure_time
-                              )
+                            ? formatDate(booking.flight.departure_time)
                             : "N/A"}
                         </div>
                         <div className="text-sm text-gray-500">
                           {booking.flight?.departure_time
-                            ? formatTime(
-                                booking.flight.departure_time
-                              )
+                            ? formatTime(booking.flight.departure_time)
                             : "N/A"}{" "}
                           -{" "}
                           {booking.flight?.arrival_time
-                            ? formatTime(
-                                booking.flight.arrival_time
-                              )
+                            ? formatTime(booking.flight.arrival_time)
                             : "N/A"}
                         </div>
                       </td>
@@ -466,6 +561,29 @@ const FlightBookings: React.FC = () => {
                           >
                             <FaEye />
                           </button>
+                          {/* Process Payment Button - Only for pending bookings and flight_agent/admin roles */}
+                          {booking.status === "pending" &&
+                            (userRole === "flight_agent" ||
+                              userRole === "admin") && (
+                              <button
+                                onClick={() =>
+                                  processPayment(
+                                    booking.id,
+                                    booking.flight_cabin?.price || 0,
+                                    booking.user_id
+                                  )
+                                }
+                                disabled={paymentLoading === booking.id}
+                                className="text-green-600 hover:text-green-900 transition-colors disabled:opacity-50"
+                                title="Process Payment"
+                              >
+                                {paymentLoading === booking.id ? (
+                                  <FaSpinner className="animate-spin" />
+                                ) : (
+                                  <FaCreditCard />
+                                )}
+                              </button>
+                            )}
                           {booking.status !== "cancelled" && (
                             <button
                               onClick={() => {
@@ -475,8 +593,7 @@ const FlightBookings: React.FC = () => {
                                   title: "Cancel Booking",
                                   message: `Are you sure you want to cancel booking FL${booking.id
                                     .toString()
-                                    .padStart(6, "0")}?`
-                                    ,
+                                    .padStart(6, "0")}?`,
                                 });
                                 setShowConfirmModal(true);
                               }}
@@ -664,8 +781,7 @@ const FlightBookings: React.FC = () => {
                         Flight Number:
                       </span>
                       <span className="ml-2 text-gray-900">
-                        {selectedBooking.flight?.flight_number ||
-                          "N/A"}
+                        {selectedBooking.flight?.flight_number || "N/A"}
                       </span>
                     </div>
                     <div>
@@ -701,19 +817,15 @@ const FlightBookings: React.FC = () => {
                     <div>
                       <span className="font-medium text-gray-700">From:</span>
                       <span className="ml-2 text-gray-900">
-                        {selectedBooking.departure_airport?.name || "N/A"}{" "}
-                        (
-                        {selectedBooking.departure_airport?.IATA_code || "N/A"}
-                        )
+                        {selectedBooking.departure_airport?.name || "N/A"} (
+                        {selectedBooking.departure_airport?.IATA_code || "N/A"})
                       </span>
                     </div>
                     <div>
                       <span className="font-medium text-gray-700">To:</span>
                       <span className="ml-2 text-gray-900">
-                        {selectedBooking.arrival_airport?.name || "N/A"}{" "}
-                        (
-                        {selectedBooking.arrival_airport?.IATA_code || "N/A"}
-                        )
+                        {selectedBooking.arrival_airport?.name || "N/A"} (
+                        {selectedBooking.arrival_airport?.IATA_code || "N/A"})
                       </span>
                     </div>
                     <div>
@@ -834,6 +946,22 @@ const FlightBookings: React.FC = () => {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Payment Modal */}
+      {paymentModalOpen && currentPayment && (
+        <PaymentModal
+          isOpen={paymentModalOpen}
+          onClose={() => {
+            setPaymentModalOpen(false);
+            setCurrentPayment(null);
+          }}
+          clientSecret={currentPayment.clientSecret}
+          bookingId={currentPayment.bookingId}
+          amount={currentPayment.amount}
+          onSuccess={handlePaymentSuccess}
+          onError={handlePaymentError}
+        />
       )}
     </div>
   );
