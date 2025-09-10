@@ -1,10 +1,8 @@
-// routes.tsx
 import { lazy, Suspense } from "react";
 import { createBrowserRouter } from "react-router-dom";
 import LoadingSpinner from "./components/LoadingSpinner/LoadingSpinner";
 import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute";
 
-// Lazy Import Helper
 const lazyImport = (path: string) => lazy(() => import(path));
 
 // Layouts
@@ -66,12 +64,10 @@ const flightAndAdmin = ["admin", "flight_agent"];
 const hotelAndAdmin = ["admin", "hotel_agent"];
 const managersOnly = ["admin","finance_officer","hotel_agent","flight_agent"];
 
-// Wrapper Component
 const withSuspense = (element: React.ReactNode) => (
   <Suspense fallback={<LoadingSpinner />}>{element}</Suspense>
 );
 
-// Router
 export const routes = createBrowserRouter([
   {
     path: "/",

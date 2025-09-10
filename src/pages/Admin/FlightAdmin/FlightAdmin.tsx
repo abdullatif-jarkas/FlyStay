@@ -12,6 +12,7 @@ import {
 import CreateFlightModal from "./CreateFlightModal";
 import EditFlightModal from "./EditFlightModal";
 import ShowFlightModal from "./ShowFlightModal";
+import DeleteFlightModal from "./DeleteFlightModal";
 import FlightFilters from "../../../components/Admin/Flights/FlightFilters";
 import { toast } from "sonner";
 import { Flight, AdminFlightFilters } from "../../../types/flight";
@@ -31,6 +32,7 @@ const FlightAdmin = () => {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isShowModalOpen, setIsShowModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedFlight, setSelectedFlight] = useState<Flight | null>(null);
   const [selectedFlightId, setSelectedFlightId] = useState<number | null>(null);
 
@@ -127,33 +129,10 @@ const FlightAdmin = () => {
     setIsEditModalOpen(true);
   }, []);
 
-  const handleDelete = useCallback(
-    async (flight: Flight) => {
-      if (
-        !window.confirm(
-          `Are you sure you want to delete flight ${flight.flight_number}?`
-        )
-      ) {
-        return;
-      }
-
-      try {
-        await axios.delete(`http://127.0.0.1:8000/api/flight/${flight.id}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            Accept: "application/json",
-          },
-        });
-
-        fetchFlights(filters); // Refresh the table
-        toast.error("Flight deleted successfully");
-      } catch (err) {
-        console.error("Error deleting flight:", err);
-        alert("Failed to delete flight");
-      }
-    },
-    [token, fetchFlights, filters]
-  );
+  const handleDelete = useCallback((flight: Flight) => {
+    setSelectedFlight(flight);
+    setIsDeleteModalOpen(true);
+  }, []);
 
   const handleCreateSuccess = useCallback(() => {
     fetchFlights(filters); // Refresh the table
@@ -163,6 +142,12 @@ const FlightAdmin = () => {
   const handleEditSuccess = useCallback(() => {
     fetchFlights(filters); // Refresh the table
     toast.info("Flight updated successfully");
+  }, [fetchFlights, filters]);
+
+  const handleDeleteSuccess = useCallback(() => {
+    fetchFlights(filters); // Refresh the table
+    setIsDeleteModalOpen(false);
+    setSelectedFlight(null);
   }, [fetchFlights, filters]);
 
   const columns = useMemo<ColumnDef<Flight>[]>(
@@ -321,6 +306,16 @@ const FlightAdmin = () => {
         isOpen={isShowModalOpen}
         onClose={() => setIsShowModalOpen(false)}
         flightId={selectedFlightId}
+      />
+
+      <DeleteFlightModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => {
+          setIsDeleteModalOpen(false);
+          setSelectedFlight(null);
+        }}
+        onSuccess={handleDeleteSuccess}
+        flight={selectedFlight}
       />
     </div>
   );
