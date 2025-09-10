@@ -15,8 +15,6 @@ const DashLayout = lazyImport("./layouts/DashLayout");
 // Pages
 const Home = lazyImport("./pages/Home/Home");
 const Error = lazyImport("./pages/Error/Error");
-const AboutUs = lazyImport("./pages/AboutUs/AboutUs");
-const CustomerService = lazyImport("./pages/CustomerService/CustomerService");
 
 // Auth Pages
 const Login = lazyImport("./pages/Auth/Login/Login");
@@ -27,22 +25,15 @@ const AuthCallback = lazyImport("./pages/Auth/AuthCallback/AuthCallback");
 
 // Hotel Pages
 const Hotel = lazyImport("./pages/Hotel/Hotel");
-const HotelSearchResult = lazyImport("./pages/Hotel/HotelSearchResult");
-const HotelFavorites = lazyImport("./pages/Hotel/HotelFavorites");
 const HotelDetails = lazyImport("./pages/Hotel/HotelDetails");
 const RoomDetails = lazyImport("./pages/Hotel/RoomDetails");
-const HotelPayment = lazyImport("./pages/Hotel/HotelPayment");
 
 // Flight Pages
 const Flight = lazyImport("./pages/Flight/Flight");
-const FlightSearchResult = lazyImport("./pages/Flight/FlightSearchResult");
 const FlightPurchase = lazyImport("./pages/Flight/FlightPurchase");
-const FlightFavorites = lazyImport("./pages/Flight/FlightFavorites");
 
 // User Pages
 const Profile = lazyImport("./pages/User/Profile");
-const Settings = lazyImport("./pages/User/Settings");
-const Payments = lazyImport("./pages/User/Payments");
 
 // Favorites
 const Favorites = lazyImport("./pages/Favorites/Favorites");
@@ -62,6 +53,19 @@ const AdminPayments = lazyImport("./pages/Admin/Payments/Payments");
 const FlightBookings = lazyImport("./pages/Admin/FlightBookings");
 const HotelBookings = lazyImport("./pages/Admin/HotelBookings");
 
+const allAuthUsers = [
+  "admin",
+  "finance_officer",
+  "hotel_agent",
+  "flight_agent",
+  "customer",
+];
+const adminOnly = ["admin"];
+const financeAndAdmin = ["admin", "finance_officer"];
+const flightAndAdmin = ["admin", "flight_agent"];
+const hotelAndAdmin = ["admin", "hotel_agent"];
+const managersOnly = ["admin","finance_officer","hotel_agent","flight_agent"];
+
 // Wrapper Component
 const withSuspense = (element: React.ReactNode) => (
   <Suspense fallback={<LoadingSpinner />}>{element}</Suspense>
@@ -77,36 +81,72 @@ export const routes = createBrowserRouter([
       {
         path: "hotel",
         children: [
-          { index: true, element: withSuspense(<Hotel />) },
-          { path: "search", element: withSuspense(<HotelSearchResult />) },
-          { path: "favorites", element: withSuspense(<HotelFavorites />) },
-          { path: ":hotelId", element: withSuspense(<HotelDetails />) },
+          {
+            index: true,
+            element: withSuspense(
+              <ProtectedRoute allowedRoles={allAuthUsers}>
+                <Hotel />
+              </ProtectedRoute>
+            ),
+          },
+          {
+            path: ":hotelId",
+            element: withSuspense(
+              <ProtectedRoute allowedRoles={allAuthUsers}>
+                <HotelDetails />
+              </ProtectedRoute>
+            ),
+          },
           {
             path: ":hotelId/room/:roomId",
-            element: withSuspense(<RoomDetails />),
+            element: withSuspense(
+              <ProtectedRoute allowedRoles={allAuthUsers}>
+                <RoomDetails />
+              </ProtectedRoute>
+            ),
           },
-          { path: ":hotelId/payment", element: withSuspense(<HotelPayment />) },
         ],
       },
       {
         path: "flight",
         children: [
-          { index: true, element: withSuspense(<Flight />) },
-          { path: "search", element: withSuspense(<FlightSearchResult />) },
+          {
+            index: true,
+            element: withSuspense(
+              <ProtectedRoute allowedRoles={allAuthUsers}>
+                <Flight />
+              </ProtectedRoute>
+            ),
+          },
           {
             path: "purchase/:flightId",
-            element: withSuspense(<FlightPurchase />),
+            element: withSuspense(
+              <ProtectedRoute allowedRoles={allAuthUsers}>
+                <FlightPurchase />
+              </ProtectedRoute>
+            ),
           },
-          { path: "favorites", element: withSuspense(<FlightFavorites />) },
         ],
       },
-      { path: "favorites", element: withSuspense(<Favorites />) },
+      {
+        path: "favorites",
+        element: withSuspense(
+          <ProtectedRoute allowedRoles={allAuthUsers}>
+            <Favorites />
+          </ProtectedRoute>
+        ),
+      },
       {
         path: "user",
         children: [
-          { path: "profile", element: withSuspense(<Profile />) },
-          { path: "settings", element: withSuspense(<Settings />) },
-          { path: "payments", element: withSuspense(<Payments />) },
+          {
+            path: "profile",
+            element: withSuspense(
+              <ProtectedRoute allowedRoles={allAuthUsers}>
+                <Profile />
+              </ProtectedRoute>
+            ),
+          },
         ],
       },
       { path: "*", element: withSuspense(<Error />) },
@@ -127,12 +167,7 @@ export const routes = createBrowserRouter([
     path: "/admin",
     element: withSuspense(
       <ProtectedRoute
-        allowedRoles={[
-          "admin",
-          "finance_officer",
-          "hotel_agent",
-          "flight_agent",
-        ]}
+        allowedRoles={managersOnly}
       >
         <DashLayout />
       </ProtectedRoute>
@@ -142,7 +177,7 @@ export const routes = createBrowserRouter([
       {
         path: "permissions",
         element: withSuspense(
-          <ProtectedRoute allowedRoles={["admin"]}>
+          <ProtectedRoute allowedRoles={adminOnly}>
             <Permissions />
           </ProtectedRoute>
         ),
@@ -150,7 +185,7 @@ export const routes = createBrowserRouter([
       {
         path: "roles",
         element: withSuspense(
-          <ProtectedRoute allowedRoles={["admin"]}>
+          <ProtectedRoute allowedRoles={adminOnly}>
             <Roles />
           </ProtectedRoute>
         ),
@@ -158,7 +193,7 @@ export const routes = createBrowserRouter([
       {
         path: "users",
         element: withSuspense(
-          <ProtectedRoute allowedRoles={["admin"]}>
+          <ProtectedRoute allowedRoles={adminOnly}>
             <Users />
           </ProtectedRoute>
         ),
@@ -172,7 +207,7 @@ export const routes = createBrowserRouter([
       {
         path: "payments",
         element: withSuspense(
-          <ProtectedRoute allowedRoles={["admin", "finance_officer"]}>
+          <ProtectedRoute allowedRoles={financeAndAdmin}>
             <AdminPayments />
           </ProtectedRoute>
         ),
@@ -180,7 +215,7 @@ export const routes = createBrowserRouter([
       {
         path: "flight-bookings",
         element: withSuspense(
-          <ProtectedRoute allowedRoles={["admin", "flight_agent"]}>
+          <ProtectedRoute allowedRoles={flightAndAdmin}>
             <FlightBookings />
           </ProtectedRoute>
         ),
@@ -188,7 +223,7 @@ export const routes = createBrowserRouter([
       {
         path: "hotel-bookings",
         element: withSuspense(
-          <ProtectedRoute allowedRoles={["admin", "hotel_agent"]}>
+          <ProtectedRoute allowedRoles={hotelAndAdmin}>
             <HotelBookings />
           </ProtectedRoute>
         ),
