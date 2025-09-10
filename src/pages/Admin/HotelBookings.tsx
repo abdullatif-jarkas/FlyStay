@@ -21,9 +21,9 @@ import {
   BookingActionResponse,
   BookingFilters,
   PaymentResponse,
+  PaymentRecord,
 } from "../../types/adminBookings";
 import { useAppSelector } from "../../store/hooks";
-import PaymentModal from "../../components/Payment/PaymentModal";
 
 const HotelBookings: React.FC = () => {
   const [bookings, setBookings] = useState<HotelBookingAdmin[]>([]);
@@ -42,12 +42,6 @@ const HotelBookings: React.FC = () => {
 
   // Payment state
   const [paymentLoading, setPaymentLoading] = useState<number | null>(null);
-  const [paymentModalOpen, setPaymentModalOpen] = useState(false);
-  const [currentPayment, setCurrentPayment] = useState<{
-    bookingId: number;
-    amount: number;
-    clientSecret: string;
-  } | null>(null);
 
   // Get user role for access control
   const userRole = useAppSelector((state) => state.user.role);
@@ -248,21 +242,12 @@ const HotelBookings: React.FC = () => {
         }
       );
 
-      if (
-        response.data.status === "success" &&
-        response.data.data &&
-        response.data.data.length > 0
-      ) {
-        const clientSecret = response.data.data[0];
-        setCurrentPayment({
-          bookingId,
-          amount,
-          clientSecret,
-        });
-        setPaymentModalOpen(true);
-        toast.info("Initializing payment...");
+      if (response.data.status === "success") {
+        // Payment processed successfully - show success message and refresh
+        toast.success("Payment processed successfully!");
+        fetchHotelBookings(currentPage, filters);
       } else {
-        toast.error(response.data.message || "Failed to initialize payment");
+        toast.error(response.data.message || "Failed to process payment");
       }
     } catch (error: unknown) {
       console.error("Error processing payment:", error);
@@ -273,21 +258,6 @@ const HotelBookings: React.FC = () => {
     } finally {
       setPaymentLoading(null);
     }
-  };
-
-  // Handle payment success
-  const handlePaymentSuccess = () => {
-    toast.success("Payment processed successfully!");
-    setPaymentModalOpen(false);
-    setCurrentPayment(null);
-    fetchHotelBookings(currentPage, filters);
-  };
-
-  // Handle payment error
-  const handlePaymentError = (error: string) => {
-    toast.error(error);
-    setPaymentModalOpen(false);
-    setCurrentPayment(null);
   };
 
   // Handle search
@@ -930,22 +900,6 @@ const HotelBookings: React.FC = () => {
             </div>
           </div>
         </div>
-      )}
-
-      {/* Payment Modal */}
-      {paymentModalOpen && currentPayment && (
-        <PaymentModal
-          isOpen={paymentModalOpen}
-          onClose={() => {
-            setPaymentModalOpen(false);
-            setCurrentPayment(null);
-          }}
-          clientSecret={currentPayment.clientSecret}
-          bookingId={currentPayment.bookingId}
-          amount={currentPayment.amount}
-          onSuccess={handlePaymentSuccess}
-          onError={handlePaymentError}
-        />
       )}
     </div>
   );

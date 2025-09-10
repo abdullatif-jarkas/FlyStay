@@ -178,7 +178,30 @@ export interface BookingActionResponse {
 export interface PaymentResponse {
   status: string;
   message: string;
-  data: string[]; // Array containing client secret
+  data: string[] | PaymentRecord; // Array containing client secret OR completed payment record
+}
+
+export interface PaymentRecord {
+  id: number;
+  user_id: number;
+  method: string;
+  transaction_id: string | null;
+  verified_by: number;
+  amount: string;
+  date: string;
+  status: string;
+  payable_id: number;
+  payable_type: string;
+  payable?: {
+    id: number;
+    user_id: number;
+    room_id?: number;
+    flight_cabins_id?: number;
+    check_in_date?: string;
+    check_out_date?: string;
+    booking_date: string;
+    status: string;
+  };
 }
 
 // Filter and Search Types
