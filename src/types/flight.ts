@@ -93,6 +93,9 @@ export interface FlightFilters {
   from_date?: string;
   to_date?: string;
   arrival_country?: string;
+  departure_country?: string;
+  arrival_city?: string;
+  departure_city?: string;
 }
 
 // Sort options
@@ -237,6 +240,9 @@ export interface AdminFlightFilters {
   from_date?: string;
   to_date?: string;
   arrival_country?: string;
+  departure_country?: string;
+  arrival_city?: string;
+  departure_city?: string;
   sort_type?: "asc" | "desc";
 }
 

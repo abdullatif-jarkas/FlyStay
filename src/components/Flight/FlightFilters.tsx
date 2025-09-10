@@ -6,10 +6,12 @@ import {
   FaPlane,
   FaCalendarAlt,
   FaGlobe,
+  FaCity,
+  FaFlag,
 } from "react-icons/fa";
 import {
-  FlightFiltersProps,
-  FlightFilters as IFlightFilters,
+  AdminFlightFiltersProps,
+  AdminFlightFilters as IFlightFilters,
 } from "../../types/flight";
 
 // Memoized Section component to prevent unnecessary re-renders
@@ -44,19 +46,38 @@ const Section = React.memo<{
 
 Section.displayName = "Section";
 
-const FlightFilters: React.FC<FlightFiltersProps> = React.memo(
-  ({ filters, onFiltersChange, availableAirlines }) => {
-    // Note: availableAirlines is part of the interface but not currently used in this simplified version
+const FlightFilters: React.FC<AdminFlightFiltersProps> = React.memo(
+  ({ filters, onFiltersChange }) => {
     const [expandedSections, setExpandedSections] = useState({
       airline: true,
       date_range: false,
       arrival_country: false,
+      departure_country: false,
+      arrival_city: false,
+      departure_city: false,
     });
     const [tempAirline, setTempAirline] = useState(filters.airline || "");
+    const [tempDepartureCountry, setTempDepartureCountry] = useState(
+      filters.departure_country || ""
+    );
+    const [tempArrivalCity, setTempArrivalCity] = useState(
+      filters.arrival_city || ""
+    );
+    const [tempDepartureCity, setTempDepartureCity] = useState(
+      filters.departure_city || ""
+    );
 
     useEffect(() => {
       setTempAirline(filters.airline || "");
-    }, [filters.airline]);
+      setTempDepartureCountry(filters.departure_country || "");
+      setTempArrivalCity(filters.arrival_city || "");
+      setTempDepartureCity(filters.departure_city || "");
+    }, [
+      filters.airline,
+      filters.departure_country,
+      filters.arrival_city,
+      filters.departure_city,
+    ]);
 
     // Automatically apply upcoming flights filter on component mount
     useEffect(() => {
@@ -92,6 +113,9 @@ const FlightFilters: React.FC<FlightFiltersProps> = React.memo(
         from_date: "",
         to_date: "",
         arrival_country: "",
+        departure_country: "",
+        arrival_city: "",
+        departure_city: "",
       });
     }, [filters, onFiltersChange]);
 
@@ -101,7 +125,10 @@ const FlightFilters: React.FC<FlightFiltersProps> = React.memo(
         filters.old_flights ||
         (filters.airline && filters.airline !== "") ||
         (filters.from_date && filters.to_date) ||
-        (filters.arrival_country && filters.arrival_country !== "")
+        (filters.arrival_country && filters.arrival_country !== "") ||
+        (filters.departure_country && filters.departure_country !== "") ||
+        (filters.arrival_city && filters.arrival_city !== "") ||
+        (filters.departure_city && filters.departure_city !== "")
       );
     }, [
       filters.old_flights,
@@ -109,6 +136,9 @@ const FlightFilters: React.FC<FlightFiltersProps> = React.memo(
       filters.from_date,
       filters.to_date,
       filters.arrival_country,
+      filters.departure_country,
+      filters.arrival_city,
+      filters.departure_city,
     ]);
 
     // Optimized event handlers for airline input
@@ -153,6 +183,40 @@ const FlightFilters: React.FC<FlightFiltersProps> = React.memo(
       },
       [update]
     );
+
+    // New filter handlers
+    const handleDepartureCountryChange = useCallback(
+      (e: React.ChangeEvent<HTMLInputElement>) => {
+        setTempDepartureCountry(e.target.value);
+      },
+      []
+    );
+
+    const handleDepartureCountryBlur = useCallback(() => {
+      update({ departure_country: tempDepartureCountry });
+    }, [tempDepartureCountry, update]);
+
+    const handleArrivalCityChange = useCallback(
+      (e: React.ChangeEvent<HTMLInputElement>) => {
+        setTempArrivalCity(e.target.value);
+      },
+      []
+    );
+
+    const handleArrivalCityBlur = useCallback(() => {
+      update({ arrival_city: tempArrivalCity });
+    }, [tempArrivalCity, update]);
+
+    const handleDepartureCityChange = useCallback(
+      (e: React.ChangeEvent<HTMLInputElement>) => {
+        setTempDepartureCity(e.target.value);
+      },
+      []
+    );
+
+    const handleDepartureCityBlur = useCallback(() => {
+      update({ departure_city: tempDepartureCity });
+    }, [tempDepartureCity, update]);
 
     return (
       <div className="bg-white border border-gray-200 rounded-lg shadow-sm">
@@ -254,6 +318,75 @@ const FlightFilters: React.FC<FlightFiltersProps> = React.memo(
               />
               <p className="text-xs text-gray-500">
                 Filter flights by destination country
+              </p>
+            </div>
+          </Section>
+
+          {/* Departure Country */}
+          <Section
+            title="Departure Country"
+            icon={<FaFlag />}
+            sectionKey="departure_country"
+            isExpanded={expandedSections.departure_country}
+            onToggle={handleToggleSection}
+          >
+            <div className="space-y-2">
+              <input
+                type="text"
+                value={tempDepartureCountry}
+                placeholder="e.g. Turkey, France, Germany"
+                onChange={handleDepartureCountryChange}
+                onBlur={handleDepartureCountryBlur}
+                className="w-full border border-gray-300 px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm"
+              />
+              <p className="text-xs text-gray-500">
+                Filter flights by departure country
+              </p>
+            </div>
+          </Section>
+
+          {/* Arrival City */}
+          <Section
+            title="Arrival City"
+            icon={<FaCity />}
+            sectionKey="arrival_city"
+            isExpanded={expandedSections.arrival_city}
+            onToggle={handleToggleSection}
+          >
+            <div className="space-y-2">
+              <input
+                type="text"
+                value={tempArrivalCity}
+                placeholder="e.g. Istanbul, Paris, Berlin"
+                onChange={handleArrivalCityChange}
+                onBlur={handleArrivalCityBlur}
+                className="w-full border border-gray-300 px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm"
+              />
+              <p className="text-xs text-gray-500">
+                Filter flights by destination city
+              </p>
+            </div>
+          </Section>
+
+          {/* Departure City */}
+          <Section
+            title="Departure City"
+            icon={<FaCity />}
+            sectionKey="departure_city"
+            isExpanded={expandedSections.departure_city}
+            onToggle={handleToggleSection}
+          >
+            <div className="space-y-2">
+              <input
+                type="text"
+                value={tempDepartureCity}
+                placeholder="e.g. Istanbul, Paris, Berlin"
+                onChange={handleDepartureCityChange}
+                onBlur={handleDepartureCityBlur}
+                className="w-full border border-gray-300 px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm"
+              />
+              <p className="text-xs text-gray-500">
+                Filter flights by departure city
               </p>
             </div>
           </Section>

@@ -6,7 +6,7 @@ import FlightFilters from "../../components/Flight/FlightFilters";
 import FlightResults from "../../components/Flight/FlightResults";
 import {
   FlightSearchParams,
-  FlightFilters as IFlightFilters,
+  AdminFlightFilters as IFlightFilters,
   Flight as IFlight,
   FlightSortOption,
   Airline,
@@ -30,22 +30,15 @@ const Flight = () => {
   const [showAllFlights, setShowAllFlights] = useState(true);
 
   const [filters, setFilters] = useState<IFlightFilters>({
-    price_range: { min: 0, max: 2000 },
-    airlines: [],
-    departure_time_range: { start: "00:00", end: "23:59" },
-    arrival_time_range: { start: "00:00", end: "23:59" },
-    duration_range: { min: 60, max: 1440 },
-    stops: [],
-    aircraft_types: [],
-    departure_airports: [],
-    arrival_airports: [],
-    // Advanced filters
     old_flights: false,
-    later_flight: false,
+    later_flight: true,
     airline: "",
     from_date: "",
     to_date: "",
     arrival_country: "",
+    departure_country: "",
+    arrival_city: "",
+    departure_city: "",
   });
 
   const searchFlights = useCallback(
@@ -136,6 +129,12 @@ const Flight = () => {
         if (filters.to_date) queryParams.append("to_date", filters.to_date);
         if (filters.arrival_country)
           queryParams.append("arrival_country", filters.arrival_country);
+        if (filters.departure_country)
+          queryParams.append("departure_country", filters.departure_country);
+        if (filters.arrival_city)
+          queryParams.append("arrival_city", filters.arrival_city);
+        if (filters.departure_city)
+          queryParams.append("departure_city", filters.departure_city);
 
         const response = await axios.get(
           `http://127.0.0.1:8000/api/flight?${queryParams.toString()}`,
@@ -241,7 +240,6 @@ const Flight = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-
       {/* Results Section */}
       {(searchParams || showAllFlights) && (
         <div className="container mx-auto px-4 py-8">
@@ -251,9 +249,20 @@ const Flight = () => {
               <FlightFilters
                 filters={filters}
                 onFiltersChange={handleFiltersChange}
-                availableAirlines={availableAirlines}
-                priceRange={priceRange}
-                durationRange={durationRange}
+                onClearFilters={() =>
+                  setFilters({
+                    old_flights: false,
+                    later_flight: true,
+                    airline: "",
+                    from_date: "",
+                    to_date: "",
+                    arrival_country: "",
+                    departure_country: "",
+                    arrival_city: "",
+                    departure_city: "",
+                  })
+                }
+                loading={loading}
               />
             </div>
 
