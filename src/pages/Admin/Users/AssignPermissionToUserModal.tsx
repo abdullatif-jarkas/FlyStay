@@ -74,8 +74,9 @@ const AssignPermissionToUserModal: React.FC<
   if (!isOpen) return null;
 
   // Filter out permissions that user already has (directly assigned)
-  const userPermissionNames =
-    user?.permissions?.map((permission) => permission.name) || [];
+  const userPermissionNames = user?.permissions?.map((permission) => permission.name) || [];
+  console.log("permissions: ", user)
+
   const availablePermissionsToAssign = availablePermissions.filter(
     (permission) => !userPermissionNames.includes(permission.name)
   );

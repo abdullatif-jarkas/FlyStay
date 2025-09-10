@@ -137,13 +137,7 @@ export interface DeleteImageConfirmation {
 export const ROOM_TYPES = [
   { value: 'single', label: 'Single Room' },
   { value: 'double', label: 'Double Room' },
-  { value: 'twin', label: 'Twin Room' },
-  { value: 'triple', label: 'Triple Room' },
-  { value: 'quad', label: 'Quad Room' },
   { value: 'Suite', label: 'Suite' },
-  { value: 'deluxe', label: 'Deluxe Room' },
-  { value: 'executive', label: 'Executive Room' },
-  { value: 'presidential', label: 'Presidential Suite' },
 ] as const;
 
 export type RoomType = typeof ROOM_TYPES[number]['value'];

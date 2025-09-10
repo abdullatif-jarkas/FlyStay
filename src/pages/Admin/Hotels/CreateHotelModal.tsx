@@ -1,7 +1,13 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { FaPlus, FaTrash, FaStar, FaUpload } from "react-icons/fa";
-import { CreateHotelModalProps, CreateHotelFormData, City, ImagePreview, HotelFormErrors } from "../../../types/hotel";
+import {
+  CreateHotelModalProps,
+  CreateHotelFormData,
+  City,
+  ImagePreview,
+  HotelFormErrors,
+} from "../../../types/hotel";
 import { toast } from "sonner";
 
 const CreateHotelModal: React.FC<CreateHotelModalProps> = ({
@@ -34,33 +40,73 @@ const CreateHotelModal: React.FC<CreateHotelModalProps> = ({
   const fetchCities = async () => {
     setLoadingCities(true);
     try {
-      const response = await axios.get("http://127.0.0.1:8000/api/get-all-cities", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          Accept: "application/json",
-        },
-        params: { per_page: 100 }, // Get more cities for dropdown
-      });
+      // أول صفحة
+      const firstPageResponse = await axios.get(
+        "http://127.0.0.1:8000/api/get-all-cities?page=1&per_page=100",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: "application/json",
+          },
+        }
+      );
 
-      if (response.data.status === "success") {
-        setCities(response.data.data);
+      if (firstPageResponse.data.status === "success") {
+        const firstPageData = firstPageResponse.data;
+        let allCities = [...firstPageData.data];
+
+        // عدد الصفحات
+        const totalPages = firstPageData.pagination?.total_pages || 1;
+
+        if (totalPages > 1) {
+          const pagePromises: Promise<import("axios").AxiosResponse<any>>[] =
+            [];
+
+          for (let page = 2; page <= totalPages; page++) {
+            const pagePromise = axios.get(
+              `http://127.0.0.1:8000/api/get-all-cities?page=${page}&per_page=100`,
+              {
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                  Accept: "application/json",
+                },
+              }
+            );
+            pagePromises.push(pagePromise);
+          }
+
+          const pageResponses = await Promise.all(pagePromises);
+
+          pageResponses.forEach((response) => {
+            if (response.data.status === "success") {
+              allCities = [...allCities, ...response.data.data];
+            }
+          });
+        }
+
+        setCities(allCities);
       }
     } catch (err) {
       console.error("Failed to fetch cities:", err);
+      setCities([]);
     } finally {
       setLoadingCities(false);
     }
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+  const handleInputChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >
+  ) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       [name]: value,
     }));
     // Clear error when user starts typing
     if (errors[name as keyof HotelFormErrors]) {
-      setErrors(prev => ({
+      setErrors((prev) => ({
         ...prev,
         [name]: undefined,
       }));
@@ -69,13 +115,15 @@ const CreateHotelModal: React.FC<CreateHotelModalProps> = ({
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
-    
+
     // Validate file types
-    const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
-    const invalidFiles = files.filter(file => !validTypes.includes(file.type));
-    
+    const validTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
+    const invalidFiles = files.filter(
+      (file) => !validTypes.includes(file.type)
+    );
+
     if (invalidFiles.length > 0) {
-      setErrors(prev => ({
+      setErrors((prev) => ({
         ...prev,
         images: "Please select only image files (JPEG, PNG, WebP)",
       }));
@@ -83,9 +131,9 @@ const CreateHotelModal: React.FC<CreateHotelModalProps> = ({
     }
 
     // Validate file sizes (max 5MB each)
-    const oversizedFiles = files.filter(file => file.size > 5 * 1024 * 1024);
+    const oversizedFiles = files.filter((file) => file.size > 5 * 1024 * 1024);
     if (oversizedFiles.length > 0) {
-      setErrors(prev => ({
+      setErrors((prev) => ({
         ...prev,
         images: "Each image must be less than 5MB",
       }));
@@ -93,20 +141,20 @@ const CreateHotelModal: React.FC<CreateHotelModalProps> = ({
     }
 
     // Create previews
-    const newPreviews: ImagePreview[] = files.map(file => ({
+    const newPreviews: ImagePreview[] = files.map((file) => ({
       file,
       url: URL.createObjectURL(file),
       id: Math.random().toString(36).substr(2, 9),
     }));
 
-    setImagePreviews(prev => [...prev, ...newPreviews]);
-    setFormData(prev => ({
+    setImagePreviews((prev) => [...prev, ...newPreviews]);
+    setFormData((prev) => ({
       ...prev,
       images: [...prev.images, ...files],
     }));
 
     // Clear image errors
-    setErrors(prev => ({
+    setErrors((prev) => ({
       ...prev,
       images: undefined,
     }));
@@ -116,8 +164,8 @@ const CreateHotelModal: React.FC<CreateHotelModalProps> = ({
     const preview = imagePreviews[index];
     URL.revokeObjectURL(preview.url);
 
-    setImagePreviews(prev => prev.filter((_, i) => i !== index));
-    setFormData(prev => ({
+    setImagePreviews((prev) => prev.filter((_, i) => i !== index));
+    setFormData((prev) => ({
       ...prev,
       images: prev.images.filter((_, i) => i !== index),
     }));
@@ -134,7 +182,11 @@ const CreateHotelModal: React.FC<CreateHotelModalProps> = ({
       newErrors.city_id = "Please select a city";
     }
 
-    if (!formData.rating || parseInt(formData.rating) < 1 || parseInt(formData.rating) > 5) {
+    if (
+      !formData.rating ||
+      parseInt(formData.rating) < 1 ||
+      parseInt(formData.rating) > 5
+    ) {
       newErrors.rating = "Rating must be between 1 and 5";
     }
 
@@ -152,7 +204,7 @@ const CreateHotelModal: React.FC<CreateHotelModalProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
@@ -184,9 +236,10 @@ const CreateHotelModal: React.FC<CreateHotelModalProps> = ({
       handleClose();
     } catch (err: any) {
       setErrors({
-        general: err.response?.data?.message || 
-                err.response?.data?.error || 
-                "Failed to create hotel"
+        general:
+          err.response?.data?.message ||
+          err.response?.data?.error ||
+          "Failed to create hotel",
       });
     } finally {
       setLoading(false);
@@ -195,8 +248,8 @@ const CreateHotelModal: React.FC<CreateHotelModalProps> = ({
 
   const handleClose = () => {
     // Clean up image previews
-    imagePreviews.forEach(preview => URL.revokeObjectURL(preview.url));
-    
+    imagePreviews.forEach((preview) => URL.revokeObjectURL(preview.url));
+
     setFormData({
       name: "",
       city_id: "",
@@ -216,7 +269,9 @@ const CreateHotelModal: React.FC<CreateHotelModalProps> = ({
       <div className="bg-white rounded-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto">
         <div className="sticky top-0 bg-white border-b px-6 py-4">
           <div className="flex justify-between items-center">
-            <h2 className="text-xl font-bold text-gray-800">Create New Hotel</h2>
+            <h2 className="text-xl font-bold text-gray-800">
+              Create New Hotel
+            </h2>
             <button
               onClick={handleClose}
               className="text-gray-500 hover:text-gray-700 text-xl"
@@ -245,10 +300,12 @@ const CreateHotelModal: React.FC<CreateHotelModalProps> = ({
               onChange={handleInputChange}
               placeholder="Enter hotel name (e.g., Frankfort Hotel)"
               className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 ${
-                errors.name ? 'border-red-500' : 'border-gray-300'
+                errors.name ? "border-red-500" : "border-gray-300"
               }`}
             />
-            {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
+            {errors.name && (
+              <p className="text-red-500 text-xs mt-1">{errors.name}</p>
+            )}
           </div>
 
           {/* City Selection */}
@@ -262,7 +319,7 @@ const CreateHotelModal: React.FC<CreateHotelModalProps> = ({
               onChange={handleInputChange}
               disabled={loadingCities}
               className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 ${
-                errors.city_id ? 'border-red-500' : 'border-gray-300'
+                errors.city_id ? "border-red-500" : "border-gray-300"
               }`}
             >
               <option value="">
@@ -274,7 +331,9 @@ const CreateHotelModal: React.FC<CreateHotelModalProps> = ({
                 </option>
               ))}
             </select>
-            {errors.city_id && <p className="text-red-500 text-xs mt-1">{errors.city_id}</p>}
+            {errors.city_id && (
+              <p className="text-red-500 text-xs mt-1">{errors.city_id}</p>
+            )}
           </div>
 
           {/* Rating */}
@@ -288,25 +347,31 @@ const CreateHotelModal: React.FC<CreateHotelModalProps> = ({
                 value={formData.rating}
                 onChange={handleInputChange}
                 className={`px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 ${
-                  errors.rating ? 'border-red-500' : 'border-gray-300'
+                  errors.rating ? "border-red-500" : "border-gray-300"
                 }`}
               >
-                {[1, 2, 3, 4, 5].map(num => (
-                  <option key={num} value={num}>{num}</option>
+                {[1, 2, 3, 4, 5].map((num) => (
+                  <option key={num} value={num}>
+                    {num}
+                  </option>
                 ))}
               </select>
               <div className="flex">
-                {[1, 2, 3, 4, 5].map(star => (
+                {[1, 2, 3, 4, 5].map((star) => (
                   <FaStar
                     key={star}
                     className={`text-lg ${
-                      star <= parseInt(formData.rating) ? 'text-yellow-400' : 'text-gray-300'
+                      star <= parseInt(formData.rating)
+                        ? "text-yellow-400"
+                        : "text-gray-300"
                     }`}
                   />
                 ))}
               </div>
             </div>
-            {errors.rating && <p className="text-red-500 text-xs mt-1">{errors.rating}</p>}
+            {errors.rating && (
+              <p className="text-red-500 text-xs mt-1">{errors.rating}</p>
+            )}
           </div>
 
           {/* Description */}
@@ -321,10 +386,12 @@ const CreateHotelModal: React.FC<CreateHotelModalProps> = ({
               rows={4}
               placeholder="Enter hotel description..."
               className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 resize-vertical ${
-                errors.description ? 'border-red-500' : 'border-gray-300'
+                errors.description ? "border-red-500" : "border-gray-300"
               }`}
             />
-            {errors.description && <p className="text-red-500 text-xs mt-1">{errors.description}</p>}
+            {errors.description && (
+              <p className="text-red-500 text-xs mt-1">{errors.description}</p>
+            )}
           </div>
 
           {/* Image Upload */}
@@ -332,7 +399,7 @@ const CreateHotelModal: React.FC<CreateHotelModalProps> = ({
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Hotel Images <span className="text-red-500">*</span>
             </label>
-            
+
             <div className="border-2 border-dashed border-gray-300 rounded-lg p-4">
               <input
                 type="file"
@@ -348,11 +415,15 @@ const CreateHotelModal: React.FC<CreateHotelModalProps> = ({
               >
                 <FaUpload className="text-gray-400 text-2xl mb-2" />
                 <span className="text-gray-600">Click to upload images</span>
-                <span className="text-gray-400 text-xs">JPEG, PNG, WebP (max 5MB each)</span>
+                <span className="text-gray-400 text-xs">
+                  JPEG, PNG, WebP (max 5MB each)
+                </span>
               </label>
             </div>
 
-            {errors.images && <p className="text-red-500 text-xs mt-1">{errors.images}</p>}
+            {errors.images && (
+              <p className="text-red-500 text-xs mt-1">{errors.images}</p>
+            )}
 
             {/* Image Previews */}
             {imagePreviews.length > 0 && (

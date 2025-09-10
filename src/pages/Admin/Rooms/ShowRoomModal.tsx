@@ -253,14 +253,14 @@ const ShowRoomModal: React.FC<ShowRoomModalProps> = ({
                         </span>
                         <p className="text-gray-600">{room.hotel.name}</p>
                       </div>
-                      {/* <div>
-                        <span className="font-medium text-gray-700">Location:</span>
-                        <p className="text-gray-600">{room.hotel.city.name}, {room.hotel.country.name}</p>
+                      <div>
+                        <span className="font-medium text-gray-700">Rating:</span>
+                        <p className="text-2xl font-bold text-yellow-600">{room.hotel.rating}</p>
                       </div>
                       <div>
-                        <span className="font-medium text-gray-700">Country Code:</span>
-                        <p className="text-2xl font-bold text-yellow-600">{room.hotel.country.iso2}</p>
-                      </div> */}
+                        <span className="font-medium text-gray-700">Description:</span>
+                        <p className="text-gray-600">{room.hotel.description}</p>
+                      </div>
                     </div>
                   </div>
 
@@ -310,26 +310,6 @@ const ShowRoomModal: React.FC<ShowRoomModalProps> = ({
                       </span>
                       <p className="text-gray-600">#{room.id}</p>
                     </div>
-                    <div>
-                      <span className="font-medium text-gray-700">
-                        Created:
-                      </span>
-                      <p className="text-gray-600 flex items-center gap-1">
-                        <FaCalendarAlt className="text-primary-500" />
-                        {formatDate(room.created_at)}
-                      </p>
-                    </div>
-                    {room.updated_at && (
-                      <div>
-                        <span className="font-medium text-gray-700">
-                          Last Updated:
-                        </span>
-                        <p className="text-gray-600 flex items-center gap-1">
-                          <FaCalendarAlt className="text-primary-500" />
-                          {formatDate(room.updated_at)}
-                        </p>
-                      </div>
-                    )}
                     <div>
                       <span className="font-medium text-gray-700">
                         Total Images:

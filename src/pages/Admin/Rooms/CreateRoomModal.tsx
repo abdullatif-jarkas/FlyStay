@@ -48,18 +48,55 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
   const fetchHotels = async () => {
     setLoadingHotels(true);
     try {
-      const res = await axios.get("http://127.0.0.1:8000/api/hotel", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          Accept: "application/json",
-        },
-      });
+      // أول صفحة
+      const firstPageResponse = await axios.get(
+        "http://127.0.0.1:8000/api/hotel?page=1",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: "application/json",
+          },
+        }
+      );
 
-      if (res.data.status === "success") {
-        setHotels(res.data.data);
+      if (firstPageResponse.data.status === "success") {
+        const firstPageData = firstPageResponse.data;
+        let allHotels = [...firstPageData.data];
+
+        // عدد الصفحات
+        const totalPages = firstPageData.pagination?.total_pages || 1;
+
+        if (totalPages > 1) {
+          const pagePromises: Promise<import("axios").AxiosResponse<any>>[] =
+            [];
+
+          for (let page = 2; page <= totalPages; page++) {
+            const pagePromise = axios.get(
+              `http://127.0.0.1:8000/api/hotel?page=${page}`,
+              {
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                  Accept: "application/json",
+                },
+              }
+            );
+            pagePromises.push(pagePromise);
+          }
+
+          const pageResponses = await Promise.all(pagePromises);
+
+          pageResponses.forEach((response) => {
+            if (response.data.status === "success") {
+              allHotels = [...allHotels, ...response.data.data];
+            }
+          });
+        }
+
+        setHotels(allHotels);
       }
     } catch (err) {
       console.error("Failed to fetch hotels:", err);
+      setHotels([]);
     } finally {
       setLoadingHotels(false);
     }

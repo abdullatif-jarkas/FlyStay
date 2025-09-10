@@ -68,9 +68,7 @@ const CreateFlightCabinModal: React.FC<CreateFlightCabinModalProps> = ({
           setLoadingProgress({ current: 1, total: totalPages });
 
           // Fetch remaining pages in parallel
-          const pagePromises: Promise<
-            import("axios").AxiosResponse<FlightsResponse>
-          >[] = [];
+          const pagePromises: Promise<import("axios").AxiosResponse<FlightsResponse>>[] = [];
 
           for (let page = 2; page <= totalPages; page++) {
             const pagePromise = axios.get<FlightsResponse>(

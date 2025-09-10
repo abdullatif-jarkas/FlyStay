@@ -103,18 +103,59 @@ const Users = () => {
 
   const fetchPermissions = useCallback(async () => {
     try {
-      const res = await axios.get(ROLE_PERMISSION_ENDPOINTS.PERMISSIONS, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          Accept: "application/json",
-        },
-      });
+      // أول شي منجيب الصفحة الأولى
+      const firstPageResponse = await axios.get(
+        `${ROLE_PERMISSION_ENDPOINTS.PERMISSIONS}?page=1`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: "application/json",
+          },
+        }
+      );
 
-      if (res.data.status === "success") {
-        setAvailablePermissions(res.data.data);
+      if (firstPageResponse.data.status === "success") {
+        const firstPageData = firstPageResponse.data;
+        let allPermissions = [...firstPageData.data];
+
+        // نجيب عدد الصفحات الكاملة
+        const totalPages = firstPageData.pagination?.total_pages || 1;
+
+        if (totalPages > 1) {
+          // منجهز كل الطلبات لباقي الصفحات
+          const pagePromises: Promise<import("axios").AxiosResponse<any>>[] =
+            [];
+
+          for (let page = 2; page <= totalPages; page++) {
+            const pagePromise = axios.get(
+              `${ROLE_PERMISSION_ENDPOINTS.PERMISSIONS}?page=${page}`,
+              {
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                  Accept: "application/json",
+                },
+              }
+            );
+            pagePromises.push(pagePromise);
+          }
+
+          // مننتظر كل الطلبات مع بعض
+          const pageResponses = await Promise.all(pagePromises);
+
+          // مندمج النتائج كلها
+          pageResponses.forEach((response) => {
+            if (response.data.status === "success") {
+              allPermissions = [...allPermissions, ...response.data.data];
+            }
+          });
+        }
+
+        // منحفظ كل الصلاحيات بالـ state
+        setAvailablePermissions(allPermissions);
       }
     } catch (err: any) {
       console.error("Error fetching permissions:", err);
+      setAvailablePermissions([]);
     }
   }, [token]);
 
@@ -210,39 +251,6 @@ const Users = () => {
         ),
         enableSorting: true,
       },
-      // {
-      //   header: "Direct Permissions",
-      //   accessorFn: (row) => row.permissions?.length || 0,
-      //   id: "permissionsCount",
-      //   cell: ({ row }) => (
-      //     <div className="flex flex-wrap gap-1">
-      //       {row.original.permissions?.slice(0, 3).map((permission) => (
-      //         <div
-      //           key={permission.id}
-      //           className="group relative inline-flex items-center px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full hover:bg-green-200 transition-colors"
-      //         >
-      //           <span>{permission.name}</span>
-      //           <button
-      //             onClick={(e) => {
-      //               e.stopPropagation();
-      //               handleRemovePermission(row.original, permission);
-      //             }}
-      //             className="ml-1 opacity-0 group-hover:opacity-100 transition-opacity text-green-600 hover:text-red-600"
-      //             title={`Remove permission: ${permission.name}`}
-      //           >
-      //             <FaTimes className="w-3 h-3" />
-      //           </button>
-      //         </div>
-      //       ))}
-      //       {(row.original.permissions?.length || 0) > 3 && (
-      //         <span className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full">
-      //           +{(row.original.permissions?.length || 0) - 3} more
-      //         </span>
-      //       )}
-      //     </div>
-      //   ),
-      //   enableSorting: true,
-      // },
       {
         header: "Actions",
         id: "actions",

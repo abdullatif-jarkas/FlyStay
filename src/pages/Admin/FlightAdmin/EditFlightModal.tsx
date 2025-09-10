@@ -70,15 +70,59 @@ const EditFlightModal: React.FC<EditFlightModalProps> = ({
 
   const fetchAirports = async () => {
     try {
-      const res = await axios.get("http://127.0.0.1:8000/api/get-all-airports", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          Accept: "application/json",
-        },
-      });
-      setAirports(res.data.data || []);
+      // أول شي منجيب الصفحة الأولى
+      const firstPageResponse = await axios.get(
+        "http://127.0.0.1:8000/api/get-all-airports?page=1",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: "application/json",
+          },
+        }
+      );
+
+      if (firstPageResponse.data.status === "success") {
+        const firstPageData = firstPageResponse.data;
+        let allAirports = [...firstPageData.data];
+
+        // نجيب عدد الصفحات الكاملة
+        const totalPages = firstPageData.pagination?.total_pages || 1;
+
+        if (totalPages > 1) {
+          // منجهز طلبات باقي الصفحات
+          const pagePromises: Promise<import("axios").AxiosResponse<any>>[] =
+            [];
+
+          for (let page = 2; page <= totalPages; page++) {
+            const pagePromise = axios.get(
+              `http://127.0.0.1:8000/api/get-all-airports?page=${page}`,
+              {
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                  Accept: "application/json",
+                },
+              }
+            );
+            pagePromises.push(pagePromise);
+          }
+
+          // مننتظر كل الصفحات
+          const pageResponses = await Promise.all(pagePromises);
+
+          // مندمج النتائج
+          pageResponses.forEach((response) => {
+            if (response.data.status === "success") {
+              allAirports = [...allAirports, ...response.data.data];
+            }
+          });
+        }
+
+        // منخزن كل الـ airports
+        setAirports(allAirports);
+      }
     } catch (error) {
       console.error("Error fetching airports:", error);
+      setAirports([]);
       setError("Failed to load airports");
     }
   };
@@ -91,13 +135,17 @@ const EditFlightModal: React.FC<EditFlightModalProps> = ({
     setError("");
 
     try {
-      await axios.put(`http://127.0.0.1:8000/api/flight/${flight.id}`, formData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
-      });
+      await axios.put(
+        `http://127.0.0.1:8000/api/flight/${flight.id}`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
       onSuccess();
       onClose();
@@ -108,9 +156,11 @@ const EditFlightModal: React.FC<EditFlightModalProps> = ({
     }
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       [name]: value,
     }));

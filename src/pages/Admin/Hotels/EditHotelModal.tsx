@@ -43,22 +43,55 @@ const EditHotelModal: React.FC<EditHotelModalProps> = ({
   const fetchCities = async () => {
     setLoadingCities(true);
     try {
-      const response = await axios.get(
-        "http://127.0.0.1:8000/api/get-all-cities",
+      // أول صفحة
+      const firstPageResponse = await axios.get(
+        "http://127.0.0.1:8000/api/get-all-cities?page=1&per_page=100",
         {
           headers: {
             Authorization: `Bearer ${token}`,
             Accept: "application/json",
           },
-          params: { per_page: 100 }, // Get more cities for dropdown
         }
       );
 
-      if (response.data.status === "success") {
-        setCities(response.data.data);
+      if (firstPageResponse.data.status === "success") {
+        const firstPageData = firstPageResponse.data;
+        let allCities = [...firstPageData.data];
+
+        // عدد الصفحات
+        const totalPages = firstPageData.pagination?.total_pages || 1;
+
+        if (totalPages > 1) {
+          const pagePromises: Promise<import("axios").AxiosResponse<any>>[] =
+            [];
+
+          for (let page = 2; page <= totalPages; page++) {
+            const pagePromise = axios.get(
+              `http://127.0.0.1:8000/api/get-all-cities?page=${page}&per_page=100`,
+              {
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                  Accept: "application/json",
+                },
+              }
+            );
+            pagePromises.push(pagePromise);
+          }
+
+          const pageResponses = await Promise.all(pagePromises);
+
+          pageResponses.forEach((response) => {
+            if (response.data.status === "success") {
+              allCities = [...allCities, ...response.data.data];
+            }
+          });
+        }
+
+        setCities(allCities);
       }
     } catch (err) {
       console.error("Failed to fetch cities:", err);
+      setCities([]);
     } finally {
       setLoadingCities(false);
     }

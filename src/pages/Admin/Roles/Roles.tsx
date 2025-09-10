@@ -2,10 +2,7 @@ import axios from "axios";
 import { useEffect, useState, useMemo, useCallback } from "react";
 import { ColumnDef, SortingState } from "@tanstack/react-table";
 import { FaPlus, FaKey } from "react-icons/fa";
-import {
-  TableContainer,
-  ActionButtons,
-} from "../../../components/ui/table";
+import { TableContainer, ActionButtons } from "../../../components/ui/table";
 import CreateRoleModal from "./CreateRoleModal";
 import EditRoleModal from "./EditRoleModal";
 import ShowRoleModal from "./ShowRoleModal";
@@ -72,18 +69,59 @@ const Roles = () => {
 
   const fetchPermissions = useCallback(async () => {
     try {
-      const res = await axios.get(ROLE_PERMISSION_ENDPOINTS.PERMISSIONS, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          Accept: "application/json",
-        },
-      });
+      // أول شي منجيب الصفحة الأولى
+      const firstPageResponse = await axios.get(
+        `${ROLE_PERMISSION_ENDPOINTS.PERMISSIONS}?page=1`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: "application/json",
+          },
+        }
+      );
 
-      if (res.data.status === "success") {
-        setAvailablePermissions(res.data.data);
+      if (firstPageResponse.data.status === "success") {
+        const firstPageData = firstPageResponse.data;
+        let allPermissions = [...firstPageData.data];
+
+        // نجيب عدد الصفحات الكاملة
+        const totalPages = firstPageData.pagination?.total_pages || 1;
+
+        if (totalPages > 1) {
+          // منجهز كل الطلبات لباقي الصفحات
+          const pagePromises: Promise<import("axios").AxiosResponse<any>>[] =
+            [];
+
+          for (let page = 2; page <= totalPages; page++) {
+            const pagePromise = axios.get(
+              `${ROLE_PERMISSION_ENDPOINTS.PERMISSIONS}?page=${page}`,
+              {
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                  Accept: "application/json",
+                },
+              }
+            );
+            pagePromises.push(pagePromise);
+          }
+
+          // مننتظر كل الطلبات مع بعض
+          const pageResponses = await Promise.all(pagePromises);
+
+          // مندمج النتائج كلها
+          pageResponses.forEach((response) => {
+            if (response.data.status === "success") {
+              allPermissions = [...allPermissions, ...response.data.data];
+            }
+          });
+        }
+
+        // منحفظ كل الصلاحيات بالـ state
+        setAvailablePermissions(allPermissions);
       }
     } catch (err: any) {
       console.error("Error fetching permissions:", err);
+      setAvailablePermissions([]);
     }
   }, [token]);
 
@@ -203,13 +241,13 @@ const Roles = () => {
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Roles Management</h1>
-        <button
+        {/* <button
           onClick={() => setIsCreateModalOpen(true)}
           className="flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 transition-colors"
         >
           <FaPlus />
           Create New Role
-        </button>
+        </button> */}
       </div>
 
       {error && (

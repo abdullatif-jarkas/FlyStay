@@ -7,7 +7,6 @@ import {
   FaSpinner,
   FaExclamationTriangle,
   FaUsers,
-  FaDollarSign,
   FaArrowLeft,
   FaImage,
   FaCalendarAlt,
@@ -24,6 +23,7 @@ import { useBooking, HotelBookingAPI } from "../../contexts/BookingContext";
 import FavoriteButton from "../../components/Favorites/FavoriteButton";
 import { useAppDispatch } from "../../store/hooks";
 import { setActiveSection } from "../../store/sectionSlice";
+import { FaMoneyBill } from "react-icons/fa6";
 
 // API Response interface for hotel booking
 interface HotelBookingResponse {
@@ -329,7 +329,7 @@ const RoomDetails = () => {
                   <div className="flex items-center justify-between">
                     <span className="text-gray-600">Price per night:</span>
                     <div className="flex items-center">
-                      <FaDollarSign className="mr-2 text-green-500" />
+                      <FaMoneyBill className="mr-2 text-green-500" />
                       <span className="font-bold text-green-600 text-lg">
                         {formatPrice(room.price_per_night)}
                       </span>

@@ -94,13 +94,13 @@ const DashLayout = () => {
               {/* 2. User Management */}
               {role === "admin" && (
                 <SubMenu icon={<FaUsersCog />} label="User Management">
-                  <MenuItem
+                  {/* <MenuItem
                     icon={<FaKey />}
                     onClick={() => navigate("/admin/permissions")}
                     active={currentPath === "/admin/permissions"}
                   >
                     Permissions
-                  </MenuItem>
+                  </MenuItem> */}
                   <MenuItem
                     icon={<FaUsersCog />}
                     onClick={() => navigate("/admin/roles")}
@@ -135,7 +135,7 @@ const DashLayout = () => {
                   >
                     Flight Cabins
                   </MenuItem>
-                  <MenuItem
+                  {/* <MenuItem
                     icon={<FaPlaneDeparture />}
                     onClick={() => navigate("/admin/airports")}
                     active={currentPath === "/admin/airports"}
@@ -148,7 +148,7 @@ const DashLayout = () => {
                     active={currentPath === "/admin/cities"}
                   >
                     Cities
-                  </MenuItem>
+                  </MenuItem> */}
                 </SubMenu>
               )}
               {/* 4. Accommodation */}
