@@ -82,15 +82,16 @@ const DashLayout = () => {
               }}
             >
               {/* 1. General */}
-              <MenuItem
-                icon={<FaTachometerAlt />}
-                onClick={() => navigate("/admin")}
-                active={currentPath === "/admin"}
-                title="Dashboard"
-              >
-                Dashboard
-              </MenuItem>
-
+              {role === "admin" && (
+                <MenuItem
+                  icon={<FaTachometerAlt />}
+                  onClick={() => navigate("/admin")}
+                  active={currentPath === "/admin"}
+                  title="Dashboard"
+                >
+                  Dashboard
+                </MenuItem>
+              )}
               {/* 2. User Management */}
               {role === "admin" && (
                 <SubMenu icon={<FaUsersCog />} label="User Management">
@@ -152,7 +153,7 @@ const DashLayout = () => {
                 </SubMenu>
               )}
               {/* 4. Accommodation */}
-              {(role === "hotel_agent" || role === "admin") && (
+              {(role === "hotel_agent" || role === "admin" || role === "hotel_agent") && (
                 <SubMenu icon={<FaHotel />} label="Accommodation">
                   <MenuItem
                     icon={<FaHotel />}
@@ -172,26 +173,28 @@ const DashLayout = () => {
               )}
 
               {/* 5. Booking Management */}
-              <SubMenu icon={<FaCalendarCheck />} label="Bookings">
-                {(role === "flight_agent" || role === "admin") && (
-                  <MenuItem
-                    icon={<FaTicketAlt />}
-                    onClick={() => navigate("/admin/flight-bookings")}
-                    active={currentPath === "/admin/flight-bookings"}
-                  >
-                    Flight Bookings
-                  </MenuItem>
-                )}
-                {(role === "hotel_agent" || role === "admin") && (
-                  <MenuItem
-                    icon={<FaHotel />}
-                    onClick={() => navigate("/admin/hotel-bookings")}
-                    active={currentPath === "/admin/hotel-bookings"}
-                  >
-                    Hotel Bookings
-                  </MenuItem>
-                )}
-              </SubMenu>
+              {(role === "flight_agent" || role === "admin") && (
+                <SubMenu icon={<FaCalendarCheck />} label="Bookings">
+                  {(role === "flight_agent" || role === "admin") && (
+                    <MenuItem
+                      icon={<FaTicketAlt />}
+                      onClick={() => navigate("/admin/flight-bookings")}
+                      active={currentPath === "/admin/flight-bookings"}
+                    >
+                      Flight Bookings
+                    </MenuItem>
+                  )}
+                  {(role === "hotel_agent" || role === "admin") && (
+                    <MenuItem
+                      icon={<FaHotel />}
+                      onClick={() => navigate("/admin/hotel-bookings")}
+                      active={currentPath === "/admin/hotel-bookings"}
+                    >
+                      Hotel Bookings
+                    </MenuItem>
+                  )}
+                </SubMenu>
+              )}
 
               {/* 6. Finance Management */}
               {(role === "finance_officer" || role === "admin") && (

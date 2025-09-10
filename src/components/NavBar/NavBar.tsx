@@ -31,7 +31,6 @@ const NavBar = ({ isAuth }: { isAuth?: boolean }) => {
   const role = useAppSelector((state) => state.user.role);
 
   useEffect(() => {
-    
     const token = localStorage.getItem("token");
     setIsLoggedIn(!!token);
   }, []);
@@ -96,18 +95,27 @@ const NavBar = ({ isAuth }: { isAuth?: boolean }) => {
             {/* Dashboard */}
             {!(role === "customer" || role === null) && (
               <Link
-                to="/admin"
+                to={
+                  role === "flight_agent"
+                    ? "/admin/flights"
+                    : role === "hotel_agent"
+                    ? "/admin/hotels"
+                    : role === "finance_officer"
+                    ? "/admin/payments"
+                    : "/admin"
+                }
                 className="text-primary-500 flex items-center gap-1"
               >
                 <MdDashboard className="text-xl" />
                 <span className="hidden md:inline">Dashboard</span>
               </Link>
             )}
+
             {/* User account with dropdown */}
             <div className="relative" ref={dropdownRef}>
               <button
                 onClick={() => {
-                  setShowUserDropdown(!showUserDropdown)
+                  setShowUserDropdown(!showUserDropdown);
                 }}
                 className="cursor-pointer flex items-center gap-2"
               >
@@ -119,9 +127,7 @@ const NavBar = ({ isAuth }: { isAuth?: boolean }) => {
                 </div>
               </button>
 
-              {showUserDropdown && (
-                <UserDropdown onLogout={handleLogout} />
-              )}
+              {showUserDropdown && <UserDropdown onLogout={handleLogout} />}
             </div>
           </div>
         </nav>
